@@ -1,0 +1,30 @@
+#pragma once
+
+#define NOMINMAX
+#define NOMCX
+#define NOKANJI
+#define NOWH
+#define NOWINOFFSETS
+#define NOCOMM
+#define NOHELP
+#define NOPROFILER
+#define NODEFERWINDOWPOS
+#define NOMEMMGR
+#define NOMETAFILE
+#define NOOPENFILE
+#define NOSCROLL
+#define NOSERVICE
+#define NOSOUND
+#define NOTEXTMETRIC
+#define NOCLIPBOARD
+#define NOCOLOR
+#define NODRAWTEXT
+#define NOKERNEL
+#define NONLS
+#define NOGDICAPMASKS
+#define NOSYSMETRICS
+#define NORASTEROPS
+#define OEMRESOURCE
+#define NOATOM
+
+#include <Windows.h>

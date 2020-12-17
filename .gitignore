@@ -1,0 +1,11 @@
+## Visual Studio
+.vs/
+x64/
+x86/
+
+
+## Engine
+Engine/EngineLogs/
+Engine/Shaders/
+Engine/Resources/
+Engine/Scenes/

@@ -1,0 +1,56 @@
+#pragma once
+#include "Win.h"
+#include "../thirdparty/imgui/imgui.h"
+#include "../thirdparty/imgui/imgui_impl_dx11.h"
+#include "../thirdparty/imgui/imgui_impl_win32.h"
+#include "EditorWindowBase.h"
+#include <DirectXMath.h>
+#include <string>
+#include <vector>
+#include <memory>
+#include <type_traits>
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+class Editor
+{
+public:
+	class Camera
+	{
+		friend Editor;
+	private:
+		static void Update();
+	public:
+		inline static DirectX::XMVECTOR position = DirectX::XMVectorZero();
+		inline static DirectX::XMMATRIX TransformMatrix = DirectX::XMMatrixIdentity();
+		inline static float movementSpeed = 10.0f;
+		inline static float rotationSpeed = 1.5f;
+
+		//Angles are in degrees.
+		inline static float pitch = 0.0f;
+		inline static float yaw = 0.0f;
+
+		inline static bool isChanged = true;
+	};
+public:
+	Editor(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice);
+	~Editor();
+	static LRESULT EditorInputHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void Update();
+	static bool WantCaptureKeyboard();
+	static bool WantCaptureMouse();
+
+	template<class WindowType>
+	inline static WindowType* GetWindow()
+	{
+		for (const auto& window : windows)
+		{
+			if (dynamic_cast<WindowType*>(window.get()) != nullptr)
+				return (WindowType*)window.get();
+		}
+		return nullptr;
+	}
+private:
+	inline static ImGuiIO* imguiIO = nullptr;
+	inline static std::vector<std::unique_ptr<EditorWindowBase>> windows;
+};
