@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "EngineException.h"
 #include "Resources.h"
-#include "Material.h"
+#include "Phong_Material.h"
 
 #include <filesystem>
 
@@ -174,7 +174,7 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 
 			if (isMaterialAlreadyExist == materials.end())
 			{				
-				std::unique_ptr<Material> newMaterial = std::make_unique<Material>(mat->GetName().C_Str());
+				std::unique_ptr<Phong_Material> newMaterial = std::make_unique<Phong_Material>(mat->GetName().C_Str());
 				
 				////////// DIFFUSE //////////
 				aiColor4D diffuseColor;

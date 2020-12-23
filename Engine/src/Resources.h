@@ -17,42 +17,14 @@ class Resources
 	friend Model;
 	friend class EditorResourceSelectionWindow;
 public:
-	static Texture* FindTexture(std::string file)
-	{
-		const auto& texture = Textures.find(file);
-		
-		if (texture == Textures.end())
-			return nullptr;
-		else
-			return texture->second.get();
-	}
-	static VertexShader* FindVertexShader(std::string file)
-	{
-		const auto& vs = VertexShaders.find(file);
+	static Texture* FindTexture(std::string file);
 
-		if (vs == VertexShaders.end())
-			return nullptr;
-		else
-			return vs->second.get();
-	}
-	static PixelShader* FindPixelShader(std::string file)
-	{
-		const auto& ps = PixelShaders.find(file);
+	static VertexShader* FindVertexShader(std::string file);
 
-		if (ps == PixelShaders.end())
-			return nullptr;
-		else
-			return ps->second.get();
-	}
-	static Model* FindModel(std::string file)
-	{
-		const auto& model = Models.find(file);
+	static PixelShader* FindPixelShader(std::string file);
 
-		if (model == Models.end())
-			return nullptr;
-		else
-			return model->second.get();
-	}
+	static Model* FindModel(std::string file);
+
 private:
 	static void Init();
 private:

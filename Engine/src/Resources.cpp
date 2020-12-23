@@ -74,3 +74,55 @@ void Resources::Init()
 
 	ENGINE_LOG(ENGINE_INFO, "Resources successfully loaded.");
 }
+
+Texture* Resources::FindTexture(std::string file)
+{
+	const auto& texture = Textures.find(file);
+
+	if (texture == Textures.end())
+		return nullptr;
+	else
+		return texture->second.get();
+}
+
+VertexShader* Resources::FindVertexShader(std::string file)
+{
+#ifndef NDEBUG
+	const std::string shaderDir = "Shaders\\Debug\\VS_";
+#else
+	const std::string shaderDir = "Shaders\\Release\\VS_";
+#endif
+
+	const auto& vs = VertexShaders.find(shaderDir + file);
+
+	if (vs == VertexShaders.end())
+		return nullptr;
+	else
+		return vs->second.get();
+}
+
+PixelShader* Resources::FindPixelShader(std::string file)
+{
+#ifndef NDEBUG
+	const std::string shaderDir = "Shaders\\Debug\\PS_";
+#else
+	const std::string shaderDir = "Shaders\\Release\\PS_";
+#endif
+
+	const auto& ps = PixelShaders.find(shaderDir + file);
+
+	if (ps == PixelShaders.end())
+		return nullptr;
+	else
+		return ps->second.get();
+}
+
+Model* Resources::FindModel(std::string file)
+{
+	const auto& model = Models.find(file);
+
+	if (model == Models.end())
+		return nullptr;
+	else
+		return model->second.get();
+}

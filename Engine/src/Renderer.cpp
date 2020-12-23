@@ -4,6 +4,7 @@
 #include "EngineException.h"
 #include "Light.h"
 #include "EngineAssert.h"
+#include "Phong_Material.h"
 
 void Renderer::Start()
 {	
@@ -21,15 +22,11 @@ void Renderer::Update()
 
 		//Updating topology
 		Graphics::pDeviceContext->IASetPrimitiveTopology(topology);
-
-		//Updating light sources for this entity
-		UpdateDirectionalLightBuffer();
-		UpdatePointLightBuffer();
 		
 		//Rendering
 		for (int i = 0; i < materials.size() && i < mesh->GetSubMeshCount(); i++)
 		{
-			(materials[i]->*(materials[i]->Bind))(&mesh->GetSubMeshes()[i]);
+			materials[i]->Bind(&mesh->GetSubMeshes()[i],this);
 			Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[i].GetIndexCount(), 0u, 0u);
 		}
 	}
@@ -51,7 +48,7 @@ void Renderer::SetMesh(const Mesh* mesh)
 	materials.reserve(mesh->GetSubMeshCount());
 
 	for (int i = 0; i < mesh->GetSubMeshCount(); i++)
-		materials.push_back(Material::GetDefaultMaterial());
+		materials.push_back(Phong_Material::GetDefaultMaterial());
 }
 
 const Mesh* Renderer::GetMesh() const
@@ -78,7 +75,7 @@ const std::vector<const Material*>& Renderer::GetMaterials() const
 	return materials;
 }
 
-void Renderer::UpdateDirectionalLightBuffer()
+void Renderer::UpdateDirectionalLightBuffer() const
 {
 	struct DirectionalLights_TO_GPU
 	{
@@ -121,7 +118,7 @@ void Renderer::UpdateDirectionalLightBuffer()
 	directionalLightBuffer.ChangeData(&toGPU);
 }
 
-void Renderer::UpdatePointLightBuffer()
+void Renderer::UpdatePointLightBuffer() const
 {
 	struct PointLights_TO_GPU
 	{

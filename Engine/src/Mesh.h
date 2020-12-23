@@ -14,7 +14,7 @@ class Mesh : public ResourceBase
 {
 	friend class Model;
 	friend class Material;
-private:
+public:
 	class SubMesh
 	{
 	public:

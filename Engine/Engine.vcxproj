@@ -179,6 +179,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Phong_Material.cpp" />
     <ClCompile Include="src\D3DBase.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\EngineException.cpp" />
@@ -206,6 +207,7 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Phong_Material.h" />
     <ClInclude Include="src\EditorMaterialEditWindow.h" />
     <ClInclude Include="src\EditorResourceSelectionWindow.h" />
     <ClInclude Include="src\Material.h" />
@@ -223,7 +225,6 @@
     <ClInclude Include="src\Entity.h" />
     <ClInclude Include="src\Graphics.h" />
     <ClInclude Include="src\Model.h" />
-    <ClInclude Include="Scripts\IncludeScripts.h" />
     <ClInclude Include="src\IndexBuffer.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Log.h" />
@@ -253,6 +254,12 @@
     <None Include="src\Shaders\Light.hlsl">
       <FileType>Document</FileType>
     </None>
+    <FxCompile Include="src\Shaders\PS_Phong_D_N.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="src\Shaders\PS_Phong_D_S_N.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -278,6 +285,9 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_N.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="src\Shaders\PS_Phong_S.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

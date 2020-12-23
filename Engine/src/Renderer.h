@@ -11,6 +11,8 @@
 
 class Renderer final: public Component
 {
+	friend class Phong_Material;
+
 #ifdef EDITOR
 	friend class EditorEntityWindow;
 #endif
@@ -32,8 +34,8 @@ public:
 	
 	const std::vector<const Material*>& GetMaterials() const;
 private:
-	void UpdateDirectionalLightBuffer();
-	void UpdatePointLightBuffer();
+	void UpdateDirectionalLightBuffer() const;
+	void UpdatePointLightBuffer() const;
 	void UpdateTransformBuffer();
 
 public:

@@ -1,0 +1,287 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <FxCompile Include="src\Shaders\PS_Phong.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_D.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_D_S.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_D_S_N.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_S.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\VS_Phong_D_S.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\VS_Phong.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\VS_Phong_D_S_N.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_N.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Phong_D_N.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Input.cpp" />
+    <ClCompile Include="src\Editor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_demo.cpp">
+      <Filter>thirdparty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui.cpp">
+      <Filter>thirdparty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp">
+      <Filter>thirdparty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_impl_dx11.cpp">
+      <Filter>thirdparty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_impl_win32.cpp">
+      <Filter>thirdparty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp">
+      <Filter>thirdparty\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\D3DBase.cpp">
+      <Filter>Graphics\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Entity.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EngineException.cpp">
+      <Filter>LOG</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Light.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MainWindow.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Log.cpp">
+      <Filter>LOG</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Graphics\D3D</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Transform.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\WinMain.cpp">
+      <Filter>Win32</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Material.cpp">
+      <Filter>Graphics\Material System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Phong_Material.cpp">
+      <Filter>Graphics\Material System</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Input.h" />
+    <ClInclude Include="src\Random.h" />
+    <ClInclude Include="src\Time.h" />
+    <ClInclude Include="src\Editor.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorEntityWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorMaterialEditWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorResourceSelectionWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorSceneHierarchyWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorWindowBase.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imconfig.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imgui.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imgui_impl_dx11.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imgui_impl_win32.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imgui_internal.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imstb_textedit.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ConstantBuffer.h">
+      <Filter>Graphics\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="src\D3DBase.h">
+      <Filter>Graphics\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Component.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Entity.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Graphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imstb_truetype.h">
+      <Filter>thirdparty\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EngineAssert.h">
+      <Filter>LOG</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EngineException.h">
+      <Filter>LOG</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IndexBuffer.h">
+      <Filter>Graphics\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Light.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MainWindow.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Log.h">
+      <Filter>LOG</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResourceBase.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Resources.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Graphics\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Transform.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Win.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\stb_image.h">
+      <Filter>thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VertexBuffer.h">
+      <Filter>Graphics\D3D</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Material.h">
+      <Filter>Graphics\Material System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Phong_Material.h">
+      <Filter>Graphics\Material System</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
+      <Filter>thirdparty\assimp</Filter>
+    </None>
+    <None Include="thirdparty\assimp\Release\assimp-vc142-mt.dll">
+      <Filter>thirdparty\assimp</Filter>
+    </None>
+    <None Include="src\Shaders\Light.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Editor">
+      <UniqueIdentifier>{c1e5cb56-3247-4a85-8887-090f681d0d20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdparty">
+      <UniqueIdentifier>{954e90f6-260e-4fc8-a4d4-ca802bf1057b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdparty\imgui">
+      <UniqueIdentifier>{c77b751b-01a3-491d-8efc-a246c295736e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="thirdparty\assimp">
+      <UniqueIdentifier>{e7a4b873-fdc8-4dc0-a2c8-520cd8e1b55e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{c1955c10-4962-478c-be27-6da200f4fc38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\D3D">
+      <UniqueIdentifier>{c12efcb2-b998-4067-bfa9-78b4c5b04607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{5ffcc7e5-bada-47d6-b7d2-4e5d437e03ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LOG">
+      <UniqueIdentifier>{240c6192-0007-44e7-a3ee-e57f4b86a018}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Win32">
+      <UniqueIdentifier>{8fabd4a3-c187-4ab9-b8a1-47b40aac4bac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{fb1a55d9-7324-44f1-a026-ef9e18093e9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{2238ee21-0873-479e-b441-a6d34acbda80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{8d18aa71-3daa-4fc3-aa6c-46e6eed0a0ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Material System">
+      <UniqueIdentifier>{fd980ee7-eb7a-4c07-b3f6-1cc3e8e87cdd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
