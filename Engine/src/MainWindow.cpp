@@ -88,7 +88,6 @@ void MainWindow::HideCursor()
 {
 	Input::DeltaX = 0;
 	Input::DeltaY = 0;
-	SetCursorToMiddle();
 	while (::ShowCursor(FALSE) > -1);
 	isCursorHidden = true;
 }
