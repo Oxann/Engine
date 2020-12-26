@@ -2,6 +2,7 @@
 #include "EngineAssert.h"
 #include "Renderer.h"
 #include "Resources.h"
+#include "Unlit_Material.h"
 
 std::map<unsigned char,Scene> Scene::Scenes;
 Scene* Scene::ActiveScene;
@@ -11,13 +12,25 @@ void Scene::Init()
 	Scene::CreateNewScene(1, "first scene");
 	for (int i = 0; i < 1; i++)
 	{
-		Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
-		Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
-		Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
+		Scene::GetScene(1)->NewEntity(Entity::FindPrefab("sponza.obj"));
 	}
-	Scene::GetScene(1)->NewEntity("key")->AddComponent<PointLight>()->intensity = 1.0f;
-	Scene::GetScene(1)->NewEntity("fill")->AddComponent<PointLight>()->intensity = 0.8f;
-	Scene::GetScene(1)->NewEntity("back")->AddComponent<PointLight>()->intensity = 0.3f;
+	Scene::GetScene(1)->NewEntity("ligth1")->AddComponent<PointLight>()->intensity = 1.0f;
+	Renderer* renderer = Scene::GetScene(1)->GetEntity("ligth1")->AddComponent<Renderer>();
+	renderer->SetMesh(Mesh::Sphere);
+	renderer->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
+	renderer->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
+
+	Scene::GetScene(1)->NewEntity("ligth2")->AddComponent<PointLight>()->intensity = 1.0f;
+	Renderer* renderer2 = Scene::GetScene(1)->GetEntity("ligth2")->AddComponent<Renderer>();
+	renderer2->SetMesh(Mesh::Sphere);
+	renderer2->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
+	renderer2->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
+
+	Scene::GetScene(1)->NewEntity("ligth3")->AddComponent<PointLight>()->intensity = 1.0f;
+	Renderer* renderer3 = Scene::GetScene(1)->GetEntity("ligth3")->AddComponent<Renderer>();
+	renderer3->SetMesh(Mesh::Sphere);
+	renderer3->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
+	renderer3->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
 	Scene::LoadScene(1);
 }
 

@@ -18,8 +18,6 @@ void Renderer::Update()
 {
 	if (mesh)
 	{
-		UpdateTransformBuffer();
-
 		//Updating topology
 		Graphics::pDeviceContext->IASetPrimitiveTopology(topology);
 		
@@ -169,7 +167,29 @@ void Renderer::UpdatePointLightBuffer() const
 	pointLightBuffer.ChangeData(&toGPU);
 }
 
-void Renderer::UpdateTransformBuffer()
+void Renderer::UpdateTransformBuffer_Only_MVP() const
+{
+	static DirectX::XMMATRIX MVP;
+	MVP = DirectX::XMMatrixTranspose(
+				DirectX::XMMatrixMultiply(
+					DirectX::XMMatrixMultiply(transform->GetWorldMatrix(), *Graphics::viewMatrix),
+					Graphics::projectionMatrix));
+
+	//First time initialization
+	static VS_ConstantBuffer<DirectX::XMMATRIX> TransformBuffer = {
+		&MVP,
+		1u,
+		0u,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		false
+	};
+
+	TransformBuffer.ChangeData(&MVP);
+	TransformBuffer.BindPipeline();
+}
+
+void Renderer::UpdateTransformBuffer() const
 {
 	//Transform data
 	struct TransformData
@@ -194,9 +214,10 @@ void Renderer::UpdateTransformBuffer()
 		0u,
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
-		true
+		false
 	};
 		
 	TransformBuffer.ChangeData(&entityTransformData);
+	TransformBuffer.BindPipeline();
 }
 

@@ -31,6 +31,18 @@
     <FxCompile Include="src\Shaders\PS_Phong_D_N.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Unlit.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Unlit_T.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\VS_Unlit.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\VS_Unlit_T.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Input.cpp" />
@@ -107,6 +119,9 @@
       <Filter>Graphics\Material System</Filter>
     </ClCompile>
     <ClCompile Include="src\Phong_Material.cpp">
+      <Filter>Graphics\Material System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Unlit_Material.cpp">
       <Filter>Graphics\Material System</Filter>
     </ClCompile>
   </ItemGroup>
@@ -229,6 +244,9 @@
       <Filter>Graphics\Material System</Filter>
     </ClInclude>
     <ClInclude Include="src\Phong_Material.h">
+      <Filter>Graphics\Material System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Unlit_Material.h">
       <Filter>Graphics\Material System</Filter>
     </ClInclude>
   </ItemGroup>

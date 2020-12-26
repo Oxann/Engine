@@ -12,6 +12,7 @@
 class Renderer final: public Component
 {
 	friend class Phong_Material;
+	friend class Unlit_Material;
 
 #ifdef EDITOR
 	friend class EditorEntityWindow;
@@ -36,8 +37,8 @@ public:
 private:
 	void UpdateDirectionalLightBuffer() const;
 	void UpdatePointLightBuffer() const;
-	void UpdateTransformBuffer();
-
+	void UpdateTransformBuffer() const;
+	void UpdateTransformBuffer_Only_MVP() const;
 public:
 	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 private:

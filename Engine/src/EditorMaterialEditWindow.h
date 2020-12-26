@@ -1,6 +1,7 @@
 #pragma once
 #include "Editor.h"
 #include "Phong_Material.h"
+#include "Unlit_Material.h"
 
 #include <typeindex>
 #include <typeinfo>
@@ -14,6 +15,7 @@ public:
 		editorRSW = Editor::GetWindow<EditorResourceSelectionWindow>();
 		
 		materialEdits.insert({typeid(Phong_Material),&EditorMaterialEditWindow::EditPhong});
+		materialEdits.insert({typeid(Unlit_Material),&EditorMaterialEditWindow::EditUnlit});
 	}
 
 	void Update()
@@ -84,7 +86,7 @@ private:
 				});
 		}
 
-		//Diffuse map edit
+		//Normal map edit
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Normal Map -> %s", phongMaterial->normalMap ? phongMaterial->normalMap->GetFileName().c_str() : "No texture.");
 		ImGui::SameLine();
@@ -94,6 +96,31 @@ private:
 				phongMaterial->normalMap,
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetNormalMap(static_cast<const Texture*>(newResource));
+				});
+		}
+	}
+
+	void EditUnlit(Material* material)
+	{
+		Unlit_Material* unlitMaterial = static_cast<Unlit_Material*>(material);
+
+		//Diffuse color edit
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Color ");
+		ImGui::SameLine();
+		ImGui::ColorEdit4("##color", reinterpret_cast<float*>(&unlitMaterial->color));
+
+
+		//Texture edit
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Texture -> %s", unlitMaterial->texture ? unlitMaterial->texture->GetFileName().c_str() : "No Texture.");
+		ImGui::SameLine();
+		if (ImGui::RadioButton("##texture", true))
+		{
+			editorRSW->PopUp(EditorResourceSelectionWindow::Type::Texture,
+				unlitMaterial->texture,
+				[unlitMaterial](const ResourceBase* newResource) {
+					unlitMaterial->SetTexture(static_cast<const Texture*>(newResource));
 				});
 		}
 	}

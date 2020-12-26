@@ -13,7 +13,7 @@ public:
 	void Bind(const Mesh::SubMesh* subMesh, const Renderer* renderer) const override;
 
 	//Diffuse
-	void SetDiffuseColor(DirectX::XMFLOAT4 color);
+	void SetDiffuseColor(const DirectX::XMFLOAT4& color);
 	void SetDiffuseMap(const Texture* texture);
 	bool HasDiffuseMap() const;
 	const Texture* GetDiffuseMap() const;
@@ -21,7 +21,7 @@ public:
 
 	//Specular
 	//If material has specular map specular color will have no effect.
-	void SetSpecularColor(DirectX::XMFLOAT4 color);
+	void SetSpecularColor(const DirectX::XMFLOAT4& color);
 	void SetSpecularMap(const Texture* texture);
 	bool HasSpecularMap() const;
 	const Texture* GetSpecularMap() const;
@@ -39,12 +39,12 @@ public:
 	void SetShininessStrength(float sstrength);
 	float GetShininessStrength();
 
-	//Diffuse color = 1.0,1.0,1.0,1.0
+	//Diffuse color = 0.8,0.8,0.8,1.0
 	//Diffuse map = null
 	//Specular color = 1.0,1.0,1.0,1.0
 	//Specular map = null
 	//Shininess = 0.5
-	//Shininess Strenth = 0.5
+	//Shininess Strength = 0.5
 	static const Phong_Material* GetDefaultMaterial();
 
 private:
@@ -85,7 +85,7 @@ private:
 	const Texture* normalMap = nullptr;
 
 private:
-	enum MappingFlag
+	enum VariantFlag
 	{
 		None =  0,
 		D    =  1, //Diffuse
@@ -94,5 +94,5 @@ private:
 		N    =  4, //Normal
 		DN   =  5, //Diffuse and normal
 		DSN  =  7  //Diffuse, specular and normal
-	}mFlag = MappingFlag::None;
+	}vFlag = VariantFlag::None;
 };

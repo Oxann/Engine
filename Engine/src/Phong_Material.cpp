@@ -1,5 +1,4 @@
 #include "Phong_Material.h"
-#include "Input.h"
 #include "Resources.h"
 
 
@@ -16,7 +15,7 @@ void Phong_Material::Bind(const Mesh::SubMesh* subMesh, const Renderer* renderer
 	(this->*(this->Bind_))(subMesh,renderer);
 }
 
-void Phong_Material::SetDiffuseColor(DirectX::XMFLOAT4 color)
+void Phong_Material::SetDiffuseColor(const DirectX::XMFLOAT4& color)
 {
 	diffuseColor = {
 		std::clamp(color.x, 0.0f, 1.0f),
@@ -31,9 +30,9 @@ void Phong_Material::SetDiffuseMap(const Texture* texture)
 	diffuseMap = texture;
 
 	if (diffuseMap)
-		mFlag = static_cast<MappingFlag>(mFlag | MappingFlag::D);
+		vFlag = static_cast<VariantFlag>(vFlag | VariantFlag::D);
 	else
-		mFlag = static_cast<MappingFlag>(mFlag & ~MappingFlag::D);
+		vFlag = static_cast<VariantFlag>(vFlag & ~VariantFlag::D);
 
 	DecideBind();
 }
@@ -48,7 +47,7 @@ const Texture* Phong_Material::GetDiffuseMap() const
 	return diffuseMap;
 }
 
-void Phong_Material::SetSpecularColor(DirectX::XMFLOAT4 color)
+void Phong_Material::SetSpecularColor(const DirectX::XMFLOAT4& color)
 {
 	specularColor = {
 		std::clamp(color.x, 0.0f, 1.0f),
@@ -63,9 +62,9 @@ void Phong_Material::SetSpecularMap(const Texture* texture)
 	specularMap = texture;
 
 	if (specularMap)
-		mFlag = static_cast<MappingFlag>(mFlag | MappingFlag::S);
+		vFlag = static_cast<VariantFlag>(vFlag | VariantFlag::S);
 	else
-		mFlag = static_cast<MappingFlag>(mFlag & ~MappingFlag::S);
+		vFlag = static_cast<VariantFlag>(vFlag & ~VariantFlag::S);
 
 	DecideBind();
 }
@@ -85,9 +84,9 @@ void Phong_Material::SetNormalMap(const Texture* texture)
 	normalMap = texture;
 
 	if (normalMap)
-		mFlag = static_cast<MappingFlag>(mFlag | MappingFlag::N);
+		vFlag = static_cast<VariantFlag>(vFlag | VariantFlag::N);
 	else
-		mFlag = static_cast<MappingFlag>(mFlag & ~MappingFlag::N);
+		vFlag = static_cast<VariantFlag>(vFlag & ~VariantFlag::N);
 
 	DecideBind();
 }
@@ -133,10 +132,13 @@ void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, const Renderer* ren
 	//Binding shaders
 	vertexShader->BindPipeline();
 	pixelShader->BindPipeline();
-
+	
 	//Binding lights
 	renderer->UpdateDirectionalLightBuffer();
 	renderer->UpdatePointLightBuffer();
+
+	//Binding transform
+	renderer->UpdateTransformBuffer();
 
 	//Binding mesh
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Position3D)->BindPipeline();
@@ -167,7 +169,9 @@ void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, const Renderer* ren
 	D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
 	true
 	};
+
 	buffer.ChangeData(&toGPU);
+	buffer.BindPipeline();
 }
 
 void Phong_Material::BindPhong_D(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
@@ -232,39 +236,39 @@ void Phong_Material::BindPhong_D_S_N(const Mesh::SubMesh* subMesh, const Rendere
 
 void Phong_Material::DecideBind()
 {
-	switch (mFlag)
+	switch (vFlag)
 	{
-	case MappingFlag::None:
+	case VariantFlag::None:
 		Bind_ = &Phong_Material::BindPhong;
 		vertexShader = Resources::FindVertexShader("Phong.cso");
 		pixelShader = Resources::FindPixelShader("Phong.cso");
 		break;
-	case MappingFlag::D:
+	case VariantFlag::D:
 		Bind_ = &Phong_Material::BindPhong_D;
 		vertexShader = Resources::FindVertexShader("Phong_D_S.cso");
 		pixelShader = Resources::FindPixelShader("Phong_D.cso");
 		break;
-	case MappingFlag::S:
+	case VariantFlag::S:
 		Bind_ = &Phong_Material::BindPhong_S;
 		vertexShader = Resources::FindVertexShader("Phong_D_S.cso");
 		pixelShader = Resources::FindPixelShader("PS_Phong_S.cso");
 		break;
-	case MappingFlag::DS:
+	case VariantFlag::DS:
 		Bind_ = &Phong_Material::BindPhong_D_S;
 		vertexShader = Resources::FindVertexShader("Phong_D_S.cso");
 		pixelShader = Resources::FindPixelShader("Phong_D_S.cso");
 		break;
-	case MappingFlag::N:
+	case VariantFlag::N:
 		Bind_ = &Phong_Material::BindPhong_N;
 		vertexShader = Resources::FindVertexShader("Phong_D_S_N.cso");
 		pixelShader = Resources::FindPixelShader("Phong_N.cso");
 		break;
-	case MappingFlag::DN:
+	case VariantFlag::DN:
 		Bind_ = &Phong_Material::BindPhong_D_N;
 		vertexShader = Resources::FindVertexShader("Phong_D_S_N.cso");
 		pixelShader = Resources::FindPixelShader("Phong_D_N.cso");
 		break;
-	case MappingFlag::DSN:
+	case VariantFlag::DSN:
 		Bind_ = &Phong_Material::BindPhong_D_S_N;
 		vertexShader = Resources::FindVertexShader("Phong_D_S_N.cso");
 		pixelShader = Resources::FindPixelShader("Phong_D_S_N.cso");
