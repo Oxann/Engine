@@ -209,6 +209,8 @@ void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, const Renderer* r
 	normalMap->BindPipeline(Texture::Type::NORMAL);
 
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
+	subMesh->GetVertexElement(VertexBuffer::ElementType::Tangent)->BindPipeline();
+	subMesh->GetVertexElement(VertexBuffer::ElementType::Bitangent)->BindPipeline();
 }
 
 void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
@@ -219,6 +221,8 @@ void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, const Renderer*
 	normalMap->BindPipeline(Texture::Type::NORMAL);
 
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
+	subMesh->GetVertexElement(VertexBuffer::ElementType::Tangent)->BindPipeline();
+	subMesh->GetVertexElement(VertexBuffer::ElementType::Bitangent)->BindPipeline();
 }
 
 void Phong_Material::BindPhong_D_S_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const

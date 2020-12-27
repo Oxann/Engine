@@ -15,7 +15,7 @@ cbuffer Material : register(b3)
 
 
 
-float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition)
+float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float shininess)
 {
     float3 totalDiffuse = { 0.0f, 0.0f, 0.0f };
     float3 totalSpecular = { 0.0f, 0.0f, 0.0f };
@@ -29,7 +29,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition)
             continue;
         
         float3 halfwayVec = normalize(-directionalLights[i].direction + viewVec);
-        float specular = pow(max(dot(halfwayVec, normal), 0.0f), matShininess);
+        float specular = pow(max(dot(halfwayVec, normal), 0.0f), shininess);
         
         totalDiffuse += diffuse * directionalLights[i].ligth.rgb;
         totalSpecular += specular * directionalLights[i].ligth.rgb;
@@ -38,7 +38,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition)
     return totalDiffuse * matDiffuseColor.rgb + totalSpecular * matSpecularColor.rgb * matShininessStrength;
 }
 
-float3 CalculatePointLights(float3 normal, float3 viewSpacePosition)
+float3 CalculatePointLights(float3 normal, float3 viewSpacePosition,float shininess)
 {
     float3 totalDiffuse = { 0.0f, 0.0f, 0.0f };
     float3 totalSpecular = { 0.0f, 0.0f, 0.0f };
@@ -55,7 +55,7 @@ float3 CalculatePointLights(float3 normal, float3 viewSpacePosition)
             continue;
            
         float3 halfwayVec = normalize(-lightDirection + viewVec);
-        float specular = pow(max(dot(halfwayVec, normal), 0.0f), matShininess);
+        float specular = pow(max(dot(halfwayVec, normal), 0.0f), shininess);
         float attenuation = 1.0f / (PointLight_Constant + PointLight_Linear * distance + PointLight_Quadratic * distance * distance);
         
         totalDiffuse += diffuse * pointLights[i].light.rgb * attenuation;
@@ -70,14 +70,16 @@ float4 main(float3 ViewSpacePosition : VIEWSPACEPOSITION,
             float2 TexCoord : TEXCOORD,
             float3 Tangent : TANGENT,
             float3 Bitangent : BITANGENT) : SV_Target
-{        
+{   
+    float shininess = pow(2.0f, 13.0f * matShininess);
+    
     ViewSpaceNormal = normalize(mul(normalize(normalMap.Sample(normalMapSampler, TexCoord).rgb * 2.0f - 1.0f),
                            float3x3(normalize(Tangent), normalize(Bitangent), normalize(ViewSpaceNormal))));
     
     //Lighting   
     float3 phong = AmbientLight.rgb * AmbientLight.a * matDiffuseColor.rgb +
-               CalculateDirectionalLights(ViewSpaceNormal, ViewSpacePosition) +
-               CalculatePointLights(ViewSpaceNormal, ViewSpacePosition);
+               CalculateDirectionalLights(ViewSpaceNormal, ViewSpacePosition, shininess) +
+               CalculatePointLights(ViewSpaceNormal, ViewSpacePosition, shininess);
     
     return saturate(float4(phong, 1.0f));
 }

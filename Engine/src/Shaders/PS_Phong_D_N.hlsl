@@ -18,7 +18,7 @@ cbuffer Material : register(b3)
 
 
 
-float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor)
+float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor,float shininess)
 {
     float3 totalDiffuse = { 0.0f, 0.0f, 0.0f };
     float3 totalSpecular = { 0.0f, 0.0f, 0.0f };
@@ -32,7 +32,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
             continue;
         
         float3 halfwayVec = normalize(-directionalLights[i].direction + viewVec);
-        float specular = pow(max(dot(halfwayVec, normal), 0.0f), matShininess);
+        float specular = pow(max(dot(halfwayVec, normal), 0.0f), shininess);
         
         totalDiffuse += diffuse * directionalLights[i].ligth.rgb;
         totalSpecular += specular * directionalLights[i].ligth.rgb;
@@ -41,7 +41,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
     return totalDiffuse * diffuseColor + totalSpecular * matSpecularColor.rgb * matShininessStrength;
 }
 
-float3 CalculatePointLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor)
+float3 CalculatePointLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor,float shininess)
 {
     float3 totalDiffuse = { 0.0f, 0.0f, 0.0f };
     float3 totalSpecular = { 0.0f, 0.0f, 0.0f };
@@ -58,7 +58,7 @@ float3 CalculatePointLights(float3 normal, float3 viewSpacePosition, float3 diff
             continue;
            
         float3 halfwayVec = normalize(-lightDirection + viewVec);
-        float specular = pow(max(dot(halfwayVec, normal), 0.0f), matShininess);
+        float specular = pow(max(dot(halfwayVec, normal), 0.0f), shininess);
         float attenuation = 1.0f / (PointLight_Constant + PointLight_Linear * distance + PointLight_Quadratic * distance * distance);
         
         totalDiffuse += diffuse * pointLights[i].light.rgb * attenuation;
@@ -76,13 +76,15 @@ float4 main(float3 ViewSpacePosition : VIEWSPACEPOSITION,
 {
     float4 diffuseColor = matDiffuseColor * diffuseMap.Sample(diffuseMapSampler, TexCoord).rgba;
     
+    float shininess = pow(2.0f, 13.0f * matShininess);
+    
     ViewSpaceNormal = normalize(mul(normalize(normalMap.Sample(normalMapSampler, TexCoord).rgb * 2.0f - 1.0f),
                            float3x3(normalize(Tangent), normalize(Bitangent), normalize(ViewSpaceNormal))));
     
     //Lighting   
-    float3 phong = AmbientLight.rgb * AmbientLight.a * matDiffuseColor.rgb +
-               CalculateDirectionalLights(ViewSpaceNormal, ViewSpacePosition, diffuseColor.rgb) +
-               CalculatePointLights(ViewSpaceNormal, ViewSpacePosition, diffuseColor.rgb);
+    float3 phong = AmbientLight.rgb * AmbientLight.a * diffuseColor.rgb +
+               CalculateDirectionalLights(ViewSpaceNormal, ViewSpacePosition, diffuseColor.rgb, shininess) +
+               CalculatePointLights(ViewSpaceNormal, ViewSpacePosition, diffuseColor.rgb, shininess);
     
     return saturate(float4(phong, 1.0f));
 }
