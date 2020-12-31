@@ -7,6 +7,7 @@
 
 class Texture : public ResourceBase, public D3DBase
 {
+	friend class Material;
 public:
 	enum Type
 	{
@@ -15,21 +16,41 @@ public:
 		NORMAL
 	};
 
-	friend class Material;
+	enum FilterMode
+	{
+		POINT = D3D11_FILTER_MIN_MAG_MIP_POINT,
+		LINEAR = D3D11_FILTER_MIN_MAG_POINT_MIP_LINEAR,
+		BILINEAR = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT,
+		TRILINEAR = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+		ANISOTROPIC = D3D11_FILTER_ANISOTROPIC
+	};
 public:
 	Texture(std::filesystem::path file);
 
 	bool HasAlpha() const;
 
-	void SetType(Type type);
-
 	//Also binds sampler.
-	void BindPipeline() const override;
+	void BindPipeline() const override {};
 
 	void BindPipeline(Texture::Type slot) const;
+
+	void SetFilterMode(FilterMode fm);
+	
+	FilterMode GetFilterMode() const;
+	
+	//[1,16]
+	void SetAnisotropy(unsigned int value);
+
+	unsigned int GetAnisotropy() const;
+
+public:
+	const int width = 0;
+	const int heigth = 0;
+	const int nChannels = 0;
+	
 private:
-	int nChannels;
-	UINT slot = 0u;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSRV = nullptr;
+	FilterMode filterMode;
+	unsigned int anisotropy = 16u;
 };

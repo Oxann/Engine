@@ -16,7 +16,7 @@ public:
 public:
 	void Start() override
 	{
-		Deactivate();
+		isActive = false;
 	}
 
 	void Update() override
@@ -47,7 +47,10 @@ public:
 				{
 					bool isSelected = material.second.get() == currentResource;
 					if (ImGui::Selectable(material.second->GetFileName().c_str(), isSelected))
+					{
 						onResourceChange(material.second.get());
+						currentResource = material.second.get();
+					}						
 				}
 			}
 			break;
@@ -58,7 +61,10 @@ public:
 				{
 					bool isSelected = mesh.second.get() == currentResource;			
 					if (ImGui::Selectable(mesh.second->GetFileName().c_str(), isSelected))
+					{
 						onResourceChange(mesh.second.get());
+						currentResource = mesh.second.get();
+					}						
 				}
 			}
 			break;
@@ -69,7 +75,7 @@ public:
 
 	void PopUp(Type type,const ResourceBase* currentResource, std::function<void(const ResourceBase*)> onResourceChange)
 	{
-		Activate();
+		isActive = true;
 
 		this->type = type;
 		this->currentResource = currentResource;

@@ -37,8 +37,7 @@ private:
 		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 		{
 			selectedIndex = uniqueIndex;
-			entityWindow->Activate();
-			entityWindow->DisplayEntity(entity);
+			entityWindow->PopUp(entity);
 		}
 
 		//Zooming selected entity

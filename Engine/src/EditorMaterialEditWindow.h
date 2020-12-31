@@ -2,6 +2,7 @@
 #include "Editor.h"
 #include "Phong_Material.h"
 #include "Unlit_Material.h"
+#include "EditorTextureEditWindow.h"
 
 #include <typeindex>
 #include <typeinfo>
@@ -9,23 +10,24 @@
 class EditorMaterialEditWindow : public EditorWindowBase
 {
 public:
-	void Start()
+	void Start() override
 	{
-		Deactivate();
+		isActive = false;
 		editorRSW = Editor::GetWindow<EditorResourceSelectionWindow>();
+		editorTEW = Editor::GetWindow<EditorTextureEditWindow>();
 		
 		materialEdits.insert({typeid(Phong_Material),&EditorMaterialEditWindow::EditPhong});
 		materialEdits.insert({typeid(Unlit_Material),&EditorMaterialEditWindow::EditUnlit});
 	}
 
-	void Update()
+	void Update() override
 	{
 		(this->*(this->materialEdit))(material);
 	}
 
 	void PopUp(Material* material)
 	{
-		Activate();
+		isActive = true;
 		name = material->GetFileName() + "###MaterialEdit";
 		this->material = material;
 		materialEdit = materialEdits[typeid(*material)];
@@ -71,6 +73,7 @@ private:
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetDiffuseMap(static_cast<const Texture*>(newResource));
 				});
+			editorTEW->PopUp(const_cast<Texture*>(phongMaterial->diffuseMap));
 		}
 
 		//Specular map edit
@@ -84,6 +87,7 @@ private:
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetSpecularMap(static_cast<const Texture*>(newResource));
 				});
+			editorTEW->PopUp(const_cast<Texture*>(phongMaterial->specularMap));
 		}
 
 		//Normal map edit
@@ -97,6 +101,7 @@ private:
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetNormalMap(static_cast<const Texture*>(newResource));
 				});
+			editorTEW->PopUp(const_cast<Texture*>(phongMaterial->normalMap));
 		}
 	}
 
@@ -122,12 +127,14 @@ private:
 				[unlitMaterial](const ResourceBase* newResource) {
 					unlitMaterial->SetTexture(static_cast<const Texture*>(newResource));
 				});
+			editorTEW->PopUp(const_cast<Texture*>(unlitMaterial->texture));
 		}
 	}
 private:
 	Material* material;
 	EditorResourceSelectionWindow* editorRSW;
-	
+	EditorTextureEditWindow* editorTEW;
+
 	std::unordered_map <std::type_index, void(EditorMaterialEditWindow::*)(Material*)> materialEdits;
 	void(EditorMaterialEditWindow::* materialEdit)(Material*) = nullptr;
 };

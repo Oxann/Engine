@@ -12,25 +12,38 @@ void Scene::Init()
 	Scene::CreateNewScene(1, "first scene");
 	for (int i = 0; i < 1; i++)
 	{
-		Scene::GetScene(1)->NewEntity(Entity::FindPrefab("sponza.obj"));
+		Entity* e = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("sponza.obj"));
+		e->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
 	}
-	Scene::GetScene(1)->NewEntity("ligth1")->AddComponent<PointLight>()->intensity = 1.0f;
+	Scene::GetScene(1)->NewEntity("ligth1")->AddComponent<PointLight>()->intensity = 1.2f;
 	Renderer* renderer = Scene::GetScene(1)->GetEntity("ligth1")->AddComponent<Renderer>();
 	renderer->SetMesh(Mesh::Sphere);
 	renderer->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
 	renderer->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
 
-	Scene::GetScene(1)->NewEntity("ligth2")->AddComponent<PointLight>()->intensity = 1.0f;
+	Scene::GetScene(1)->NewEntity("ligth2")->AddComponent<PointLight>()->intensity = 1.2f;
 	Renderer* renderer2 = Scene::GetScene(1)->GetEntity("ligth2")->AddComponent<Renderer>();
 	renderer2->SetMesh(Mesh::Sphere);
 	renderer2->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
 	renderer2->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
 
-	Scene::GetScene(1)->NewEntity("ligth3")->AddComponent<PointLight>()->intensity = 1.0f;
+	Scene::GetScene(1)->NewEntity("ligth3")->AddComponent<PointLight>()->intensity = 1.2f;
 	Renderer* renderer3 = Scene::GetScene(1)->GetEntity("ligth3")->AddComponent<Renderer>();
 	renderer3->SetMesh(Mesh::Sphere);
 	renderer3->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
 	renderer3->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
+
+	/*Unlit_Material* mat = new Unlit_Material("mat");
+	mat->SetTexture(Resources::FindTexture("Resources\\brickwall.jpg"));
+	mat->SetColor({ 1.0f,1.0f,1.0f,1.0f });
+
+	Entity* e = Scene::GetScene(1)->NewEntity("asd");
+	Renderer* r = e->AddComponent<Renderer>();
+	r->SetMesh(Mesh::Quad);
+	r->SetMaterial(mat, 0u);*/
+
+
+
 	Scene::LoadScene(1);
 }
 

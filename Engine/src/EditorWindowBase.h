@@ -7,9 +7,7 @@ class EditorWindowBase
 public:
 	virtual void Start() = 0;
 	virtual void Update() = 0;
-	void Activate() { isActive = true; }
-	void Deactivate() { isActive = false; }
-protected:
+public:
 	std::string name;
 	bool isActive = true;
 };

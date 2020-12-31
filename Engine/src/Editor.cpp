@@ -7,6 +7,7 @@
 #include "EditorSceneHierarchyWindow.h"
 #include "EditorResourceSelectionWindow.h"
 #include "EditorMaterialEditWindow.h"
+#include "EditorTextureEditWindow.h"
 
 
 
@@ -23,6 +24,7 @@ Editor::Editor(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDe
 	windows.push_back(std::make_unique<EditorSceneHierarchyWindow>());
 	windows.push_back(std::make_unique<EditorResourceSelectionWindow>());
 	windows.push_back(std::make_unique<EditorMaterialEditWindow>());
+	windows.push_back(std::make_unique<EditorTextureEditWindow>());
 
 	//Windows start calls
 	for (const auto& window : windows)
@@ -46,7 +48,7 @@ void Editor::Update()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	
+
 	//Windows update calls	
 	for (auto& window : windows)
 	{

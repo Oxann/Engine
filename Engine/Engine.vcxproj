@@ -189,7 +189,6 @@
     <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\Log.cpp" />
     <ClCompile Include="src\MainWindow.cpp" />
-    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
@@ -208,6 +207,7 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\EditorTextureEditWindow.h" />
     <ClInclude Include="src\Phong_Material.h" />
     <ClInclude Include="src\EditorMaterialEditWindow.h" />
     <ClInclude Include="src\EditorResourceSelectionWindow.h" />

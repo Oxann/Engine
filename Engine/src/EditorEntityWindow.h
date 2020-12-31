@@ -27,15 +27,17 @@ public:
 		}
 	}
 
-	void DisplayEntity(Entity* entity)
+	void PopUp(Entity* entity)
 	{
+		isActive = true;
+
 		displayedEntity = entity;
 		displayedTransform = displayedEntity->GetTransform();
 		displayedRenderer = displayedEntity->GetComponent<Renderer>();
 		strcpy_s(displayedName, displayedEntity->name.c_str());
 
 		//Deactivating resource selection window when displayed entity is changed, because it causes misuse.
-		editorRSW->Deactivate();
+		editorRSW->isActive = false;
 	}
 private:
 	void DisplayTransform()
@@ -64,7 +66,7 @@ private:
 				displayedTransform->GetLocalPosition().x,
 				displayedTransform->GetLocalPosition().y ,
 				displayedTransform->GetLocalPosition().z };
-			if(ImGui::InputFloat3("##position", position))
+			if(ImGui::DragFloat3("##position", position,0.01f))
 				displayedTransform->SetLocalPosition(position[0], position[1], position[2]);
 
 			//Scale
@@ -76,7 +78,7 @@ private:
 				displayedTransform->GetLocalScale().y ,
 				displayedTransform->GetLocalScale().z };
 
-			if (ImGui::InputFloat3("##scale", scale))
+			if (ImGui::DragFloat3("##scale", scale,0.01f))
 				displayedTransform->SetLocalScale(scale[0], scale[1], scale[2]);
 
 			//Rotation
