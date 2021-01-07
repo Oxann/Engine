@@ -184,7 +184,8 @@ LRESULT MainWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		const POINTS mousePos = MAKEPOINTS(lParam);
 		Input::DeltaX = mousePos.x - Input::MousePosition.first;
 		Input::DeltaY = mousePos.y - Input::MousePosition.second;
-		Input::MousePosition = { mousePos.x,mousePos.y };
+		Input::MousePosition.first = mousePos.x;
+		Input::MousePosition.second = mousePos.y;
 
 		if (isCursorHidden)
 			SetCursorToMiddle();
@@ -231,10 +232,10 @@ LRESULT MainWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-void MainWindow::CreateMainWindow(int clientWidth, int clientHeigth)
+void MainWindow::CreateMainWindow(int clientWidth, int clientheight)
 {
 	DWORD dwStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-	Resolution adjustedRes = GetAdjustedResolution(clientWidth, clientHeigth, dwStyle);
+	Resolution adjustedRes = GetAdjustedResolution(clientWidth, clientheight, dwStyle);
 	CHECK_WIN32_ERROR()
 
 	hWnd = CreateWindowEx(0,

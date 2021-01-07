@@ -6,10 +6,6 @@
 #include "EngineAssert.h"
 
 
-Mesh* Mesh::Cube = new Mesh;
-Mesh* Mesh::Sphere = new Mesh;
-Mesh* Mesh::Quad = new Mesh;
-
 void Mesh::SubMesh::SetVertexCount(unsigned int count)
 {
     vertexCount = count;
@@ -205,7 +201,9 @@ void Mesh::GenerateCube()
         16,17,19, 17,18,19,
         //Bottom
         20,21,23, 21,22,23
-    };
+    };  
+
+    Mesh::Cube = new Mesh;
     SubMesh& newSubMesh = Cube->AddNewSubMesh();
     newSubMesh.SetVertexCount(cube_Positions.size());
     newSubMesh.AddNewVertexElement(cube_Positions.data(), VertexBuffer::ElementType::Position3D);
@@ -283,6 +281,8 @@ void Mesh::GenerateSphere()
             }
         }
     }
+
+    Mesh::Sphere = new Mesh;
     SubMesh& newSubMesh = Sphere->AddNewSubMesh();
     newSubMesh.SetVertexCount(sphere_pos_vertices.size());
     newSubMesh.AddNewVertexElement(sphere_pos_vertices.data(), VertexBuffer::ElementType::Position3D);
@@ -319,6 +319,7 @@ void Mesh::GenerateQuad()
         1u,3u,2u
     };
 
+    Mesh::Quad = new Mesh;
     SubMesh& newSubMesh = Quad->AddNewSubMesh();
     newSubMesh.SetVertexCount(positions.size());
     newSubMesh.AddNewVertexElement(positions.data(), VertexBuffer::ElementType::Position3D);

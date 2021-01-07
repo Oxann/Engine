@@ -24,6 +24,12 @@ public:
 
 			if(displayedRenderer)
 				DisplayRenderer();
+
+			if (displayedDirectionalLight)
+				DisplayDirectionalLight();
+		
+			if (displayedPointLight)
+				DisplayPointLight();
 		}
 	}
 
@@ -34,6 +40,8 @@ public:
 		displayedEntity = entity;
 		displayedTransform = displayedEntity->GetTransform();
 		displayedRenderer = displayedEntity->GetComponent<Renderer>();
+		displayedPointLight = displayedEntity->GetComponent<PointLight>();
+		displayedDirectionalLight = displayedEntity->GetComponent<DirectionalLight>();
 		strcpy_s(displayedName, displayedEntity->name.c_str());
 
 		//Deactivating resource selection window when displayed entity is changed, because it causes misuse.
@@ -166,10 +174,49 @@ private:
 			}
 		}
 	}
+
+	void DisplayDirectionalLight()
+	{
+		if (ImGui::CollapsingHeader("DIRECTIONAL LIGHT"))
+		{
+			//Intensity
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Intensity: ");
+			ImGui::SameLine();
+			ImGui::DragFloat("##directionalLightIntensity", &displayedDirectionalLight->intensity, 0.05f, 0.0f, 1000.0f);
+		
+			//Color
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Color: ");
+			ImGui::SameLine();
+			ImGui::ColorEdit3("##directionalLightColor", reinterpret_cast<float*>(&displayedDirectionalLight->color));		
+		}
+	}
+
+	void DisplayPointLight()
+	{
+		if (ImGui::CollapsingHeader("POINT LIGHT"))
+		{
+			//Intensity
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Intensity: ");
+			ImGui::SameLine();
+			ImGui::DragFloat("##pointLightIntensity", &displayedPointLight->intensity, 0.05f, 0.0f, 1000.0f);
+
+			//Color
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Color: ");
+			ImGui::SameLine();
+			ImGui::ColorEdit3("##pointLightColor", reinterpret_cast<float*>(&displayedPointLight->color));
+		}
+	}
+
 private:
 	Entity* displayedEntity = nullptr;
 	Transform* displayedTransform = nullptr;
 	Renderer* displayedRenderer = nullptr;
+	PointLight* displayedPointLight = nullptr;
+	DirectionalLight* displayedDirectionalLight = nullptr;
 	static inline char displayedName[128];
 	
 	EditorResourceSelectionWindow* editorRSW;

@@ -24,8 +24,11 @@ int WINAPI WinMain(
             {
                 if (msg.message == WM_QUIT)
                 {
-                    ENGINE_LOG(ENGINE_INFO, "Program terminated successfully.");
+                    if(msg.wParam == 0)
+                        ENGINE_LOG(ENGINE_INFO, "Program terminated successfully.")
+
                     while (Engine::Log::MessageCount() > 0); // Waiting for all log messages to be pumped.
+
                     return static_cast<int>(msg.wParam);
                 }
                 TranslateMessage(&msg);
@@ -44,7 +47,7 @@ int WINAPI WinMain(
             //Time 
             auto FrameEnd = std::chrono::steady_clock::now();
             Time::DeltaTime = std::chrono::duration<float>(FrameEnd - FrameBegin).count();
-            Time::AppTime += Time::GetDeltaTime();
+            Time::AppTime += Time::DeltaTime;
         }
     }
     catch (const EngineException & e)

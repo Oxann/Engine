@@ -43,6 +43,7 @@ private:
 		//Zooming selected entity
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 		{
+			//TODO: if the entity has a renderer, this needs to be AABB center.
 			DirectX::XMFLOAT3 entityPosition = entity->GetTransform()->GetWorldPosition();
 			Editor::Camera::position = DirectX::XMLoadFloat3(&entityPosition);
 			Editor::Camera::isChanged = true;

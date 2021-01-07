@@ -73,7 +73,9 @@ private:
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetDiffuseMap(static_cast<const Texture*>(newResource));
 				});
-			editorTEW->PopUp(const_cast<Texture*>(phongMaterial->diffuseMap));
+			
+			if(phongMaterial->diffuseMap)
+				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->diffuseMap));
 		}
 
 		//Specular map edit
@@ -87,7 +89,9 @@ private:
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetSpecularMap(static_cast<const Texture*>(newResource));
 				});
-			editorTEW->PopUp(const_cast<Texture*>(phongMaterial->specularMap));
+			
+			if(phongMaterial->specularMap)
+				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->specularMap));
 		}
 
 		//Normal map edit
@@ -101,7 +105,9 @@ private:
 				[phongMaterial](const ResourceBase* newResource) {
 					phongMaterial->SetNormalMap(static_cast<const Texture*>(newResource));
 				});
-			editorTEW->PopUp(const_cast<Texture*>(phongMaterial->normalMap));
+			
+			if(phongMaterial->normalMap)
+				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->normalMap));
 		}
 	}
 
@@ -127,7 +133,9 @@ private:
 				[unlitMaterial](const ResourceBase* newResource) {
 					unlitMaterial->SetTexture(static_cast<const Texture*>(newResource));
 				});
-			editorTEW->PopUp(const_cast<Texture*>(unlitMaterial->texture));
+
+			if(unlitMaterial->texture)
+				editorTEW->PopUp(const_cast<Texture*>(unlitMaterial->texture));
 		}
 	}
 private:

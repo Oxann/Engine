@@ -5,7 +5,6 @@
 std::array<Input::KeyState,Input::KeyCount> Input::keys;
 bool Input::IsMainWindowFocused = false;
 std::pair<short, short> Input::MousePosition;
-bool Input::IsMouseInWindow = false;
 int Input::WheelDelta = 0;
 short Input::DeltaX = 0;
 short Input::DeltaY = 0;

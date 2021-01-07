@@ -11,7 +11,7 @@ enum class Keycode
 
 class Input
 {
-private:
+	friend class MainWindow;
 private:
 	enum class KeyState : unsigned char
 	{
@@ -44,13 +44,11 @@ private:
 public:
 	static void FlushKeys() noexcept;
 private:
-	friend class MainWindow;
 	static constexpr unsigned int KeyCount = 256u;
 	static std::array<KeyState,KeyCount> keys;
 	//Keyboard
 	static bool IsMainWindowFocused;
 	//Mouse
-	static bool IsMouseInWindow;
 	static std::pair<short, short> MousePosition;
 	static int WheelDelta;
 	static short DeltaX;

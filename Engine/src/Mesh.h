@@ -49,9 +49,9 @@ private:
 	static void GenerateSphere();
 	static void GenerateQuad();
 public:
-	static Mesh* Cube;
-	static Mesh* Sphere;
-	static Mesh* Quad;
+	inline static Mesh* Cube;
+	inline static Mesh* Sphere;
+	inline static Mesh* Quad;
 private:
 	std::vector<SubMesh> submeshes;
 };

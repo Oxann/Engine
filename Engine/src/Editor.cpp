@@ -48,6 +48,20 @@ void Editor::Update()
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	
+	//Main Menu
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Windows##windowsMenu"))
+		{
+			if (ImGui::MenuItem("Scene##windowsMenu/Scene", nullptr, nullptr))
+			{
+				windows[1]->isActive = true;
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
 
 	//Windows update calls	
 	for (auto& window : windows)

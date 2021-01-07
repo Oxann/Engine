@@ -10,46 +10,17 @@ Scene* Scene::ActiveScene;
 void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
-	for (int i = 0; i < 1; i++)
-	{
-		Entity* e = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("sponza.obj"));
-		e->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
-	}
-	Scene::GetScene(1)->NewEntity("ligth1")->AddComponent<PointLight>()->intensity = 1.2f;
-	Renderer* renderer = Scene::GetScene(1)->GetEntity("ligth1")->AddComponent<Renderer>();
-	renderer->SetMesh(Mesh::Sphere);
-	renderer->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
-	renderer->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
+	
+	Entity* wolf = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
 
-	Scene::GetScene(1)->NewEntity("ligth2")->AddComponent<PointLight>()->intensity = 1.2f;
-	Renderer* renderer2 = Scene::GetScene(1)->GetEntity("ligth2")->AddComponent<Renderer>();
-	renderer2->SetMesh(Mesh::Sphere);
-	renderer2->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
-	renderer2->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
-
-	Scene::GetScene(1)->NewEntity("ligth3")->AddComponent<PointLight>()->intensity = 1.2f;
-	Renderer* renderer3 = Scene::GetScene(1)->GetEntity("ligth3")->AddComponent<Renderer>();
-	renderer3->SetMesh(Mesh::Sphere);
-	renderer3->SetMaterial(Unlit_Material::GetDefaultMaterial(), 0);
-	renderer3->GetEntity()->GetTransform()->SetLocalScale(0.4f, 0.4f, 0.4f);
-
-	/*Unlit_Material* mat = new Unlit_Material("mat");
-	mat->SetTexture(Resources::FindTexture("Resources\\brickwall.jpg"));
-	mat->SetColor({ 1.0f,1.0f,1.0f,1.0f });
-
-	Entity* e = Scene::GetScene(1)->NewEntity("asd");
-	Renderer* r = e->AddComponent<Renderer>();
-	r->SetMesh(Mesh::Quad);
-	r->SetMaterial(mat, 0u);*/
-
-
-
+	Entity* light = Scene::GetScene(1)->NewEntity("Light");
+	light->AddComponent<DirectionalLight>();
+	
 	Scene::LoadScene(1);
 }
 
 void Scene::CreateNewScene(unsigned char index, std::string name)
 {
-	ENGINEASSERT(index > 0, "Scene index must be greater than 0.");
 	auto scene = Scenes.insert(std::pair<unsigned char, Scene>(index, Scene(index, name)));
 	ENGINEASSERT(scene.second, "Duplicate scene index.");
 }
@@ -150,7 +121,7 @@ size_t Scene::GetEntityCount() const
 
 void Scene::UpdateComponents(Entity* entity)
 {
-	/*size_t componentSize = entity->Components.size();
+	/*
 	for (size_t j = 0; j < componentSize; j++)
 	{
 		auto& component = entity->Components[j];
@@ -174,7 +145,6 @@ void Scene::UpdateComponents(Entity* entity)
 
 void Scene::UpdateEngineComponents(Entity* entity)
 {
-	size_t componentSize = entity->EngineComponents.size();
 	for (auto& component : entity->EngineComponents)
 	{
 		switch (component.second->state)

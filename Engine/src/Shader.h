@@ -8,19 +8,16 @@
 
 /*///////////////////////////////////
 //	All shader binaries must be inside Resources/Shaders directory. 
+//
 //	Vertex shaders must start with VS_
 //	Pixel shaders must start with PS_
 //
 //	--- Default Input Slots For Vertex Elements ---
-//  Position = 0
-//  Color = 1
-//	TexCoord = 2
-//  Normal = 3
-//
-//  
-//
-//
-//
+//  Position	=	0
+//  TexCoord	=	1
+//	Normal		=	2
+//  Tangent		=	3
+//	Bitanget	=	4
 *////////////////////////////////////
 
 

@@ -11,13 +11,13 @@ using namespace Microsoft::WRL;
 Texture::Texture(std::filesystem::path file)
 	:ResourceBase(file)
 {
-	unsigned char* img_data = stbi_load(file.string().c_str() , const_cast<int*>(&width), const_cast<int*>(&heigth), const_cast<int*>(&nChannels), 4);
+	unsigned char* img_data = stbi_load(file.string().c_str() , const_cast<int*>(&width), const_cast<int*>(&height), const_cast<int*>(&nChannels), 4);
 	
 	if (img_data)
 	{
 		D3D11_TEXTURE2D_DESC textureDesc = {  };
 		textureDesc.Width = width;
-		textureDesc.Height = heigth;
+		textureDesc.Height = height;
 		textureDesc.MipLevels = 0u;
 		textureDesc.ArraySize = 1u;
 		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;

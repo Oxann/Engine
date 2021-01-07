@@ -66,29 +66,29 @@ public:
 	static float GetAmbientIntensity();
 
 private:
-	//TODO
-	static void OnMainWindowResize();
-private:
 	//DX objects
-	static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
-	static Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	static Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext;
-	static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView;
-	static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil;
+	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
+	inline static Microsoft::WRL::ComPtr<ID3D11Device> pDevice = nullptr;
+	inline static Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext = nullptr;
+	inline static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView = nullptr;
+	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil = nullptr;
 
-	static bool isVSyncEnabled;
-	static ClearMode clearMode;
-	static float* clearColor;
-	static float verticalFOV;
-	static float horizontalFOV;
-	static float aspectRatio;
-	static ProjectionType projectionType;
-	static Resolution renderResolution;
+	inline static bool isVSyncEnabled = false;
+	inline static ClearMode clearMode;
+	inline static float clearColor[4];
+	inline static Resolution renderResolution;
 
 	//Ambient Light
-	static DirectX::XMVECTOR ambientLight; // w is intensity
-	static PS_ConstantBuffer<DirectX::XMVECTOR>* ambientLightBuffer;	
+	inline static DirectX::XMVECTOR ambientLight; // w is intensity
+	inline static PS_ConstantBuffer<DirectX::XMVECTOR>* ambientLightBuffer;	
 
-	static DirectX::XMMATRIX projectionMatrix;
-	static DirectX::XMMATRIX* viewMatrix;
+	//Currently if we are in editor mode, view matrix is editor camera's lookat matrix
+	inline static DirectX::XMMATRIX* viewMatrix;
+
+	//Projection stuff
+	inline static DirectX::XMMATRIX projectionMatrix;
+	inline static float verticalFOV;
+	inline static float horizontalFOV;
+	inline static float aspectRatio;
+	inline static ProjectionType projectionType;
 };

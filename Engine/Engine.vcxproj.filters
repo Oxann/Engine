@@ -31,17 +31,17 @@
     <FxCompile Include="src\Shaders\PS_Phong_D_N.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Unlit.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="src\Shaders\PS_Unlit_T.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Unlit</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_Unlit.hlsl">
+      <Filter>Shaders\Unlit</Filter>
     </FxCompile>
     <FxCompile Include="src\Shaders\VS_Unlit.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Unlit</Filter>
     </FxCompile>
     <FxCompile Include="src\Shaders\VS_Unlit_T.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Unlit</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +300,9 @@
     </Filter>
     <Filter Include="Graphics\Material System">
       <UniqueIdentifier>{fd980ee7-eb7a-4c07-b3f6-1cc3e8e87cdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Unlit">
+      <UniqueIdentifier>{1d5c18a0-1e22-43b3-8b36-56482d01b7fd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

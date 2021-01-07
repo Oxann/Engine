@@ -65,7 +65,7 @@ void Resources::Init()
 			{
 				Textures.insert({ file.path().string(),std::make_unique<Texture>(file.path()) });
 			}
-			else if (extension == ".obj" || extension == ".fbx" || extension == ".max")
+			else if (extension == ".obj" || extension == ".fbx" || extension == ".max" || extension == ".FBX")
 			{
 				Models.insert({ file.path().string(),std::make_unique<Model>(file.path()) });
 			}

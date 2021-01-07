@@ -11,30 +11,6 @@
 #include "ConstantBuffer.h"
 #include "Texture.h"
 
-Microsoft::WRL::ComPtr<IDXGISwapChain> Graphics::pSwapChain = nullptr;
-Microsoft::WRL::ComPtr<ID3D11Device> Graphics::pDevice = nullptr;
-Microsoft::WRL::ComPtr<ID3D11DeviceContext> Graphics::pDeviceContext = nullptr;
-Microsoft::WRL::ComPtr<ID3D11RenderTargetView> Graphics::pView = nullptr;
-Microsoft::WRL::ComPtr<ID3D11DepthStencilView> Graphics::pDepthStencil = nullptr;
-
-DirectX::XMMATRIX* Graphics::viewMatrix = nullptr;
-bool Graphics::isVSyncEnabled = false;
-
-//Screen clear
-Graphics::ClearMode Graphics::clearMode;
-float* Graphics::clearColor = new float[4];
-
-//Projection
-DirectX::XMMATRIX Graphics::projectionMatrix;
-float Graphics::verticalFOV;
-float Graphics::horizontalFOV;
-float Graphics::aspectRatio;
-Graphics::ProjectionType Graphics::projectionType;
-
-//Ambient Lighting
-DirectX::XMVECTOR Graphics::ambientLight;
-PS_ConstantBuffer<DirectX::XMVECTOR>* Graphics::ambientLightBuffer = nullptr;
-
 
 void Graphics::Init(HWND hWnd)
 {
@@ -214,7 +190,7 @@ float Graphics::GetHorizontalFOV()
 		return -1.0f;
 }
 
-//TODO: Error handling
+
 void Graphics::SetProjection(ProjectionType type, float aspectRatio, float height,float near_z,float far_z)
 {
 	projectionType = type;
@@ -258,8 +234,4 @@ DirectX::XMFLOAT3 Graphics::GetAmbientColor()
 float Graphics::GetAmbientIntensity()
 {
 	return DirectX::XMVectorGetW(ambientLight);
-}
-
-void Graphics::OnMainWindowResize()
-{
 }

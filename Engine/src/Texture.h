@@ -45,7 +45,7 @@ public:
 
 public:
 	const int width = 0;
-	const int heigth = 0;
+	const int height = 0;
 	const int nChannels = 0;
 	
 private:

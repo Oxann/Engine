@@ -104,12 +104,6 @@ public:
 
 	Transform* GetTransform() const;
 
-	/*//If the entity is an instance of a prefab returns prefab, otherwise returns nullptr.
-	//If the caller entity is a prefab returns itself.
-	const Entity* GetPrefab() const;
-
-	//If the entity is an instance of a prefab returns instance count, otherwise returns 0.
-	unsigned int GetInstanceCount() const;*/
 public:
 	std::string name;
 private:
@@ -118,9 +112,6 @@ private:
 	std::unordered_map<std::type_index, std::unique_ptr<Component>> Components;
 	std::unordered_map<std::type_index, std::unique_ptr<Component>> EngineComponents;
 	std::unique_ptr<Transform> transform;
-	//Prefab
-	/*const Entity* prefab = nullptr;
-	unsigned int instanceCount = 0u;*/
 private:
 	inline static std::unordered_map<std::string, std::unique_ptr<Entity>> Prefabs;
 };

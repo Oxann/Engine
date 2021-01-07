@@ -12,9 +12,9 @@ public:
 
 	void Update() override
 	{
-		//Width and heigth
+		//Width and height
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Width: %d    Heigth: %d", texture->width, texture->heigth);
+		ImGui::Text("Width: %d    height: %d", texture->width, texture->height);
 
 		//Filter mode selection
 		ImGui::AlignTextToFramePadding();

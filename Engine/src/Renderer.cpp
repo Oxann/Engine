@@ -56,7 +56,7 @@ const Mesh* Renderer::GetMesh() const
 
 void Renderer::SetMaterial(const Material* material, unsigned int materialIndex)
 {
-	if (materialIndex >= materials.size() || materialIndex < 0)
+	if (materialIndex >= materials.size())
 	{
 		std::stringstream ss;
 		ss << "Entity name: " << GetEntity()->name << std::endl
