@@ -10,6 +10,7 @@
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "Texture.h"
+#include "Editor.h"
 
 
 void Graphics::Init(HWND hWnd)

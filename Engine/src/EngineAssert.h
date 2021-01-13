@@ -16,7 +16,7 @@
 					 << "Message: " << msg << "\n";\
 		ENGINE_LOG(ENGINE_ERROR,formattedMsg.str());\
 		MessageBoxA(nullptr,formattedMsg.str().c_str(),"Engine Assert!!!",MB_OK | MB_ICONERROR);\
-		while(Engine::Log::MessageCount() > 0);\
+		while(Log::MessageCount() > 0);\
 		exit(-1);\
 	}
 #else

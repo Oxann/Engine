@@ -1,4 +1,7 @@
 #pragma once
+
+#ifdef EDITOR
+
 #include "Win.h"
 #include "../thirdparty/imgui/imgui.h"
 #include "../thirdparty/imgui/imgui_impl_dx11.h"
@@ -9,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -33,8 +37,8 @@ public:
 		inline static bool isChanged = true;
 	};
 public:
-	Editor(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice);
-	~Editor();
+	static void Init(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice);
+	static void ShutDown();
 	static LRESULT EditorInputHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static void Update();
 	static bool WantCaptureKeyboard();
@@ -50,7 +54,11 @@ public:
 		}
 		return nullptr;
 	}
-private:
+public:
+	inline static bool isActive = true;
 	inline static ImGuiIO* imguiIO = nullptr;
 	inline static std::vector<std::unique_ptr<EditorWindowBase>> windows;
 };
+
+
+#endif

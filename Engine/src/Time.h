@@ -3,6 +3,7 @@
 
 class Time
 {
+	friend class Engine;
 public:
 	Time() = delete;
 	~Time() = delete;
@@ -12,8 +13,7 @@ public:
 	Time& operator=(Time&&) = delete;
 	inline static float GetAppTime() { return AppTime; };
 	inline static float GetDeltaTime() { return DeltaTime; };
-public:
-	//Do not modify time parameters.
+private:
 	inline static float AppTime = 0.0f;
 	inline static float DeltaTime = 0.0f;
 };

@@ -1,3 +1,5 @@
+#ifdef EDITOR
+
 #include "Editor.h"
 #include "Input.h"
 #include "Time.h"
@@ -8,10 +10,10 @@
 #include "EditorResourceSelectionWindow.h"
 #include "EditorMaterialEditWindow.h"
 #include "EditorTextureEditWindow.h"
+#include "EditorMetricsWindow.h"
 
 
-
-Editor::Editor(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice)
+void Editor::Init(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice)
 {
 	ImGui::CreateContext();
 	imguiIO = &ImGui::GetIO();
@@ -25,6 +27,7 @@ Editor::Editor(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDe
 	windows.push_back(std::make_unique<EditorResourceSelectionWindow>());
 	windows.push_back(std::make_unique<EditorMaterialEditWindow>());
 	windows.push_back(std::make_unique<EditorTextureEditWindow>());
+	windows.push_back(std::make_unique<EditorMetricsWindow>());
 
 	//Windows start calls
 	for (const auto& window : windows)
@@ -36,7 +39,7 @@ LRESULT Editor::EditorInputHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 	return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 }
 
-Editor::~Editor()
+void Editor::ShutDown()
 {
 	ImGui_ImplWin32_Shutdown();
 	ImGui_ImplDX11_Shutdown();
@@ -45,40 +48,45 @@ Editor::~Editor()
 
 void Editor::Update()
 {
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	
-	//Main Menu
-	if (ImGui::BeginMainMenuBar())
+	if (isActive)
 	{
-		if (ImGui::BeginMenu("Windows##windowsMenu"))
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		//Main Menu
+		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::MenuItem("Scene##windowsMenu/Scene", nullptr, nullptr))
+			if (ImGui::BeginMenu("Windows##windowsMenu"))
 			{
-				windows[1]->isActive = true;
+				if (ImGui::MenuItem("Scene##windowsMenu/Scene", nullptr, nullptr))
+					windows[1]->isActive = true;
+				
+				if (ImGui::MenuItem("Scene##windowsMenu/Metrics", nullptr, nullptr))
+					windows[5]->isActive = true;
+
+				ImGui::EndMenu();
 			}
-			ImGui::EndMenu();
+			ImGui::EndMainMenuBar();
 		}
-		ImGui::EndMainMenuBar();
-	}
 
-	//Windows update calls	
-	for (auto& window : windows)
-	{
-		if (window->isActive)
+		//Windows update calls	
+		for (auto& window : windows)
 		{
-			if(ImGui::Begin(window->name.c_str(),&window->isActive))
-				window->Update();
-			
-			ImGui::End();
-		}			
-	}
-	
-	Camera::Update();
+			if (window->isActive)
+			{
+				if (ImGui::Begin(window->name.c_str(), &window->isActive))
+					window->Update();
 
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+				ImGui::End();
+			}
+		}
+
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
+
+	Camera::Update();
 }
 
 bool Editor::WantCaptureKeyboard()
@@ -144,7 +152,7 @@ void Editor::Camera::Update()
 			else if (Input::GetKey('D'))
 				movementDirection = DirectX::XMVectorAdd(movementDirection, rotationMatrix.r[0]);
 
-			position = DirectX::XMVectorAdd(position, DirectX::XMVectorScale(DirectX::XMVector3Normalize(movementDirection), Time::DeltaTime * movementSpeed));
+			position = DirectX::XMVectorAdd(position, DirectX::XMVectorScale(DirectX::XMVector3Normalize(movementDirection), Time::GetDeltaTime() * movementSpeed));
 		}
 	}
 
@@ -169,3 +177,6 @@ void Editor::Camera::Update()
 		TransformMatrix = DirectX::XMMatrixLookToLH(position, rotationMatrix.r[2], worldUp);
 	}
 }
+
+
+#endif

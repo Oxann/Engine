@@ -3,12 +3,12 @@
 #include "Input.h"
 #include "EngineException.h"
 #include "Log.h"
-#include "Scene.h"
-#include "Mesh.h"
-#include "Model.h"
-#include "Resources.h"
+
 
 #ifdef EDITOR
+
+#include "Editor.h"
+
 #define EDITOR_CAPTURE_INPUT \
 if(Editor::WantCaptureKeyboard() || (Editor::WantCaptureMouse() && !MainWindow::isCursorHidden))\
 	break;
@@ -16,33 +16,16 @@ if(Editor::WantCaptureKeyboard() || (Editor::WantCaptureMouse() && !MainWindow::
 #define EDITOR_CAPTURE_INPUT
 #endif
 
-#ifdef EDITOR
-std::unique_ptr<Editor> MainWindow::editor = nullptr;
-#endif
 
-
-
-const std::wstring MainWindow::MainWindowClassName = L"MainWindowClass";
-bool MainWindow::isCreated = false;
-bool MainWindow::isFullScreen = false;
-Resolution MainWindow::displayResolution;
-HWND MainWindow::hWnd = nullptr;
-bool MainWindow::isCursorHidden = false;
-
-
-MainWindow::MainWindow(std::wstring name,int clientWidth,int clientHeight)
-	:MainWindowName(name)
+void MainWindow::Init(std::wstring name, int clientWidth, int clientHeight)
 {
 	ENGINEASSERT(!isCreated, "Main Window can only be created once!!!");
 
+	MainWindowName = name;
+	
 	//Creating window
 	CreateMainWindowClass();
 	CreateMainWindow(clientWidth, clientHeight);
-
-	Graphics::Init(hWnd);
-	Mesh::Init();
-	Resources::Init();
-	Scene::Init();
 
 	//Initially setting cursor position to middle of the client region.
 	SetCursorToMiddle();
@@ -50,13 +33,14 @@ MainWindow::MainWindow(std::wstring name,int clientWidth,int clientHeight)
 	ShowWindow(hWnd, SW_SHOW);
 	CHECK_WIN32_ERROR()
 
-	//Initializing editor if we are in editor mode.
-#ifdef EDITOR
-	editor = std::make_unique<Editor>(hWnd,Graphics::pDeviceContext.Get(),Graphics::pDevice.Get());
-#endif
-
 	isCreated = true;
 	ENGINE_LOG(ENGINE_INFO, "Main Window Ready!");
+}
+
+void MainWindow::ShutDown()
+{
+	DestroyWindow(hWnd);
+	UnregisterClass(MainWindowClassName.c_str(), GetModuleHandle(nullptr));
 }
 
 HWND MainWindow::GetHWND()
@@ -118,12 +102,6 @@ void MainWindow::SetCursorToMiddle()
 	Input::MousePosition.second = clientMidPoint.y;
 	ClientToScreen(hWnd, &clientMidPoint);
 	SetCursorPos(clientMidPoint.x, clientMidPoint.y);
-}
-
-MainWindow::~MainWindow()
-{
-	DestroyWindow(hWnd);
-	UnregisterClass(MainWindowClassName.c_str(),GetModuleHandle(nullptr));
 }
 
 LRESULT MainWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

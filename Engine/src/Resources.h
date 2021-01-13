@@ -13,7 +13,7 @@
 
 class Resources
 {
-	friend class MainWindow;
+	friend class Engine;
 	friend Model;
 	friend class EditorResourceSelectionWindow;
 public:

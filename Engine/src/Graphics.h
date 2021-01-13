@@ -65,7 +65,7 @@ public:
 	static DirectX::XMFLOAT3 GetAmbientColor();
 	static float GetAmbientIntensity();
 
-private:
+public:
 	//DX objects
 	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11Device> pDevice = nullptr;
@@ -73,6 +73,7 @@ private:
 	inline static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil = nullptr;
 
+private:
 	inline static bool isVSyncEnabled = false;
 	inline static ClearMode clearMode;
 	inline static float clearColor[4];

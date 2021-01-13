@@ -1,21 +1,13 @@
 #pragma once
 #include "Win.h"
-#include "Graphics.h"
-#include "Editor.h"
 #include <string>
-#include <memory>
+#include "Graphics.h"
 
 class MainWindow
 {
-private:
-	MainWindow() = delete;
-	MainWindow(const MainWindow&) = delete;
-	MainWindow(MainWindow&&) = delete;
-	MainWindow& operator=(const MainWindow&) = delete;
-	MainWindow& operator=(MainWindow&&) = delete;
 public:
-	MainWindow(std::wstring name, int clientWidth, int clientHeight);
-	~MainWindow();
+	static void Init(std::wstring name, int clientWidth, int clientHeight);
+	static void ShutDown();
 
 	static HWND GetHWND();
 	static Resolution GetDisplayResolution();
@@ -27,22 +19,19 @@ public:
 	static void SetCursorToMiddle();
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	void CreateMainWindow(int clientWidth,int clientHeight);
+	static void CreateMainWindow(int clientWidth,int clientHeight);
 	static void CreateMainWindowClass();
 	static Resolution GetAdjustedResolution(int clientWidth, int clientHeight,DWORD dwStyle);
+
 private:
 	//MainWindow Class
-	static const std::wstring MainWindowClassName;
-	static bool isCreated;
-	//MainWindow
-	const std::wstring MainWindowName;
-	static HWND hWnd;
-	static Resolution displayResolution;
-	static bool isFullScreen;
-	static bool isCursorHidden;
+	inline static const std::wstring MainWindowClassName = L"MainWindowClass";
+	inline static bool isCreated = false;
 
-	//Initialization and destruction purposes
-#ifdef EDITOR
-	static std::unique_ptr<Editor> editor;
-#endif
+	//MainWindow
+	inline static std::wstring MainWindowName;
+	inline static HWND hWnd = nullptr;
+	inline static Resolution displayResolution;
+	inline static bool isFullScreen = false;
+	inline static bool isCursorHidden = false;
 };

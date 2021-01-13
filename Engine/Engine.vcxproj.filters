@@ -46,9 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Input.cpp" />
-    <ClCompile Include="src\Editor.cpp">
-      <Filter>Editor</Filter>
-    </ClCompile>
     <ClCompile Include="thirdparty\imgui\imgui_demo.cpp">
       <Filter>thirdparty\imgui</Filter>
     </ClCompile>
@@ -121,29 +118,15 @@
     <ClCompile Include="src\Unlit_Material.cpp">
       <Filter>Graphics\Material System</Filter>
     </ClCompile>
+    <ClCompile Include="src\Editor.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Time.h" />
-    <ClInclude Include="src\Editor.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EditorEntityWindow.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EditorMaterialEditWindow.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EditorResourceSelectionWindow.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EditorSceneHierarchyWindow.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="src\EditorWindowBase.h">
-      <Filter>Editor</Filter>
-    </ClInclude>
     <ClInclude Include="thirdparty\imgui\imconfig.h">
       <Filter>thirdparty\imgui</Filter>
     </ClInclude>
@@ -246,9 +229,31 @@
     <ClInclude Include="src\Unlit_Material.h">
       <Filter>Graphics\Material System</Filter>
     </ClInclude>
+    <ClInclude Include="src\EditorMetricsWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Editor.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
     <ClInclude Include="src\EditorTextureEditWindow.h">
       <Filter>Editor</Filter>
     </ClInclude>
+    <ClInclude Include="src\EditorWindowBase.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorResourceSelectionWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorSceneHierarchyWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorEntityWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorMaterialEditWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Engine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
