@@ -62,11 +62,23 @@ void Editor::Update()
 				if (ImGui::MenuItem("Scene##windowsMenu/Scene", nullptr, nullptr))
 					windows[1]->isActive = true;
 				
-				if (ImGui::MenuItem("Scene##windowsMenu/Metrics", nullptr, nullptr))
+				if (ImGui::MenuItem("Metrics##windowsMenu/Metrics", nullptr, nullptr))
 					windows[5]->isActive = true;
 
 				ImGui::EndMenu();
 			}
+
+			if (ImGui::BeginMenu("Draw Mode##drawModeMenu"))
+			{
+				if (ImGui::MenuItem("Solid##drawModeMenu/Solid", nullptr, nullptr))
+					Graphics::DisableWireframe();
+
+				if (ImGui::MenuItem("Wireframe##drawModeMenu/Wireframe", nullptr, nullptr))
+					Graphics::EnableWireframe();
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMainMenuBar();
 		}
 

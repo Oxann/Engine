@@ -8,7 +8,7 @@
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Light.h"
-
+#include "Unlit_Material.h"
 
 struct Resolution
 {
@@ -65,6 +65,11 @@ public:
 	static DirectX::XMFLOAT3 GetAmbientColor();
 	static float GetAmbientIntensity();
 
+	static void EnableWireframe();
+	static void DisableWireframe();
+	static bool IsWireFrameEnabled();
+	static const Unlit_Material& GetWireframeMaterial();
+
 public:
 	//DX objects
 	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
@@ -92,4 +97,7 @@ private:
 	inline static float horizontalFOV;
 	inline static float aspectRatio;
 	inline static ProjectionType projectionType;
+
+	//Drawing mode
+	inline static bool isWireframeEnabled = false;
 };

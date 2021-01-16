@@ -24,7 +24,14 @@ void Renderer::Update()
 		//Rendering
 		for (int i = 0; i < materials.size() && i < mesh->GetSubMeshCount(); i++)
 		{
-			materials[i]->Bind(&mesh->GetSubMeshes()[i],this);
+
+#ifdef EDITOR
+			if (Graphics::isWireframeEnabled)
+				Graphics::GetWireframeMaterial().Bind(&mesh->GetSubMeshes()[i], this);
+			else
+#endif
+				materials[i]->Bind(&mesh->GetSubMeshes()[i], this);
+			
 			Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[i].GetIndexCount(), 0u, 0u);
 		}
 	}

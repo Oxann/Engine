@@ -236,3 +236,52 @@ float Graphics::GetAmbientIntensity()
 {
 	return DirectX::XMVectorGetW(ambientLight);
 }
+
+void Graphics::EnableWireframe()
+{
+	isWireframeEnabled = true;
+	
+	D3D11_RASTERIZER_DESC rsDesc;
+	ZeroMemory(&rsDesc, sizeof(D3D11_RASTERIZER_DESC));
+
+	rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+	rsDesc.CullMode = D3D11_CULL_BACK;
+	rsDesc.FrontCounterClockwise = FALSE;
+	rsDesc.DepthClipEnable = TRUE;
+
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rsState;
+	pDevice->CreateRasterizerState(&rsDesc, &rsState);
+	
+	pDeviceContext->RSSetState(rsState.Get());
+}
+
+void Graphics::DisableWireframe()
+{
+	isWireframeEnabled = false;
+
+	D3D11_RASTERIZER_DESC rsDesc;
+	ZeroMemory(&rsDesc, sizeof(D3D11_RASTERIZER_DESC));
+
+	rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rsDesc.CullMode = D3D11_CULL_BACK;
+	rsDesc.FrontCounterClockwise = FALSE;
+	rsDesc.DepthClipEnable = TRUE;
+
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rsState;
+	pDevice->CreateRasterizerState(&rsDesc, &rsState);
+
+	pDeviceContext->RSSetState(rsState.Get());
+}
+
+bool Graphics::IsWireFrameEnabled()
+{
+	return isWireframeEnabled;
+}
+
+const Unlit_Material& Graphics::GetWireframeMaterial()
+{
+	static Unlit_Material wireframeMaterial("Graphics\\wireframeMaterial");
+	wireframeMaterial.SetColor( { 0.0f, 0.5f, 0.0f, 1.0f } );
+	
+	return wireframeMaterial;
+}
