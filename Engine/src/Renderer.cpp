@@ -5,37 +5,8 @@
 #include "Light.h"
 #include "EngineAssert.h"
 #include "Phong_Material.h"
+#include "Transform.h"
 
-void Renderer::Start()
-{	
-	if (mesh == nullptr)
-		SetMesh(Mesh::Cube);
-	
-	transform = GetEntity()->GetTransform();
-}
-
-void Renderer::Update()
-{
-	if (mesh)
-	{
-		//Updating topology
-		Graphics::pDeviceContext->IASetPrimitiveTopology(topology);
-		
-		//Rendering
-		for (int i = 0; i < materials.size() && i < mesh->GetSubMeshCount(); i++)
-		{
-
-#ifdef EDITOR
-			if (Graphics::isWireframeEnabled)
-				Graphics::GetWireframeMaterial().Bind(&mesh->GetSubMeshes()[i], this);
-			else
-#endif
-				materials[i]->Bind(&mesh->GetSubMeshes()[i], this);
-			
-			Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[i].GetIndexCount(), 0u, 0u);
-		}
-	}
-}
 
 Renderer* Renderer::Clone()
 {
@@ -173,58 +144,3 @@ void Renderer::UpdatePointLightBuffer() const
 
 	pointLightBuffer.ChangeData(&toGPU);
 }
-
-void Renderer::UpdateTransformBuffer_Only_MVP() const
-{
-	static DirectX::XMMATRIX MVP;
-	MVP = DirectX::XMMatrixTranspose(
-				DirectX::XMMatrixMultiply(
-					DirectX::XMMatrixMultiply(transform->GetWorldMatrix(), *Graphics::viewMatrix),
-					Graphics::projectionMatrix));
-
-	//First time initialization
-	static VS_ConstantBuffer<DirectX::XMMATRIX> TransformBuffer = {
-		&MVP,
-		1u,
-		0u,
-		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
-		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
-		false
-	};
-
-	TransformBuffer.ChangeData(&MVP);
-	TransformBuffer.BindPipeline();
-}
-
-void Renderer::UpdateTransformBuffer() const
-{
-	//Transform data
-	struct TransformData
-	{
-		DirectX::XMMATRIX modelView;
-		DirectX::XMMATRIX normalMatrix;
-		DirectX::XMMATRIX MVP;
-	};
-
-	static TransformData entityTransformData;
-	entityTransformData.modelView = DirectX::XMMatrixMultiply(transform->GetWorldMatrix(),*Graphics::viewMatrix);
-	entityTransformData.normalMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, DirectX::XMMatrixTranspose(entityTransformData.modelView)));
-
-	//Matrices are row order we need to make them column. 
-	entityTransformData.MVP = DirectX::XMMatrixTranspose(DirectX::XMMatrixMultiply(entityTransformData.modelView,Graphics::projectionMatrix));
-	entityTransformData.modelView = DirectX::XMMatrixTranspose(entityTransformData.modelView);
-
-	//First time initialization
-	static VS_ConstantBuffer<TransformData> TransformBuffer = {
-		&entityTransformData,
-		1u,
-		0u,
-		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
-		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
-		false
-	};
-		
-	TransformBuffer.ChangeData(&entityTransformData);
-	TransformBuffer.BindPipeline();
-}
-

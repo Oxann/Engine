@@ -71,10 +71,15 @@ void Editor::Update()
 			if (ImGui::BeginMenu("Draw Mode##drawModeMenu"))
 			{
 				if (ImGui::MenuItem("Solid##drawModeMenu/Solid", nullptr, nullptr))
-					Graphics::DisableWireframe();
-
+				{
+					Graphics::pDeviceContext->RSSetState(Graphics::RS_Solid.Get());
+					isWireframe = false;
+				}
 				if (ImGui::MenuItem("Wireframe##drawModeMenu/Wireframe", nullptr, nullptr))
-					Graphics::EnableWireframe();
+				{
+					Graphics::pDeviceContext->RSSetState(Graphics::RS_Wireframe.Get());
+					isWireframe = true;
+				}	
 
 				ImGui::EndMenu();
 			}

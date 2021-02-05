@@ -1,6 +1,7 @@
 #include "Unlit_Material.h"
 #include "Resources.h"
-
+#include "Renderer.h"
+#include "Graphics.h"
 
 Unlit_Material::Unlit_Material(std::string name)
 	:Material(name)
@@ -9,7 +10,7 @@ Unlit_Material::Unlit_Material(std::string name)
 	pixelShader = Resources::FindPixelShader("Unlit.cso");
 }
 
-void Unlit_Material::Bind(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Unlit_Material::Bind(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	(this->*(Bind_))(subMesh, renderer);
 }
@@ -58,7 +59,7 @@ const Material* Unlit_Material::GetDefaultMaterial()
 	return &defaultMat;
 }
 
-void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	//Binding shaders
 	vertexShader->BindPipeline();
@@ -68,19 +69,22 @@ void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, const Renderer* ren
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Position3D)->BindPipeline();
 	subMesh->GetIndexBuffer()->BindPipeline();
 
-	//Biding transform
-	renderer->UpdateTransformBuffer_Only_MVP();
-
-	//Binding material properties
-	struct Material_TO_GPU
-	{
-		alignas(16u)DirectX::XMFLOAT4 color;
+	//Vertex Shader
+	static VS_ConstantBuffer<DirectX::XMMATRIX> VS_CB = {
+		&renderer->MVP_Matrix,
+		1u,
+		0u,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		false
 	};
-	static Material_TO_GPU toGPU = {};
-	toGPU.color = color;
 
-	static PS_ConstantBuffer<Material_TO_GPU> buffer = {
-		&toGPU,
+	VS_CB.ChangeData(&renderer->MVP_Matrix);
+	VS_CB.BindPipeline();
+
+	//Pixel shader
+	static PS_ConstantBuffer<PS_CB_Slot3> PS_CB = {
+		&PS_CB_Slot3_,
 		1u,
 		PS_MaterialSlot,
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
@@ -88,11 +92,13 @@ void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, const Renderer* ren
 		false
 	};
 	
-	buffer.ChangeData(&toGPU);
-	buffer.BindPipeline();
+	PS_CB_Slot3_.color = color;
+
+	PS_CB.ChangeData(&PS_CB_Slot3_);
+	PS_CB.BindPipeline();
 }
 
-void Unlit_Material::BindUnlit_T(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Unlit_Material::BindUnlit_T(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	BindUnlit(subMesh, renderer);
 	

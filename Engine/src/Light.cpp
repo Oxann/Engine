@@ -1,5 +1,4 @@
 #include "Light.h"
-#include "Entity.h"
 
 //Directional
 std::vector<const DirectionalLight*> DirectionalLight::lights;

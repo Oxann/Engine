@@ -4,6 +4,8 @@
 #include "Scene.h"
 #include "EditorResourceSelectionWindow.h"
 #include "EditorMaterialEditWindow.h"
+#include "Transform.h"
+#include "Renderer.h"
 
 class EditorEntityWindow : public EditorWindowBase
 {
@@ -39,7 +41,7 @@ public:
 
 		displayedEntity = entity;
 		displayedTransform = displayedEntity->GetTransform();
-		displayedRenderer = displayedEntity->GetComponent<Renderer>();
+		displayedRenderer = displayedEntity->GetRenderer();
 		displayedPointLight = displayedEntity->GetComponent<PointLight>();
 		displayedDirectionalLight = displayedEntity->GetComponent<DirectionalLight>();
 		strcpy_s(displayedName, displayedEntity->name.c_str());

@@ -66,18 +66,18 @@ bool Mesh::SubMesh::HasTextureCoords() const
 
 size_t Mesh::GetSubMeshCount() const
 {
-    return submeshes.size();
+    return subMeshes.size();
 }
 
 const std::vector<Mesh::SubMesh>& Mesh::GetSubMeshes() const
 {
-    return submeshes;
+    return subMeshes;
 }
 
 Mesh::SubMesh& Mesh::AddNewSubMesh()
 {
-    submeshes.push_back({});
-    return submeshes.back();
+    subMeshes.push_back({});
+    return subMeshes.back();
 }
 
 void Mesh::Init()

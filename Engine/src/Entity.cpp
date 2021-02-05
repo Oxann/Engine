@@ -1,43 +1,42 @@
 #include "Entity.h"
 #include "EngineException.h"
+#include "Transform.h"
+#include "Renderer.h"
 
 Entity::Entity(std::string name)
 {
 	this->name = name;
-	transform = std::make_unique<Transform>();
-	Component* temp = transform.get();
-	temp->entity = this;
+	Transform_ = std::make_unique<Transform>();
+	static_cast<Component*>(Transform_.get())->entity = this;
 }
 
 Entity* Entity::Clone()
 {
 	Entity* newEntity = new Entity;
 	newEntity->name = name;
-	newEntity->transform = std::unique_ptr<Transform>(this->transform->Clone());
-	Component* temp = newEntity->transform.get();
-	temp->entity = newEntity;
-
-
-	for (auto& engineComponent : EngineComponents)
+	
+	//Transform
+	newEntity->Transform_ = std::unique_ptr<Transform>(this->Transform_->Clone());
+	static_cast<Component*>(newEntity->Transform_.get())->entity = newEntity;
+	
+	//Renderer
+	if (Renderer_)
 	{
-		auto newComponent = newEntity->EngineComponents.insert({ engineComponent.first,nullptr });
-		Component* clone = engineComponent.second->Clone();
-		clone->entity = newEntity;
-		newComponent.first->second.reset(clone);
+		newEntity->Renderer_ = std::unique_ptr<Renderer>(this->Renderer_->Clone());
+		static_cast<Component*>(newEntity->Renderer_.get())->entity = newEntity;
+		static_cast<Component*>(newEntity->Renderer_.get())->transform = newEntity->Transform_.get();
 	}
-
+			
 	for (auto& component : Components)
 	{
-		auto newComponent = newEntity->Components.insert({ component.first,nullptr });
-		Component* clone = component.second->Clone();
-		clone->entity = newEntity;
-		newComponent.first->second.reset(clone);
+		auto newComponent = newEntity->Components.insert({ component.first,std::unique_ptr<Component>(component.second->Clone()) });
+		newComponent.first->second->entity = newEntity;
+		newComponent.first->second->transform = newEntity->Transform_.get();
 	}
 
 	for (int i = 0; i < Children.size(); i++)
 	{
-		newEntity->Children.push_back(nullptr);
-		newEntity->Children.back().reset(this->Children[i]->Clone());
+		newEntity->Children.push_back(std::unique_ptr<Entity>(this->Children[i]->Clone()));
 		newEntity->Children.back()->parent = newEntity;
 	}
 
@@ -58,9 +57,7 @@ Entity* Entity::FindPrefab(std::string name)
 
 void Entity::MakePrefab(Entity* entity)
 {
-	Entity* newPrefab = entity->Clone();
-	//newPrefab->prefab = newPrefab;
-	Prefabs.insert({ entity->name,std::unique_ptr<Entity>(newPrefab) });
+	Prefabs.insert({ entity->name,std::unique_ptr<Entity>(entity->Clone()) });
 }
 
 Entity* Entity::AddChild(std::string name)
@@ -112,15 +109,25 @@ Entity* Entity::GetRoot() const
 
 Transform* Entity::GetTransform() const
 {
-	return transform.get();
+	return Transform_.get();
 }
 
-/*const Entity* Entity::GetPrefab() const
+Renderer* Entity::GetRenderer() const
 {
-	return prefab;
+	return Renderer_.get();
 }
 
-unsigned int Entity::GetInstanceCount() const
+Renderer* Entity::AddRenderer(Entity* cloneFrom)
 {
-	return prefab ? prefab->instanceCount : 1u;
-}*/
+	if (!Renderer_)
+	{
+		if (cloneFrom)
+			Renderer_.reset(cloneFrom->GetRenderer()->Clone());
+		else
+			Renderer_ = std::make_unique<Renderer>();
+
+		static_cast<Component*>(Renderer_.get())->entity = this;
+		static_cast<Component*>(Renderer_.get())->transform = this->Transform_.get();
+	}
+	return Renderer_.get();
+}

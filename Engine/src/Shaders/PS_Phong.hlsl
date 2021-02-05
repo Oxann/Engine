@@ -74,5 +74,5 @@ float4 main(float3 viewSpacePos : VIEWSPACEPOSITION,
                CalculateDirectionalLights(normal, viewSpacePos,shininess) +
                CalculatePointLights(normal, viewSpacePos,shininess);
     
-    return saturate(float4(phong, 1.0f));
+    return saturate(float4(phong, diffuseColor.a));
 }

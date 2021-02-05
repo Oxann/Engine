@@ -22,6 +22,26 @@ public:
 
 	void Update() override
 	{
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Opacity Mode:");
+		ImGui::SameLine();
+
+		const Material::Mode opacity = material->mode;
+		if (ImGui::BeginCombo("##opacityMode", opacityName.c_str()))
+		{
+			if (ImGui::Selectable("Opaque", opacity == Material::Mode::Opaque))
+			{
+				opacityName = "Opaque";
+				material->mode = Material::Mode::Opaque;
+			}
+			if (ImGui::Selectable("Transparent", opacity == Material::Mode::Transparent))
+			{
+				opacityName = "Transparent";
+				material->mode = Material::Mode::Transparent;
+			}
+			ImGui::EndCombo();
+		}
+
 		(this->*(this->materialEdit))(material);
 	}
 
@@ -31,6 +51,18 @@ public:
 		name = material->GetFileName() + "###MaterialEdit";
 		this->material = material;
 		materialEdit = materialEdits[typeid(*material)];
+
+		switch (material->mode)
+		{
+		case Material::Mode::Opaque:
+			opacityName = "Opaque";
+			break;
+		case Material::Mode::Transparent:
+			opacityName = "Transparent";
+			break;
+		default:
+			break;
+		}
 	}
 
 private:
@@ -139,9 +171,11 @@ private:
 		}
 	}
 private:
+
 	Material* material;
 	EditorResourceSelectionWindow* editorRSW;
 	EditorTextureEditWindow* editorTEW;
+	std::string opacityName;
 
 	std::unordered_map <std::type_index, void(EditorMaterialEditWindow::*)(Material*)> materialEdits;
 	void(EditorMaterialEditWindow::* materialEdit)(Material*) = nullptr;

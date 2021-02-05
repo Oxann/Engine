@@ -4,7 +4,6 @@
 #include <memory>
 #include <DirectXMath.h>
 
-#include "Entity.h"
 #include "Mesh.h"
 #include "Material.h"
 #include "ResourceBase.h"

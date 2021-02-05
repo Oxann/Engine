@@ -1,11 +1,14 @@
 #pragma once
 
-#include "Entity.h"
 #include <map>
+#include <string>
+
+#include "Entity.h"
 
 class Scene
 {
 	friend class EditorSceneHierarchyWindow;
+	friend class Engine;
 public:
 	static void Init();
 	static void CreateNewScene(unsigned char index, std::string name);
@@ -18,7 +21,6 @@ public:
 	Entity* NewEntity(std::string name);
 	Entity* NewEntity(Entity* from);
 	Entity* GetEntity(std::string name);
-	void Update();
 	size_t GetEntityCount() const;
 	size_t GetRootEntityCount() const;
 private:
@@ -26,8 +28,6 @@ private:
 		:Index(index),
 		Name(name)
 	{}
-	void UpdateComponents(Entity* entity);
-	void UpdateEngineComponents(Entity* entity);
 public:
 	std::string Name;
 	unsigned char Index;

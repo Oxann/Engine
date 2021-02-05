@@ -5,17 +5,18 @@
 #include <memory>
 #include <string>
 #include <typeindex>
+#include <unordered_map>
 
-//Components
+#include "Component.h"
 #include "Transform.h"
 #include "Renderer.h"
-#include "Light.h"
 
 class Entity
 {
 	friend class Model;
 	friend class Scene;
 	friend class EditorSceneHierarchyWindow;
+	friend class Engine;
 public:
 	Entity(std::string name);
 	~Entity() = default;
@@ -34,13 +35,13 @@ public:
 	static void MakePrefab(Entity* entity);
 public:
 	template<class ComponentType>
-	inline ComponentType* GetComponent() const
+	ComponentType* GetComponent() const
 	{
 		static_assert(std::is_base_of<Component, ComponentType>::value,"All components must be derived from Component.");
 		static_assert(!std::is_same<Transform, ComponentType>::value, "Use GetTransform instead.");
 		
-		auto result = EngineComponents.find(typeid(ComponentType));
-		if (result == EngineComponents.end())
+		auto result = Components.find(typeid(ComponentType));
+		if (result == Components.end())
 			return nullptr;
 		else
 		{
@@ -50,15 +51,16 @@ public:
 	
 	//Returns newly added component.
 	template<class ComponentType>
-	inline ComponentType* AddComponent()
+	ComponentType* AddComponent()
 	{		
 		static_assert(std::is_base_of<Component, ComponentType>::value, "All components must be derived from Component.");
 		static_assert(!std::is_same<Transform, ComponentType>::value, "Transform can't be added.");
 
-		auto result = EngineComponents.insert({ typeid(ComponentType),std::make_unique<ComponentType>() });
+		auto result = Components.insert({ typeid(ComponentType),std::make_unique<ComponentType>() });
 		if (result.second)
 		{
 			result.first->second->entity = this;
+			result.first->second->transform = Transform_.get();
 			return static_cast<ComponentType*>(result.first->second.get());
 		}
 		else
@@ -68,22 +70,22 @@ public:
 	//Clones the component from given entity.
 	//If the given entity doesn't have the component or this entity already has the component,it will return nullptr.
 	template <class ComponentType>
-	inline ComponentType* AddComponent(const Entity* cloneFrom)
+	ComponentType* AddComponent(const Entity* cloneFrom)
 	{
 		static_assert(std::is_base_of<Component, ComponentType>::value, "All components must be derived from Component.");
 		static_assert(std::is_same<Transform, ComponentType>::value, "Transform can't be added.");
 
 		std::type_index componentType = typeid(ComponentType);		
-		auto cloneComponent = cloneFrom->EngineComponents.find(componentType);
+		auto cloneComponent = cloneFrom->Components.find(componentType);
 
-		if(cloneComponent == cloneFrom->EngineComponents.end() || EngineComponents.find(componentType) != EngineComponents.end())
+		if(cloneComponent == cloneFrom->Components.end() || Components.find(componentType) != Components.end())
 			return nullptr;
 		else
 		{
-			auto result = EngineComponents.insert({ componentType,std::make_unique<ComponentType>() });
-			ComponentType* newComponent = static_cast<ComponentType*>(cloneComponent.second.get())->Clone();
-			result.first->second.reset(newComponent);
-			return newComponent;
+			auto result = Components.insert({ componentType, std::unique_ptr<Component>(cloneComponent.second.get()->Clone()) });
+			result.first->second->entity = this;
+			result.first->second->transform = Transform_.get();
+			return static_cast<ComponentType*>(result.first->second.get());
 		}
 	}
 
@@ -99,10 +101,13 @@ public:
 
 	size_t GetDescendantCount() const;
 
-	//If the calling entity is the root then returns itself.
+	//If the caller is the root then returns itself.
 	Entity* GetRoot() const;
 
 	Transform* GetTransform() const;
+
+	Renderer* GetRenderer() const;
+	Renderer* AddRenderer(Entity* cloneFrom);
 
 public:
 	std::string name;
@@ -110,8 +115,8 @@ private:
 	Entity* parent = nullptr;
 	std::vector<std::unique_ptr<Entity>> Children;
 	std::unordered_map<std::type_index, std::unique_ptr<Component>> Components;
-	std::unordered_map<std::type_index, std::unique_ptr<Component>> EngineComponents;
-	std::unique_ptr<Transform> transform;
+	std::unique_ptr<Transform> Transform_;
+	std::unique_ptr<Renderer> Renderer_ = nullptr;
 private:
 	inline static std::unordered_map<std::string, std::unique_ptr<Entity>> Prefabs;
 };

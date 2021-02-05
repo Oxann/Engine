@@ -1,13 +1,12 @@
 #pragma once
 #include "ConstantBuffer.h"
-#include "Transform.h"
+#include "Component.h"
 
 class DirectionalLight final : public Component
 {
 	friend class Renderer;
 public:
 	void Start() override;
-	void Update() override {};
 	DirectionalLight* Clone() override;
 public:
 	DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
@@ -23,7 +22,6 @@ class PointLight final : public Component
 	friend class Renderer;
 public:
 	void Start() override;
-	void Update() override {};
 	PointLight* Clone() override;
 public:
 	DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };

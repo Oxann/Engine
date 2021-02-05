@@ -1,11 +1,11 @@
 #pragma once
 #include <DirectXMath.h>
-#include "Component.h"
 
+#include "Component.h"
 
 class Transform final : public Component
 {
-	friend class Entity;
+	friend Entity;
 public:
 	void Reset();
 
@@ -56,9 +56,6 @@ public:
 
 	//Transform's world space matrix.
 	DirectX::XMMATRIX GetWorldMatrix() const;
-
-	void Start() {};
-	void Update() {};
 
 	Transform* Clone() override;
 private:

@@ -448,6 +448,7 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">Vertex</ShaderType>
     </FxCompile>
+    <None Include="src\Shaders\PS_Unlit.hlsli" />
     <None Include="src\Shaders\Light.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -569,6 +570,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">5.0</ShaderModel>
     </FxCompile>
+    <None Include="src\Shaders\VS_Unlit.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll" />

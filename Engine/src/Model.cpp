@@ -1,9 +1,11 @@
 #pragma once
 #include "Model.h"
 #include "Scene.h"
+#include "Entity.h"
 #include "EngineException.h"
 #include "Resources.h"
 #include "Phong_Material.h"
+#include "Renderer.h"
 
 #include <filesystem>
 
@@ -43,7 +45,7 @@ Model::Model(std::filesystem::path file)
 
 	if (root->GetMesh() != nullptr)
 	{
-		Renderer* renderer = newPrefab->AddComponent<Renderer>();
+		Renderer* renderer = newPrefab->AddRenderer(nullptr);
 		renderer->SetMesh(root->GetMesh());
 		for (int i = 0; i < root->materials.size(); i++)
 			renderer->SetMaterial(root->materials[i], i);
@@ -52,8 +54,7 @@ Model::Model(std::filesystem::path file)
 	InitHierarchy(root.get(), scene->mRootNode, scene,newPrefab);
 	
 	//Creating a new prefab from this model.
-	Entity::MakePrefab(newPrefab);
-	delete newPrefab;
+	Entity::Prefabs.insert({ newPrefab->name,std::unique_ptr<Entity>(newPrefab) });
 }
 
 size_t Model::GetMeshCount() const
@@ -110,7 +111,7 @@ void Model::InitHierarchy(Node* node, aiNode* ai_node, const aiScene* scene,Enti
 		newPrefab_newChild->parent = newPrefab;
 		if (newChild->GetMesh() != nullptr)
 		{
-			Renderer* renderer = newPrefab_newChild->AddComponent<Renderer>();
+			Renderer* renderer = newPrefab_newChild->AddRenderer(nullptr);
 			renderer->SetMesh(newChild->GetMesh());
 			for (int i = 0; i < newChild->materials.size(); i++)
 				renderer->SetMaterial(newChild->materials[i],i);
@@ -173,7 +174,7 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 			const auto& isMaterialAlreadyExist = materials.find(mat->GetName().C_Str());
 
 			if (isMaterialAlreadyExist == materials.end())
-			{				
+			{	
 				std::unique_ptr<Phong_Material> newMaterial = std::make_unique<Phong_Material>(mat->GetName().C_Str());
 				
 				////////// DIFFUSE //////////

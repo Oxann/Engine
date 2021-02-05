@@ -20,6 +20,6 @@ OUT main( float3 position : POSITION, float3 normal : NORMAL )
     OUT Out;
     Out.Position = mul(float4(position, 1.0f), MVP);
     Out.ViewSpacePosition = mul(float4(position, 1.0f), modelView).xyz;
-    Out.ViewSpaceNormal = normalize(mul(normal, (float3x3) modelView));
+    Out.ViewSpaceNormal = normalize(mul(normal, (float3x3) normalMatrix));
     return Out;
 }

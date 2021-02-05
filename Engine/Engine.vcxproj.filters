@@ -265,6 +265,12 @@
     <None Include="src\Shaders\Light.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="src\Shaders\VS_Unlit.hlsli">
+      <Filter>Shaders\Unlit</Filter>
+    </None>
+    <None Include="src\Shaders\PS_Unlit.hlsli">
+      <Filter>Shaders\Unlit</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Editor">

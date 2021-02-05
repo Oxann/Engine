@@ -58,6 +58,7 @@ public:
 	inline static bool isActive = true;
 	inline static ImGuiIO* imguiIO = nullptr;
 	inline static std::vector<std::unique_ptr<EditorWindowBase>> windows;
+	inline static bool isWireframe = false;
 };
 
 

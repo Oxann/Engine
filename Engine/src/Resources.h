@@ -32,4 +32,6 @@ private:
 	static inline std::unordered_map<std::string, std::unique_ptr<VertexShader>> VertexShaders;
 	static inline std::unordered_map<std::string, std::unique_ptr<PixelShader>> PixelShaders;
 	static inline std::unordered_map<std::string, std::unique_ptr<Model>> Models;
+
+	static inline std::string shaderDir;
 };

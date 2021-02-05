@@ -1,28 +1,24 @@
 
 #pragma once
 #include "Mesh.h"
-#include "Transform.h"
 #include <DirectXMath.h>
-#include "Component.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Resources.h"
 #include "Material.h"
+#include "Component.h"
 
 class Renderer final: public Component
 {
 	friend class Phong_Material;
 	friend class Unlit_Material;
+	friend class Engine;
 
 #ifdef EDITOR
 	friend class EditorEntityWindow;
 #endif
 
 public:
-	void Start() override;
-
-	void Update() override;
-
 	Renderer* Clone() override;
 
 	//If renderer already has a mesh this function also resets all materials to default.
@@ -37,12 +33,14 @@ public:
 private:
 	void UpdateDirectionalLightBuffer() const;
 	void UpdatePointLightBuffer() const;
-	void UpdateTransformBuffer() const;
-	void UpdateTransformBuffer_Only_MVP() const;
 public:
 	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 private:
 	const Mesh* mesh = nullptr;
 	std::vector<const Material*> materials;
-	Transform* transform;
+
+	//All matrices are column order.
+	DirectX::XMMATRIX MV_Matrix;
+	DirectX::XMMATRIX normalMatrix;
+	DirectX::XMMATRIX MVP_Matrix;
 };

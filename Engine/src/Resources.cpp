@@ -12,11 +12,15 @@ void Resources::Init()
 {
 	ENGINE_LOG(ENGINE_INFO, "Resources loading...");
 
-	#ifndef NDEBUG
-	std::string shaderDir = "Shaders\\Debug";
-	#else
-	std::string shaderDir = "Shaders\\Release";
-	#endif
+#if defined NDEBUG && defined EDITOR
+	shaderDir = "Shaders\\Release-Editor\\";
+#elif defined NDEBUG && !defined EDITOR
+	shaderDir = "Shaders\\Release\\";
+#elif !defined NDEBUG && defined EDITOR
+	shaderDir = "Shaders\\Debug-Editor\\";
+#else
+	shaderDir = "Shaders\\Debug\\";
+#endif
 
 	for (auto& file : recursive_directory_iterator(shaderDir))
 	{
@@ -87,13 +91,7 @@ Texture* Resources::FindTexture(std::string file)
 
 VertexShader* Resources::FindVertexShader(std::string file)
 {
-#ifndef NDEBUG
-	const std::string shaderDir = "Shaders\\Debug\\VS_";
-#else
-	const std::string shaderDir = "Shaders\\Release\\VS_";
-#endif
-
-	const auto& vs = VertexShaders.find(shaderDir + file);
+	const auto& vs = VertexShaders.find(shaderDir + "VS_" + file);
 
 	if (vs == VertexShaders.end())
 		return nullptr;
@@ -103,13 +101,7 @@ VertexShader* Resources::FindVertexShader(std::string file)
 
 PixelShader* Resources::FindPixelShader(std::string file)
 {
-#ifndef NDEBUG
-	const std::string shaderDir = "Shaders\\Debug\\PS_";
-#else
-	const std::string shaderDir = "Shaders\\Release\\PS_";
-#endif
-
-	const auto& ps = PixelShaders.find(shaderDir + file);
+	const auto& ps = PixelShaders.find(shaderDir + "PS_" + file);
 
 	if (ps == PixelShaders.end())
 		return nullptr;

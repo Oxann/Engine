@@ -10,7 +10,7 @@ class Phong_Material : public Material
 public:
 	Phong_Material(std::string name);
 
-	void Bind(const Mesh::SubMesh* subMesh, const Renderer* renderer) const override;
+	void Bind(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const override;
 
 	//Diffuse
 	void SetDiffuseColor(const DirectX::XMFLOAT4& color);
@@ -49,30 +49,30 @@ public:
 
 private:
 	//Binds default phong material, only diffuse and specular color, no texture mapping.
-	void BindPhong(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	//Phong with diffuse map.
-	void BindPhong_D(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong_D(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	//Phong with specular map.
-	void BindPhong_S(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong_S(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	//Phong with diffuse and specular map.
-	void BindPhong_D_S(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong_D_S(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	//Phong with normal map.
-	void BindPhong_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	//Phong with diffuse and normal map.
-	void BindPhong_D_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong_D_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	//Phong with diffuse,specular and normal map.
-	void BindPhong_D_S_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const;
+	void BindPhong_D_S_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
 
 	void DecideBind();
 
 private:
-	void (Phong_Material::* Bind_)(const Mesh::SubMesh*,const Renderer*) const = &Phong_Material::BindPhong;
+	void (Phong_Material::* Bind_)(const Mesh::SubMesh*, std::unique_ptr<Renderer>& renderer) const = &Phong_Material::BindPhong;
 
 	DirectX::XMFLOAT4 diffuseColor = { 0.8f, 0.8f, 0.8f, 1.0f };
 	const Texture* diffuseMap = nullptr;
@@ -83,6 +83,24 @@ private:
 	float ShininessStrength = 0.5f;
 
 	const Texture* normalMap = nullptr;
+
+private:
+	struct VS_CB_Slot0
+	{
+		DirectX::XMMATRIX modelView;
+		DirectX::XMMATRIX normalMatrix;
+		DirectX::XMMATRIX MVP;
+	};
+	inline static VS_CB_Slot0 VS_CB_Slot0_;
+
+	struct PS_CB_Slot3
+	{
+		alignas(16u)DirectX::XMFLOAT4 diffuseColor;
+		alignas(16u)DirectX::XMFLOAT4 specularColor;
+		float shininess;
+		float shininessStrength;
+	};
+	inline static PS_CB_Slot3 PS_CB_Slot3_;
 
 private:
 	enum VariantFlag

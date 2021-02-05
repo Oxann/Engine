@@ -53,5 +53,5 @@ public:
 	inline static Mesh* Sphere;
 	inline static Mesh* Quad;
 private:
-	std::vector<SubMesh> submeshes;
+	std::vector<SubMesh> subMeshes;
 };

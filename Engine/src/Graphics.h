@@ -21,6 +21,7 @@ class Graphics
 	friend class D3DBase;
 	friend class Renderer;
 	friend class MainWindow;
+	friend class Engine;
 public:
 	enum class ProjectionType
 	{
@@ -34,11 +35,7 @@ public:
 	};
 public:
 	static void Init(HWND hWnd);
-	Graphics() = delete;
-	Graphics(const Graphics&) = delete;
-	Graphics(Graphics&&) = delete;
-	Graphics& operator= (const Graphics&) = delete;
-	Graphics& operator= (Graphics&&) = delete;
+
 	static void EndFrame();
 	static void BeginFrame();
 	static void Enable_VSYNC();
@@ -65,11 +62,14 @@ public:
 	static DirectX::XMFLOAT3 GetAmbientColor();
 	static float GetAmbientIntensity();
 
-	static void EnableWireframe();
-	static void DisableWireframe();
-	static bool IsWireFrameEnabled();
 	static const Unlit_Material& GetWireframeMaterial();
 
+	static const DirectX::XMMATRIX& GetViewMatrix() { return *viewMatrix; }
+	static const DirectX::XMMATRIX& GetProjectionMatrix() { return projectionMatrix; }
+	static const DirectX::XMMATRIX& GetViewProjectionMatrix() { return viewProjectionMatrix; }
+private:
+	static void InitRS();
+	static void InitBS();
 public:
 	//DX objects
 	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
@@ -78,6 +78,13 @@ public:
 	inline static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil = nullptr;
 
+	//Rasterizer States
+	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_Solid;
+	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_Wireframe;
+
+	//Blend States
+	inline static Microsoft::WRL::ComPtr<ID3D11BlendState> BS_Opaque;
+	inline static Microsoft::WRL::ComPtr<ID3D11BlendState> BS_Transparent;
 private:
 	inline static bool isVSyncEnabled = false;
 	inline static ClearMode clearMode;
@@ -88,9 +95,6 @@ private:
 	inline static DirectX::XMVECTOR ambientLight; // w is intensity
 	inline static PS_ConstantBuffer<DirectX::XMVECTOR>* ambientLightBuffer;	
 
-	//Currently if we are in editor mode, view matrix is editor camera's lookat matrix
-	inline static DirectX::XMMATRIX* viewMatrix;
-
 	//Projection stuff
 	inline static DirectX::XMMATRIX projectionMatrix;
 	inline static float verticalFOV;
@@ -98,6 +102,8 @@ private:
 	inline static float aspectRatio;
 	inline static ProjectionType projectionType;
 
-	//Drawing mode
-	inline static bool isWireframeEnabled = false;
+	inline static DirectX::XMMATRIX viewProjectionMatrix;
+
+	//Currently if we are in editor mode, view matrix is editor camera's lookat matrix
+	inline static DirectX::XMMATRIX* viewMatrix;
 };

@@ -1,8 +1,14 @@
 #include "Scene.h"
+#include "Entity.h"
 #include "EngineAssert.h"
 #include "Renderer.h"
 #include "Resources.h"
 #include "Unlit_Material.h"
+#include "Light.h"
+#include "Graphics.h"
+#include "Editor.h"
+
+#include <set>
 
 std::map<unsigned char,Scene> Scene::Scenes;
 Scene* Scene::ActiveScene;
@@ -10,12 +16,13 @@ Scene* Scene::ActiveScene;
 void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
-	
-	Entity* wolf = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
 
-	Entity* light = Scene::GetScene(1)->NewEntity("Light");
+	Entity* sponza = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
+	Entity* sponza1 = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("spaceship.fbx"));
+	sponza1->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
+	Entity* light = Scene::GetScene(1)->NewEntity("light");
 	light->AddComponent<DirectionalLight>();
-	
+
 	Scene::LoadScene(1);
 }
 
@@ -28,7 +35,7 @@ void Scene::CreateNewScene(unsigned char index, std::string name)
 Scene* Scene::GetScene(unsigned char index)
 {
 	auto scene = Scenes.find(index);
-	ENGINEASSERT(scene != Scenes.end(), "Specified scene index is not correct");
+	ENGINEASSERT(scene != Scenes.end(), "Scene index is not correct");
 	return &scene->second;
 }
 
@@ -88,22 +95,6 @@ Entity* Scene::GetEntity(std::string name)
 	return nullptr;
 }
 
-void Scene::Update()
-{
-	size_t entitiySize = Entities.size();
-
-	for (size_t i = 0; i < entitiySize; i++)
-	{
-		UpdateComponents(Entities[i].get());
-	}
-
-	//Engine Component Calls
-	for (size_t i = 0; i < entitiySize; i++)
-	{
-		UpdateEngineComponents(Entities[i].get());
-	}
-}
-
 size_t Scene::GetRootEntityCount() const
 {
 	return Entities.size();
@@ -117,50 +108,4 @@ size_t Scene::GetEntityCount() const
 		count += Entities[i]->GetDescendantCount();
 	}
 	return count;
-}
-
-void Scene::UpdateComponents(Entity* entity)
-{
-	/*
-	for (size_t j = 0; j < componentSize; j++)
-	{
-		auto& component = entity->Components[j];
-		switch (component->state)
-		{
-		[[unlikely]] case Component::State::Start:
-			component->Start();
-			component->state = Component::State::Update;
-			break;
-		[[likely]] case Component::State::Update:
-			component->Update();
-			break;
-		default:
-			break;
-		}
-	}
-
-	for (int i = 0; i < entity->GetChildrenCount(); i++)
-		UpdateComponents(entity->Children[i].get());*/
-}
-
-void Scene::UpdateEngineComponents(Entity* entity)
-{
-	for (auto& component : entity->EngineComponents)
-	{
-		switch (component.second->state)
-		{
-		[[unlikely]] case Component::State::Start:
-			component.second->Start();
-			component.second->state = Component::State::Update;
-			break;
-		[[likely]] case Component::State::Update:
-			component.second->Update();
-			break;
-		default:
-			break;
-		}
-	}
-
-	for (int i = 0; i < entity->GetChildrenCount(); i++)
-		UpdateEngineComponents(entity->Children[i].get());
 }

@@ -77,9 +77,9 @@ float4 main(float3 viewSpacePos : VIEWSPACEPOSITION,
     float shininess = pow(2.0f, 13.0f * matShininess);
      
     //Lighting   
-    float3 phong = AmbientLight.rgb * AmbientLight.a * (float3) diffuseColor +
+    float3 phong = AmbientLight.rgb * AmbientLight.a * diffuseColor.rgb +
                CalculateDirectionalLights(normal, viewSpacePos, diffuseColor.rgb, shininess) +
                CalculatePointLights(normal, viewSpacePos, diffuseColor.rgb, shininess);
     
-    return saturate(float4(phong, 1.0f));
+    return saturate(float4(phong, diffuseColor.a));
 }

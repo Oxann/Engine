@@ -1,7 +1,7 @@
 #include "Phong_Material.h"
 #include "Resources.h"
-
-
+#include "Renderer.h"
+#include "Graphics.h"
 
 Phong_Material::Phong_Material(std::string name)
 	:Material(name)
@@ -10,9 +10,9 @@ Phong_Material::Phong_Material(std::string name)
 	pixelShader = Resources::FindPixelShader("Phong.cso");
 }
 
-void Phong_Material::Bind(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::Bind(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
-	(this->*(this->Bind_))(subMesh,renderer);
+	(this->*(this->Bind_))(subMesh, renderer);
 }
 
 void Phong_Material::SetDiffuseColor(const DirectX::XMFLOAT4& color)
@@ -127,63 +127,67 @@ const Phong_Material* Phong_Material::GetDefaultMaterial()
 	return &defaultMat;
 }
 
-void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	//Binding shaders
 	vertexShader->BindPipeline();
 	pixelShader->BindPipeline();
-	
-	//Binding lights
+
+	//Lights
 	renderer->UpdateDirectionalLightBuffer();
 	renderer->UpdatePointLightBuffer();
-
-	//Binding transform
-	renderer->UpdateTransformBuffer();
-
+	
 	//Binding mesh
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Position3D)->BindPipeline();
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Normal)->BindPipeline();
 	subMesh->GetIndexBuffer()->BindPipeline();
 
-	//Binding material properties
-	struct Material_TO_GPU
-	{
-		alignas(16u)DirectX::XMFLOAT4 diffuseColor;
-		alignas(16u)DirectX::XMFLOAT4 specularColor;
-		float shininess;
-		float shininessStrength;
+	//Vertex Shader
+	static VS_ConstantBuffer<VS_CB_Slot0> VS_CB = {
+		&VS_CB_Slot0_,
+		1u,
+		0u,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		false
+	};
+	
+	VS_CB_Slot0_.modelView = renderer->MV_Matrix;
+	VS_CB_Slot0_.normalMatrix = renderer->normalMatrix;
+	VS_CB_Slot0_.MVP = renderer->MVP_Matrix;
+
+	VS_CB.ChangeData(&VS_CB_Slot0_);
+	VS_CB.BindPipeline();
+
+	//Pixel Shader	
+	static PS_ConstantBuffer<PS_CB_Slot3> PS_CB = {
+		&PS_CB_Slot3_,
+		1u,
+		PS_MaterialSlot,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true
 	};
 
-	static Material_TO_GPU toGPU = {};
-	toGPU.diffuseColor = diffuseColor;
-	toGPU.specularColor = specularColor;
-	toGPU.shininess = Shininess;
-	toGPU.shininessStrength = ShininessStrength;
+	PS_CB_Slot3_.diffuseColor = diffuseColor;
+	PS_CB_Slot3_.specularColor = specularColor;
+	PS_CB_Slot3_.shininess = Shininess;
+	PS_CB_Slot3_.shininessStrength = ShininessStrength;
 
-
-	static PS_ConstantBuffer<Material_TO_GPU> buffer = {
-	&toGPU,
-	1u,
-	PS_MaterialSlot,
-	D3D11_USAGE::D3D11_USAGE_DYNAMIC,
-	D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
-	true
-	};
-
-	buffer.ChangeData(&toGPU);
-	buffer.BindPipeline();
+	PS_CB.ChangeData(&PS_CB_Slot3_);
+	PS_CB.BindPipeline();
 }
 
-void Phong_Material::BindPhong_D(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong_D(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
-	BindPhong(subMesh,renderer);
+	BindPhong(subMesh, renderer);
 
 	diffuseMap->BindPipeline(Texture::Type::DIFFUSE);
 
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_S(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong_S(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -192,7 +196,7 @@ void Phong_Material::BindPhong_S(const Mesh::SubMesh* subMesh, const Renderer* r
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_D_S(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong_D_S(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -202,7 +206,7 @@ void Phong_Material::BindPhong_D_S(const Mesh::SubMesh* subMesh, const Renderer*
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -213,7 +217,7 @@ void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, const Renderer* r
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Bitangent)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -225,7 +229,7 @@ void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, const Renderer*
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Bitangent)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_D_S_N(const Mesh::SubMesh* subMesh, const Renderer* renderer) const
+void Phong_Material::BindPhong_D_S_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
 {
 	BindPhong(subMesh, renderer);
 

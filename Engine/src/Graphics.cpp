@@ -52,6 +52,8 @@ void Graphics::Init(HWND hWnd)
 		&pDeviceContext
 	));
 
+	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	//Viewport
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = 0.0f;
@@ -114,6 +116,9 @@ void Graphics::Init(HWND hWnd)
 	//Ambient Lighting
 	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 	ambientLightBuffer = new PS_ConstantBuffer<DirectX::XMVECTOR>(&ambientLight, 1u, 0u, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
+
+	InitRS();
+	InitBS();
 
 	ENGINE_LOG(ENGINE_INFO, "Graphics Ready!");
 }
@@ -237,51 +242,65 @@ float Graphics::GetAmbientIntensity()
 	return DirectX::XMVectorGetW(ambientLight);
 }
 
-void Graphics::EnableWireframe()
-{
-	isWireframeEnabled = true;
-	
-	D3D11_RASTERIZER_DESC rsDesc;
-	ZeroMemory(&rsDesc, sizeof(D3D11_RASTERIZER_DESC));
-
-	rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
-	rsDesc.CullMode = D3D11_CULL_BACK;
-	rsDesc.FrontCounterClockwise = FALSE;
-	rsDesc.DepthClipEnable = TRUE;
-
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rsState;
-	pDevice->CreateRasterizerState(&rsDesc, &rsState);
-	
-	pDeviceContext->RSSetState(rsState.Get());
-}
-
-void Graphics::DisableWireframe()
-{
-	isWireframeEnabled = false;
-
-	D3D11_RASTERIZER_DESC rsDesc;
-	ZeroMemory(&rsDesc, sizeof(D3D11_RASTERIZER_DESC));
-
-	rsDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-	rsDesc.CullMode = D3D11_CULL_BACK;
-	rsDesc.FrontCounterClockwise = FALSE;
-	rsDesc.DepthClipEnable = TRUE;
-
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rsState;
-	pDevice->CreateRasterizerState(&rsDesc, &rsState);
-
-	pDeviceContext->RSSetState(rsState.Get());
-}
-
-bool Graphics::IsWireFrameEnabled()
-{
-	return isWireframeEnabled;
-}
-
 const Unlit_Material& Graphics::GetWireframeMaterial()
 {
 	static Unlit_Material wireframeMaterial("Graphics\\wireframeMaterial");
 	wireframeMaterial.SetColor( { 0.0f, 0.5f, 0.0f, 1.0f } );
 	
 	return wireframeMaterial;
+}
+
+void Graphics::InitRS()
+{
+	D3D11_RASTERIZER_DESC solid;
+	ZeroMemory(&solid, sizeof(D3D11_RASTERIZER_DESC));
+
+	solid.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	solid.CullMode = D3D11_CULL_BACK;
+	solid.FrontCounterClockwise = FALSE;
+	solid.DepthClipEnable = TRUE;
+	
+	pDevice->CreateRasterizerState(&solid, &RS_Solid);
+
+	////////////////////////////////////////////////////
+
+	D3D11_RASTERIZER_DESC wireframe;
+	ZeroMemory(&wireframe, sizeof(D3D11_RASTERIZER_DESC));
+
+	wireframe.FillMode = D3D11_FILL_MODE::D3D11_FILL_WIREFRAME;
+	wireframe.CullMode = D3D11_CULL_BACK;
+	wireframe.FrontCounterClockwise = FALSE;
+	wireframe.DepthClipEnable = TRUE;
+
+	pDevice->CreateRasterizerState(&wireframe, &RS_Wireframe);
+}
+
+void Graphics::InitBS()
+{
+	D3D11_BLEND_DESC opaque;
+	opaque.AlphaToCoverageEnable = FALSE;
+	opaque.IndependentBlendEnable = FALSE;
+	opaque.RenderTarget[0].BlendEnable = FALSE;
+	opaque.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+	opaque.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+	opaque.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	opaque.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	opaque.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+	opaque.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	opaque.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+	pDevice->CreateBlendState(&opaque, &BS_Opaque);
+
+	
+	D3D11_BLEND_DESC transparent;
+	transparent.AlphaToCoverageEnable = FALSE;
+	transparent.IndependentBlendEnable = FALSE;
+	transparent.RenderTarget[0].BlendEnable = TRUE;
+	transparent.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+	transparent.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+	transparent.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	transparent.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	transparent.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+	transparent.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	transparent.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+	pDevice->CreateBlendState(&transparent, &BS_Transparent);
 }

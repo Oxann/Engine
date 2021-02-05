@@ -81,5 +81,5 @@ float4 main(float3 ViewSpacePosition : VIEWSPACEPOSITION,
                CalculateDirectionalLights(ViewSpaceNormal, ViewSpacePosition, shininess) +
                CalculatePointLights(ViewSpaceNormal, ViewSpacePosition, shininess);
     
-    return saturate(float4(phong, 1.0f));
+    return saturate(float4(phong, matDiffuseColor.a));
 }
