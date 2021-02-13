@@ -102,7 +102,7 @@ struct TransparentObject
 
 	void Render() const
 	{
-		renderer->GetMaterials()[index]->Bind(&renderer->GetMesh()->GetSubMeshes()[index], renderer);
+		renderer->GetMaterials()[index]->Bind(&renderer->GetMesh()->GetSubMeshes()[index], renderer.get());
 		Graphics::pDeviceContext->DrawIndexed(renderer->GetMesh()->GetSubMeshes()[index].GetIndexCount(), 0u, 0u);
 	}
 };
@@ -194,14 +194,15 @@ void Engine::RenderEntity(std::unique_ptr<Entity>& entity, DirectX::XMMATRIX wor
 #ifdef EDITOR
 				if (Editor::isWireframe)
 				{
-					Graphics::GetWireframeMaterial().Bind(&mesh->GetSubMeshes()[i], entity->Renderer_);
+					static Material* wireframeMaterial = Resources::FindMaterial("$Default\\wireframeMaterial");
+					wireframeMaterial->Bind(&mesh->GetSubMeshes()[i], entity->Renderer_.get());
 					Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[i].GetIndexCount(), 0u, 0u);
 					continue;
 				}
 #endif
 				if (materials[i]->mode == Material::Mode::Opaque)
 				{
-					materials[i]->Bind(&mesh->GetSubMeshes()[i], entity->Renderer_);
+					materials[i]->Bind(&mesh->GetSubMeshes()[i], entity->Renderer_.get());
 					Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[i].GetIndexCount(), 0u, 0u);
 				}
 				else

@@ -5,6 +5,7 @@
 #include "Texture.h"
 #include "Model.h"
 #include "Shader.h"
+#include "Material.h"
 
 #include <sstream>
 #include <unordered_map>
@@ -25,6 +26,7 @@ public:
 
 	static Model* FindModel(std::string file);
 
+	static Material* FindMaterial(std::string file);
 private:
 	static void Init();
 private:
@@ -32,6 +34,7 @@ private:
 	static inline std::unordered_map<std::string, std::unique_ptr<VertexShader>> VertexShaders;
 	static inline std::unordered_map<std::string, std::unique_ptr<PixelShader>> PixelShaders;
 	static inline std::unordered_map<std::string, std::unique_ptr<Model>> Models;
+	static inline std::unordered_map<std::string, std::unique_ptr<Material>> Materials;
 
 	static inline std::string shaderDir;
 };

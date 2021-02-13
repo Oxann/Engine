@@ -11,7 +11,7 @@
 #include "ConstantBuffer.h"
 #include "Texture.h"
 #include "Editor.h"
-
+#include "Renderer.h"
 
 void Graphics::Init(HWND hWnd)
 {
@@ -65,21 +65,13 @@ void Graphics::Init(HWND hWnd)
 	pDeviceContext->RSSetViewports(1, &vp);
 
 	//Depth and stencil buffer
-	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-	dsDesc.DepthEnable = TRUE;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> dsState;
-	pDevice->CreateDepthStencilState(&dsDesc, &dsState);
-	pDeviceContext->OMSetDepthStencilState(dsState.Get(), 0u);
-
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> dsBuffer;
 	D3D11_TEXTURE2D_DESC desc_dsBuffer = {};
 	desc_dsBuffer.Width = MainWindow::GetDisplayResolution().width;
 	desc_dsBuffer.Height = MainWindow::GetDisplayResolution().height;
 	desc_dsBuffer.MipLevels = 1u;
 	desc_dsBuffer.ArraySize = 1u;
-	desc_dsBuffer.Format = DXGI_FORMAT_D32_FLOAT;
+	desc_dsBuffer.Format = DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT;
 	desc_dsBuffer.SampleDesc.Count = 1u;
 	desc_dsBuffer.SampleDesc.Quality = 0u;
 	desc_dsBuffer.Usage = D3D11_USAGE_DEFAULT;
@@ -87,7 +79,7 @@ void Graphics::Init(HWND hWnd)
 	CHECK_DX_ERROR(pDevice->CreateTexture2D(&desc_dsBuffer, nullptr, &dsBuffer));
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC dsViewDesc = {};
-	dsViewDesc.Format = DXGI_FORMAT_D32_FLOAT;
+	dsViewDesc.Format = DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT;
 	dsViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	dsViewDesc.Texture2D.MipSlice = 0u;
 	CHECK_DX_ERROR(pDevice->CreateDepthStencilView(dsBuffer.Get(), &dsViewDesc, pDepthStencil.GetAddressOf()));
@@ -119,7 +111,8 @@ void Graphics::Init(HWND hWnd)
 
 	InitRS();
 	InitBS();
-
+	InitDSS();	
+	
 	ENGINE_LOG(ENGINE_INFO, "Graphics Ready!");
 }
 
@@ -139,7 +132,7 @@ void Graphics::EndFrame()
 void Graphics::BeginFrame()
 {
 	pDeviceContext->ClearRenderTargetView(pView.Get(), clearColor);
-	pDeviceContext->ClearDepthStencilView(pDepthStencil.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	pDeviceContext->ClearDepthStencilView(pDepthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
 }
 
 void Graphics::Enable_VSYNC()
@@ -218,6 +211,33 @@ void Graphics::SetProjection(ProjectionType type, float aspectRatio, float heigh
 	}
 }
 
+void Graphics::DrawOutline(Renderer* renderer)
+{
+	pDeviceContext->RSSetState(RS_Solid.Get());
+	pDeviceContext->OMSetBlendState(BS_Opaque.Get(), NULL, 0xffffffff);
+
+	//Draw mask
+	static Material* outlineMaterial = Resources::FindMaterial("$Default\\outlineMaterial");
+	outlineMaterial->Bind(&renderer->GetMesh()->GetSubMeshes()[0], renderer);
+	
+	pDeviceContext->OMSetDepthStencilState(DSS_MaskObject.Get(), 0xff);
+	pDeviceContext->DrawIndexed(renderer->GetMesh()->GetSubMeshes()[0].GetIndexCount(), 0u, 0u);
+
+	//Draw outline	
+	pDeviceContext->OMSetDepthStencilState(DSS_Outline.Get(), 0xff);
+
+	renderer->MVP_Matrix = renderer->MVP_Matrix * DirectX::XMMatrixScaling(1.005f, 1.005f, 1.005f); //Scaling MVP by a factor, !!!MVP is column order!!!
+	outlineMaterial->Bind(&renderer->GetMesh()->GetSubMeshes()[0], renderer);
+	pDeviceContext->DrawIndexed(renderer->GetMesh()->GetSubMeshes()[0].GetIndexCount(), 0u, 0u);
+
+	renderer->MVP_Matrix = renderer->MVP_Matrix * DirectX::XMMatrixScaling(0.99f, 0.99f, 0.99f); //Scaling MVP by a factor, !!!MVP is column order!!!
+	outlineMaterial->Bind(&renderer->GetMesh()->GetSubMeshes()[0], renderer);
+	pDeviceContext->DrawIndexed(renderer->GetMesh()->GetSubMeshes()[0].GetIndexCount(), 0u, 0u);
+
+	//Back to default DS state
+	pDeviceContext->OMSetDepthStencilState(DSS_Default.Get(), 0xff);
+}
+
 void Graphics::SetAmbientColor(DirectX::XMFLOAT3 color)
 {
 	ambientLight = DirectX::XMVectorSet(color.x, color.y, color.z, GetAmbientIntensity());
@@ -240,14 +260,6 @@ DirectX::XMFLOAT3 Graphics::GetAmbientColor()
 float Graphics::GetAmbientIntensity()
 {
 	return DirectX::XMVectorGetW(ambientLight);
-}
-
-const Unlit_Material& Graphics::GetWireframeMaterial()
-{
-	static Unlit_Material wireframeMaterial("Graphics\\wireframeMaterial");
-	wireframeMaterial.SetColor( { 0.0f, 0.5f, 0.0f, 1.0f } );
-	
-	return wireframeMaterial;
 }
 
 void Graphics::InitRS()
@@ -273,6 +285,18 @@ void Graphics::InitRS()
 	wireframe.DepthClipEnable = TRUE;
 
 	pDevice->CreateRasterizerState(&wireframe, &RS_Wireframe);
+
+	////////////////////////////////////////////////////
+
+	D3D11_RASTERIZER_DESC cullNone;
+	ZeroMemory(&cullNone, sizeof(D3D11_RASTERIZER_DESC));
+
+	cullNone.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	cullNone.CullMode = D3D11_CULL_FRONT;
+	cullNone.FrontCounterClockwise = FALSE;
+	cullNone.DepthClipEnable = TRUE;
+
+	pDevice->CreateRasterizerState(&cullNone, &RS_CullNone);
 }
 
 void Graphics::InitBS()
@@ -290,6 +314,7 @@ void Graphics::InitBS()
 	opaque.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
 	pDevice->CreateBlendState(&opaque, &BS_Opaque);
 
+	///////////////////////////////////////////////////////////
 	
 	D3D11_BLEND_DESC transparent;
 	transparent.AlphaToCoverageEnable = FALSE;
@@ -303,4 +328,51 @@ void Graphics::InitBS()
 	transparent.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
 	transparent.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
 	pDevice->CreateBlendState(&transparent, &BS_Transparent);
+}
+
+void Graphics::InitDSS()
+{
+	D3D11_DEPTH_STENCIL_DESC defaultState = {};
+	defaultState.DepthEnable = TRUE;
+	defaultState.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	defaultState.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	defaultState.StencilEnable = FALSE;
+	pDevice->CreateDepthStencilState(&defaultState, &DSS_Default);
+	pDeviceContext->OMSetDepthStencilState(DSS_Default.Get(), 0u);
+	
+	///////////////////////////////////////////////////////////
+
+	D3D11_DEPTH_STENCIL_DESC maskObject = {};
+	maskObject.DepthEnable = TRUE;
+	maskObject.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	maskObject.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	maskObject.StencilEnable = TRUE;
+	maskObject.StencilWriteMask = 0xffu;
+	maskObject.StencilReadMask  = 0xffu;
+	maskObject.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+	maskObject.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+	maskObject.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+	maskObject.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+	maskObject.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+	maskObject.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+	maskObject.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+	maskObject.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_REPLACE;
+	pDevice->CreateDepthStencilState(&maskObject, &DSS_MaskObject);
+
+	///////////////////////////////////////////////////////////
+
+	D3D11_DEPTH_STENCIL_DESC outline = {};
+	outline.DepthEnable = FALSE;
+	outline.StencilEnable = TRUE;
+	outline.StencilWriteMask = 0xffu;
+	outline.StencilReadMask = 0xffu;
+	outline.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NOT_EQUAL;
+	outline.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+	outline.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+	outline.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+	outline.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NOT_EQUAL;
+	outline.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+	outline.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+	outline.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+	pDevice->CreateDepthStencilState(&outline, &DSS_Outline);
 }

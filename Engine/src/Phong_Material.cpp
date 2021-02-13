@@ -10,7 +10,7 @@ Phong_Material::Phong_Material(std::string name)
 	pixelShader = Resources::FindPixelShader("Phong.cso");
 }
 
-void Phong_Material::Bind(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::Bind(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	(this->*(this->Bind_))(subMesh, renderer);
 }
@@ -127,7 +127,7 @@ const Phong_Material* Phong_Material::GetDefaultMaterial()
 	return &defaultMat;
 }
 
-void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	//Binding shaders
 	vertexShader->BindPipeline();
@@ -178,7 +178,7 @@ void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, std::unique_ptr<Ren
 	PS_CB.BindPipeline();
 }
 
-void Phong_Material::BindPhong_D(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong_D(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -187,7 +187,7 @@ void Phong_Material::BindPhong_D(const Mesh::SubMesh* subMesh, std::unique_ptr<R
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_S(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong_S(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -196,7 +196,7 @@ void Phong_Material::BindPhong_S(const Mesh::SubMesh* subMesh, std::unique_ptr<R
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_D_S(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong_D_S(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -206,7 +206,7 @@ void Phong_Material::BindPhong_D_S(const Mesh::SubMesh* subMesh, std::unique_ptr
 	subMesh->GetVertexElement(VertexBuffer::ElementType::TexCoord)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -217,7 +217,7 @@ void Phong_Material::BindPhong_N(const Mesh::SubMesh* subMesh, std::unique_ptr<R
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Bitangent)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -229,7 +229,7 @@ void Phong_Material::BindPhong_D_N(const Mesh::SubMesh* subMesh, std::unique_ptr
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Bitangent)->BindPipeline();
 }
 
-void Phong_Material::BindPhong_D_S_N(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Phong_Material::BindPhong_D_S_N(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	BindPhong(subMesh, renderer);
 
@@ -259,7 +259,7 @@ void Phong_Material::DecideBind()
 	case VariantFlag::S:
 		Bind_ = &Phong_Material::BindPhong_S;
 		vertexShader = Resources::FindVertexShader("Phong_D_S.cso");
-		pixelShader = Resources::FindPixelShader("PS_Phong_S.cso");
+		pixelShader = Resources::FindPixelShader("Phong_S.cso");
 		break;
 	case VariantFlag::DS:
 		Bind_ = &Phong_Material::BindPhong_D_S;

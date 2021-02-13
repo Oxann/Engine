@@ -139,6 +139,10 @@ private:
 
 	void DisplayRenderer()
 	{
+		//Object outline
+		if(!Editor::isWireframe)
+			Graphics::DrawOutline(displayedRenderer);
+
 		if (ImGui::CollapsingHeader("RENDERER"))
 		{
 			//Mesh selection
@@ -213,7 +217,7 @@ private:
 		}
 	}
 
-private:
+public:
 	Entity* displayedEntity = nullptr;
 	Transform* displayedTransform = nullptr;
 	Renderer* displayedRenderer = nullptr;

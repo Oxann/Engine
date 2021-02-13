@@ -14,7 +14,7 @@ class Unlit_Material : public Material
 public:
 	Unlit_Material(std::string name);
 
-	void Bind(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const override;
+	void Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const override;
 
 	void SetColor(const DirectX::XMFLOAT4& color);
 
@@ -29,11 +29,11 @@ public:
 	static const Material* GetDefaultMaterial();
 
 private:
-	void BindUnlit(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
+	void BindUnlit(const Mesh::SubMesh* subMesh, Renderer* renderer) const;
 
-	void BindUnlit_T(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const;
+	void BindUnlit_T(const Mesh::SubMesh* subMesh, Renderer* renderer) const;
 private:
-	void (Unlit_Material::* Bind_)(const Mesh::SubMesh*, std::unique_ptr<Renderer>& renderer) const = &Unlit_Material::BindUnlit;
+	void (Unlit_Material::* Bind_)(const Mesh::SubMesh*, Renderer* renderer) const = &Unlit_Material::BindUnlit;
 
 	DirectX::XMFLOAT4 color = {0.8f,0.8f,0.8f,1.0f};
 	const Texture* texture = nullptr;

@@ -12,8 +12,11 @@ cbuffer Transform : register(b0)
     matrix MVP;
 };
 
-
+#ifdef TEXTURE
 OUT main(float3 position : POSITION, float2 texCoord : TEXCOORD)
+#else
+OUT main(float3 position : POSITION)
+#endif
 {
     OUT Out;
     Out.Position = mul(float4(position, 1.0f), MVP);

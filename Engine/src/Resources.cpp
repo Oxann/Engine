@@ -4,6 +4,7 @@
 #include "Texture.h"
 #include "Model.h"
 #include "Shader.h"
+#include "Unlit_Material.h"
 
 using namespace std::filesystem;
 
@@ -76,6 +77,16 @@ void Resources::Init()
 		}
 	}
 
+
+	//Some default resources
+#ifdef EDITOR
+	Material* wireframe = Materials.insert({ "$Default\\wireframeMaterial", std::make_unique<Unlit_Material>("$Default\\wireframeMaterial") }).first->second.get();
+	static_cast<Unlit_Material*>(wireframe)->SetColor({ 0.0f, 0.6f, 0.0f, 1.0f });
+
+	Material* outline  = Materials.insert({ "$Default\\outlineMaterial", std::make_unique<Unlit_Material>("$Default\\outlineMaterial") }).first->second.get();
+	static_cast<Unlit_Material*>(outline)->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
+#endif
+
 	ENGINE_LOG(ENGINE_INFO, "Resources successfully loaded.");
 }
 
@@ -117,4 +128,14 @@ Model* Resources::FindModel(std::string file)
 		return nullptr;
 	else
 		return model->second.get();
+}
+
+Material* Resources::FindMaterial(std::string file)
+{
+	const auto& material = Materials.find(file);
+
+	if (material == Materials.end())
+		return nullptr;
+	else
+		return material->second.get();
 }

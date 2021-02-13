@@ -138,7 +138,7 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 		{			
 			aiMesh* mesh = scene->mMeshes[ai_node->mMeshes[i]];
 			Mesh::SubMesh& newSubMesh = newMesh->AddNewSubMesh();
-			
+
 			newSubMesh.SetVertexCount(mesh->mNumVertices);
 
 			if (mesh->HasPositions())

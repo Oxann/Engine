@@ -10,7 +10,7 @@ Unlit_Material::Unlit_Material(std::string name)
 	pixelShader = Resources::FindPixelShader("Unlit.cso");
 }
 
-void Unlit_Material::Bind(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Unlit_Material::Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const
 {
 	(this->*(Bind_))(subMesh, renderer);
 }
@@ -59,7 +59,7 @@ const Material* Unlit_Material::GetDefaultMaterial()
 	return &defaultMat;
 }
 
-void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, Renderer* renderer) const
 {
 	//Binding shaders
 	vertexShader->BindPipeline();
@@ -98,7 +98,7 @@ void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, std::unique_ptr<Ren
 	PS_CB.BindPipeline();
 }
 
-void Unlit_Material::BindUnlit_T(const Mesh::SubMesh* subMesh, std::unique_ptr<Renderer>& renderer) const
+void Unlit_Material::BindUnlit_T(const Mesh::SubMesh* subMesh, Renderer* renderer) const
 {
 	BindUnlit(subMesh, renderer);
 	

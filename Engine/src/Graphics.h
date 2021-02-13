@@ -57,12 +57,12 @@ public:
 	//If the projection type is perspective then height is vertical FOV angle.
 	static void SetProjection(ProjectionType type, float aspectRatio, float height,float near_z, float far_z);
 
+	static void DrawOutline(Renderer* renderer);
+
 	static void SetAmbientColor(DirectX::XMFLOAT3 color);
 	static void SetAmbientIntensity(float intensity);
 	static DirectX::XMFLOAT3 GetAmbientColor();
 	static float GetAmbientIntensity();
-
-	static const Unlit_Material& GetWireframeMaterial();
 
 	static const DirectX::XMMATRIX& GetViewMatrix() { return *viewMatrix; }
 	static const DirectX::XMMATRIX& GetProjectionMatrix() { return projectionMatrix; }
@@ -70,6 +70,7 @@ public:
 private:
 	static void InitRS();
 	static void InitBS();
+	static void InitDSS();
 public:
 	//DX objects
 	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
@@ -81,10 +82,16 @@ public:
 	//Rasterizer States
 	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_Solid;
 	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_Wireframe;
+	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_CullNone;
 
 	//Blend States
 	inline static Microsoft::WRL::ComPtr<ID3D11BlendState> BS_Opaque;
 	inline static Microsoft::WRL::ComPtr<ID3D11BlendState> BS_Transparent;
+
+	//DS States
+	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DSS_Default;
+	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DSS_MaskObject;
+	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DSS_Outline;
 private:
 	inline static bool isVSyncEnabled = false;
 	inline static ClearMode clearMode;

@@ -17,12 +17,6 @@ void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
 
-	Entity* sponza = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("goblin.obj"));
-	Entity* sponza1 = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("spaceship.fbx"));
-	sponza1->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
-	Entity* light = Scene::GetScene(1)->NewEntity("light");
-	light->AddComponent<DirectionalLight>();
-
 	Scene::LoadScene(1);
 }
 

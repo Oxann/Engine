@@ -13,7 +13,7 @@ class Renderer final: public Component
 	friend class Phong_Material;
 	friend class Unlit_Material;
 	friend class Engine;
-
+	friend class Graphics;
 #ifdef EDITOR
 	friend class EditorEntityWindow;
 #endif
