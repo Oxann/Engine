@@ -22,6 +22,11 @@ class Graphics
 	friend class Renderer;
 	friend class MainWindow;
 	friend class Engine;
+
+#ifdef EDITOR
+	friend class Editor;
+#endif
+
 public:
 	enum class ProjectionType
 	{
@@ -64,7 +69,7 @@ public:
 	static DirectX::XMFLOAT3 GetAmbientColor();
 	static float GetAmbientIntensity();
 
-	static const DirectX::XMMATRIX& GetViewMatrix() { return *viewMatrix; }
+	static const DirectX::XMMATRIX& GetViewMatrix() { return viewMatrix; }
 	static const DirectX::XMMATRIX& GetProjectionMatrix() { return projectionMatrix; }
 	static const DirectX::XMMATRIX& GetViewProjectionMatrix() { return viewProjectionMatrix; }
 private:
@@ -112,5 +117,5 @@ private:
 	inline static DirectX::XMMATRIX viewProjectionMatrix;
 
 	//Currently if we are in editor mode, view matrix is editor camera's lookat matrix
-	inline static DirectX::XMMATRIX* viewMatrix;
+	inline static DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixIdentity();
 };

@@ -9,12 +9,14 @@
 void Mesh::SubMesh::SetVertexCount(unsigned int count)
 {
     vertexCount = count;
+    positions.reserve(count);
 }
 
 void Mesh::SubMesh::SetIndexBuffer(unsigned short* data, unsigned int indexCount)
 {
     this->indexCount = indexCount;
     indexBuffer = std::make_unique<IndexBuffer>(data, indexCount);
+    indices.reserve(indexCount);
 }
 
 void Mesh::SubMesh::AddNewVertexElement(const void* data, VertexBuffer::ElementType type)

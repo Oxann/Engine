@@ -24,32 +24,26 @@ public:
 private:
 	void ShowEntityHierarchy(Entity* entity)
 	{
-		//TODO: unique index mechanism wont work after removing an entity.
-
 		uniqueIndex++;
 		std::string nodeId = entity->name + "##" + std::to_string(uniqueIndex);
 		auto flags = ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_OpenOnArrow
 			| (!entity->Children.empty() ? 0 : ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Leaf)
-			| (uniqueIndex == selectedIndex ? ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected : 0);
+			| (entity == entityWindow->displayedEntity ? ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected : 0);
 
 		bool isNodeExpanded = ImGui::TreeNodeEx(nodeId.c_str(), flags);
 
 		if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
 		{
-			selectedIndex = uniqueIndex;
 			entityWindow->PopUp(entity);
 		}
 
-		//Zooming selected entity
+		//Focusing on selected entity
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 		{
-			//TODO: if the entity has a renderer, this needs to be AABB center.
-			DirectX::XMFLOAT3 entityPosition = entity->GetTransform()->GetWorldPosition();
-			Editor::Camera::position = DirectX::XMLoadFloat3(&entityPosition);
-			Editor::Camera::isChanged = true;
+			Editor::Camera::Focus(entity);
 		}
 
-
+		
 		if (isNodeExpanded)
 		{
 			for (int i = 0; i < entity->GetChildrenCount(); i++)
@@ -68,5 +62,4 @@ private:
 private:
 	EditorEntityWindow* entityWindow = nullptr;
 	int uniqueIndex = 0;
-	int selectedIndex = 0;
 };

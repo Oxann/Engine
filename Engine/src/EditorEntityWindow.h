@@ -40,14 +40,18 @@ public:
 		isActive = true;
 
 		displayedEntity = entity;
-		displayedTransform = displayedEntity->GetTransform();
-		displayedRenderer = displayedEntity->GetRenderer();
-		displayedPointLight = displayedEntity->GetComponent<PointLight>();
-		displayedDirectionalLight = displayedEntity->GetComponent<DirectionalLight>();
-		strcpy_s(displayedName, displayedEntity->name.c_str());
 
-		//Deactivating resource selection window when displayed entity is changed, because it causes misuse.
-		editorRSW->isActive = false;
+		if (displayedEntity)
+		{
+			displayedTransform = displayedEntity->GetTransform();
+			displayedRenderer = displayedEntity->GetRenderer();
+			displayedPointLight = displayedEntity->GetComponent<PointLight>();
+			displayedDirectionalLight = displayedEntity->GetComponent<DirectionalLight>();
+			strcpy_s(displayedName, displayedEntity->name.c_str());
+
+			//Deactivating resource selection window when displayed entity is changed, because it causes misuse.
+			editorRSW->isActive = false;
+		}
 	}
 private:
 	void DisplayTransform()

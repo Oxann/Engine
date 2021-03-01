@@ -16,7 +16,6 @@ Scene* Scene::ActiveScene;
 void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
-
 	Scene::LoadScene(1);
 }
 

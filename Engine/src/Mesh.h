@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <unordered_map>
-
+#include <DirectXCollision.h>
 
 //Loaded meshes can be accessible through model objects.
 //Look Model::FindMesh
@@ -33,6 +33,10 @@ public:
 		bool HasPositions() const;
 		bool HasNormals() const;
 		bool HasTextureCoords() const;
+	public:		
+		DirectX::BoundingBox AABB;
+		std::vector<DirectX::XMFLOAT3> positions;
+		std::vector<unsigned short> indices;
 	private:
 		std::unordered_map<VertexBuffer::ElementType,VertexBuffer> vertexElements;
 		std::unique_ptr<IndexBuffer> indexBuffer = nullptr;
@@ -52,6 +56,8 @@ public:
 	inline static Mesh* Cube;
 	inline static Mesh* Sphere;
 	inline static Mesh* Quad;
+public:
+	DirectX::BoundingBox AABB;
 private:
 	std::vector<SubMesh> subMeshes;
 };

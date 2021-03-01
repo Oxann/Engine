@@ -12,6 +12,8 @@
 #include "EditorTextureEditWindow.h"
 #include "EditorMetricsWindow.h"
 
+#include <DirectXCollision.h>
+#include <limits>
 
 void Editor::Init(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice)
 {
@@ -104,6 +106,24 @@ void Editor::Update()
 	}
 
 	Camera::Update();
+	
+	if (Input::GetKeyDown(VK_LBUTTON))
+	{
+		Entity* pickedEntity = nullptr;
+		float distance = std::numeric_limits<float>::max();
+
+		DirectX::XMFLOAT4X4 projection;
+		DirectX::XMStoreFloat4x4(&projection, Graphics::projectionMatrix);
+
+		float viewSpaceX = (((2.0f * Input::GetMouseX()) / MainWindow::GetDisplayResolution().width) - 1.0f) / projection(0, 0);
+		float viewSpaceY = -(((2.0f * Input::GetMouseY()) / MainWindow::GetDisplayResolution().height) - 1.0f) / projection(1, 1);
+
+		for (auto& entity : Scene::GetActiveScene()->Entities)
+		{
+			MousePick(entity.get(), distance, &pickedEntity, viewSpaceX, viewSpaceY);
+		}
+		static_cast<EditorEntityWindow*>(windows[0].get())->PopUp(pickedEntity);
+	}
 }
 
 bool Editor::WantCaptureKeyboard()
@@ -116,10 +136,53 @@ bool Editor::WantCaptureMouse()
 	return imguiIO->WantCaptureMouse;
 }
 
+void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity, const float viewSpaceX, const float viewSpaceY)
+{
+	if (entity->Renderer_)
+	{
+		DirectX::XMMATRIX inverseMV = DirectX::XMMatrixInverse(nullptr,DirectX::XMMatrixTranspose(entity->Renderer_->MV_Matrix)); //MV is column order
+
+		DirectX::XMVECTOR rayOrigin = DirectX::XMVector3TransformCoord(DirectX::XMVectorSet(0.0f,0.0f,0.0f,1.0f), inverseMV);
+		DirectX::XMVECTOR rayDirection = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(viewSpaceX, viewSpaceY, 1.0f, 0.0f), inverseMV);
+
+		float scaleFactor = 1.0f / DirectX::XMVectorGetX(DirectX::XMVector3Length(rayDirection));
+
+		rayDirection = DirectX::XMVector3Normalize(rayDirection);
+
+		float distance = 0.0f;
+
+		if (entity->Renderer_->mesh->GetSubMeshCount() == 1 || entity->Renderer_->mesh->AABB.Intersects(rayOrigin, rayDirection, distance))
+		{
+			for (const auto& subMesh : entity->Renderer_->mesh->GetSubMeshes())
+			{
+				if (subMesh.AABB.Intersects(rayOrigin, rayDirection, distance))
+				{
+					for (unsigned int i = 0; i < subMesh.GetIndexCount(); i += 3)
+					{
+						DirectX::XMVECTOR p1 = DirectX::XMLoadFloat3(&subMesh.positions[subMesh.indices[i]]);
+						DirectX::XMVECTOR p2 = DirectX::XMLoadFloat3(&subMesh.positions[subMesh.indices[i + 1]]);
+						DirectX::XMVECTOR p3 = DirectX::XMLoadFloat3(&subMesh.positions[subMesh.indices[i + 2]]);
+
+						if (DirectX::TriangleTests::Intersects(rayOrigin, rayDirection, p1, p2, p3, distance))
+						{
+							if ((distance * scaleFactor) < minDistance)
+							{
+								minDistance = distance * scaleFactor;
+								*pickedEntity = entity;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	for (auto& child : entity->Children)
+		MousePick(child.get(), minDistance, pickedEntity, viewSpaceX, viewSpaceY);
+}
+
 void Editor::Camera::Update()
 {
-	static DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixIdentity();
-
 	if (!(WantCaptureKeyboard() || WantCaptureMouse()))
 	{
 		if (Input::GetKeyDown(VK_RBUTTON))
@@ -173,26 +236,31 @@ void Editor::Camera::Update()
 		}
 	}
 
-
 	if (isChanged)
 	{
 		isChanged = false;
-
-		//Flipping world up vector according to camera local up vector.
-		//If the the y component of the vector is greater than zero world up vector must be (0.0f,1.0f,0.0f,1.0f) else it must be (0.0f,-1.0f,0.0f,1.0f)
-		//This enables 360 degrees pitch rotation to camera.
-		static DirectX::XMVECTOR worldUp;
-
-		float local_Y = DirectX::XMVectorGetY(rotationMatrix.r[1]);
-
-		if (local_Y >= 0.0f)
-			worldUp = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
-		else
-			worldUp = DirectX::XMVectorSet(0.0f, -1.0f, 0.0f, 1.0f);
-
-		//Updating view matrix
-		TransformMatrix = DirectX::XMMatrixLookToLH(position, rotationMatrix.r[2], worldUp);
+		UpdateViewMatrix();
 	}
+}
+
+void Editor::Camera::Focus(const Entity* entity)
+{
+	if (entity->Renderer_)
+	{
+		DirectX::BoundingBox worldAABB;
+		entity->Renderer_->GetMesh()->AABB.Transform(worldAABB, entity->GetTransform()->GetWorldMatrix());
+
+		float distanceMultiplier = std::max({ worldAABB.Extents.x, worldAABB.Extents.y, worldAABB.Extents.z }) * 2.75f;
+		
+		position = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&worldAABB.Center), DirectX::XMVectorScale( rotationMatrix.r[2], -distanceMultiplier));
+	
+		UpdateViewMatrix();
+	}
+}
+
+void Editor::Camera::UpdateViewMatrix()
+{
+	Graphics::viewMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMVectorNegate(position)) * DirectX::XMMatrixTranspose(rotationMatrix);
 }
 
 

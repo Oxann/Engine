@@ -72,7 +72,7 @@ void Renderer::UpdateDirectionalLightBuffer() const
 		const DirectionalLight& currentLight = *DirectionalLight::lights[i];
 
 		DirectX::XMMATRIX lightModelView = DirectX::XMMatrixMultiply(
-			DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion()), *Graphics::viewMatrix);
+			DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion()), Graphics::viewMatrix);
 		
 		DirectX::XMStoreFloat3(&toGPU.lights[i].direction,DirectX::XMVector3Normalize(lightModelView.r[2]));
 		
@@ -122,7 +122,7 @@ void Renderer::UpdatePointLightBuffer() const
 		DirectX::XMFLOAT3 worldPos = currentLight.GetEntity()->GetTransform()->GetWorldPosition();
 
 		//Light calculations in view space
-		DirectX::XMVECTOR pos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&worldPos),*Graphics::viewMatrix);
+		DirectX::XMVECTOR pos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&worldPos),Graphics::viewMatrix);
 		DirectX::XMStoreFloat3(&toGPU.lights[i].position,pos);
 		
 		toGPU.lights[i].light = {

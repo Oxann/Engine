@@ -121,7 +121,7 @@ void Engine::Update()
 	//Render
 	Graphics::BeginFrame();
 
-	Graphics::viewProjectionMatrix = DirectX::XMMatrixMultiply(*Graphics::viewMatrix, Graphics::projectionMatrix);
+	Graphics::viewProjectionMatrix = DirectX::XMMatrixMultiply(Graphics::viewMatrix, Graphics::projectionMatrix);
 
 	//Opaque
 	Graphics::pDeviceContext->OMSetBlendState(Graphics::BS_Opaque.Get(), NULL, 0xffffffff);

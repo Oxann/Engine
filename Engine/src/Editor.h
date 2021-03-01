@@ -13,6 +13,7 @@
 #include <memory>
 #include <type_traits>
 
+class Entity;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -25,8 +26,11 @@ public:
 	private:
 		static void Update();
 	public:
+		static void Focus(const Entity* entity);
+		static void UpdateViewMatrix();
+	public:
 		inline static DirectX::XMVECTOR position = DirectX::XMVectorZero();
-		inline static DirectX::XMMATRIX TransformMatrix = DirectX::XMMatrixIdentity();
+		inline static DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixIdentity();
 		inline static float movementSpeed = 10.0f;
 		inline static float rotationSpeed = 1.5f;
 
@@ -54,6 +58,8 @@ public:
 		}
 		return nullptr;
 	}
+private:
+	static void MousePick(Entity* entity, float& minDistance, Entity** pickedEntity, const float viewSpaceX, const float viewSpaceY);
 public:
 	inline static bool isActive = true;
 	inline static ImGuiIO* imguiIO = nullptr;

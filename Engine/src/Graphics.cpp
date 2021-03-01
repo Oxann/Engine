@@ -60,8 +60,8 @@ void Graphics::Init(HWND hWnd)
 	vp.TopLeftY = 0.0f;
 	vp.Width = (float)MainWindow::GetDisplayResolution().width;
 	vp.Height = (float)MainWindow::GetDisplayResolution().height;
-	vp.MinDepth = 0;
-	vp.MaxDepth = 1;
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
 	pDeviceContext->RSSetViewports(1, &vp);
 
 	//Depth and stencil buffer
@@ -92,21 +92,13 @@ void Graphics::Init(HWND hWnd)
 
 
 	//Initializing projection matrix
-	SetProjection(ProjectionType::Perspective, 16.0f / 9.0f , 60.0f, 0.05f, 10000.0f);
-
-	//Initializing view matrix.
-	//If we are in editor mode we will use editor camera matrix as our view matrix.
-	#ifdef EDITOR
-	viewMatrix = &Editor::Camera::TransformMatrix;
-	#else
-	//TODO: set viewmatrix to game camera's view matrix.
-	#endif
+	SetProjection(ProjectionType::Perspective, (float)MainWindow::GetDisplayResolution().width / (float)MainWindow::GetDisplayResolution().height, 60.0f, 0.05f, 10000.0f);
 
 	//Adjusting clear render target view mode
 	SetClearMode(ClearMode::Grey);
 
 	//Ambient Lighting
-	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.5f);
 	ambientLightBuffer = new PS_ConstantBuffer<DirectX::XMVECTOR>(&ambientLight, 1u, 0u, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
 
 	InitRS();
@@ -226,15 +218,18 @@ void Graphics::DrawOutline(Renderer* renderer)
 	//Draw outline	
 	pDeviceContext->OMSetDepthStencilState(DSS_Outline.Get(), 0xff);
 
-	renderer->MVP_Matrix = renderer->MVP_Matrix * DirectX::XMMatrixScaling(1.005f, 1.005f, 1.005f); //Scaling MVP by a factor, !!!MVP is column order!!!
+	DirectX::XMMATRIX MVP = renderer->MVP_Matrix;
+
+	renderer->MVP_Matrix = MVP * DirectX::XMMatrixScaling(1.01f, 1.01f, 1.01f); //Scaling MVP by a factor, !!!MVP is column order!!!
 	outlineMaterial->Bind(&renderer->GetMesh()->GetSubMeshes()[0], renderer);
 	pDeviceContext->DrawIndexed(renderer->GetMesh()->GetSubMeshes()[0].GetIndexCount(), 0u, 0u);
 
-	renderer->MVP_Matrix = renderer->MVP_Matrix * DirectX::XMMatrixScaling(0.99f, 0.99f, 0.99f); //Scaling MVP by a factor, !!!MVP is column order!!!
+	renderer->MVP_Matrix = MVP * DirectX::XMMatrixScaling(0.99f, 0.99f, 0.99f); //Scaling MVP by a factor, !!!MVP is column order!!!
 	outlineMaterial->Bind(&renderer->GetMesh()->GetSubMeshes()[0], renderer);
 	pDeviceContext->DrawIndexed(renderer->GetMesh()->GetSubMeshes()[0].GetIndexCount(), 0u, 0u);
 
-	//Back to default DS state
+	//Back to defaults
+	renderer->MVP_Matrix = MVP;
 	pDeviceContext->OMSetDepthStencilState(DSS_Default.Get(), 0xff);
 }
 

@@ -9,6 +9,11 @@ class Scene
 {
 	friend class EditorSceneHierarchyWindow;
 	friend class Engine;
+
+#ifdef EDITOR
+	friend class Editor;
+#endif
+
 public:
 	static void Init();
 	static void CreateNewScene(unsigned char index, std::string name);

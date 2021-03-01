@@ -17,6 +17,11 @@ class Entity
 	friend class Scene;
 	friend class EditorSceneHierarchyWindow;
 	friend class Engine;
+
+#ifdef EDITOR
+	friend class Editor;
+#endif
+
 public:
 	Entity(std::string name);
 	~Entity() = default;

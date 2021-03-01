@@ -16,6 +16,7 @@ class Renderer final: public Component
 	friend class Graphics;
 #ifdef EDITOR
 	friend class EditorEntityWindow;
+	friend class Editor;
 #endif
 
 public:

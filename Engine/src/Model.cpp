@@ -26,7 +26,8 @@ Model::Model(std::filesystem::path file)
 		aiProcess_Triangulate |
 		aiProcess_RemoveComponent |
 		aiProcess_CalcTangentSpace |
-		aiProcess_GenSmoothNormals;
+		aiProcess_GenSmoothNormals |
+		aiProcess_GenBoundingBoxes;
 	
 	auto scene = importer.ReadFile(file.string(), pFlags);
 	
@@ -133,18 +134,42 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 	{
 		std::unique_ptr<Mesh> newMesh = std::make_unique<Mesh>();
 		newMesh->file = newNode->name;
-		
+
 		for (int i = 0; i < ai_node->mNumMeshes; i++)
 		{			
 			aiMesh* mesh = scene->mMeshes[ai_node->mMeshes[i]];
 			Mesh::SubMesh& newSubMesh = newMesh->AddNewSubMesh();
 
+			//SubMesh AABB
+			newSubMesh.AABB.Center = {
+				(mesh->mAABB.mMax.x + mesh->mAABB.mMin.x) / 2.0f,
+				(mesh->mAABB.mMax.y + mesh->mAABB.mMin.y) / 2.0f,
+				(mesh->mAABB.mMax.z + mesh->mAABB.mMin.z) / 2.0f 
+			};
+			newSubMesh.AABB.Extents = {
+				(mesh->mAABB.mMax.x - newSubMesh.AABB.Center.x),
+				(mesh->mAABB.mMax.y - newSubMesh.AABB.Center.y),
+				(mesh->mAABB.mMax.z - newSubMesh.AABB.Center.z)
+			};
+
+			//Updating mesh AABB
+			if (i == 0)
+				newMesh->AABB = newSubMesh.AABB;				
+			else
+				DirectX::BoundingBox::CreateMerged(newMesh->AABB, newMesh->AABB, newSubMesh.AABB);
+			
 			newSubMesh.SetVertexCount(mesh->mNumVertices);
 
 			if (mesh->HasPositions())
+			{
 				newSubMesh.AddNewVertexElement(mesh->mVertices, VertexBuffer::ElementType::Position3D);
+				newSubMesh.positions.resize(mesh->mNumVertices);
+				std::copy(reinterpret_cast<DirectX::XMFLOAT3*>(mesh->mVertices), reinterpret_cast<DirectX::XMFLOAT3*>(mesh->mVertices) + mesh->mNumVertices, newSubMesh.positions.begin());
+			}
+				
 			if (mesh->HasNormals())
 				newSubMesh.AddNewVertexElement(mesh->mNormals, VertexBuffer::ElementType::Normal);
+
 			if (mesh->HasTextureCoords(0u))
 			{
 				std::vector<DirectX::XMFLOAT2> uv;
@@ -154,20 +179,20 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 				}
 				newSubMesh.AddNewVertexElement(uv.data(), VertexBuffer::ElementType::TexCoord);
 			}
+
 			if (mesh->HasTangentsAndBitangents())
 			{
 				newSubMesh.AddNewVertexElement(mesh->mTangents, VertexBuffer::ElementType::Tangent);
 				newSubMesh.AddNewVertexElement(mesh->mBitangents, VertexBuffer::ElementType::Bitangent);
 			}
 
-			std::vector<unsigned short> indices;
 			for (size_t i = 0; i < mesh->mNumFaces; i++)
 			{
-				indices.push_back(mesh->mFaces[i].mIndices[0]);
-				indices.push_back(mesh->mFaces[i].mIndices[1]);
-				indices.push_back(mesh->mFaces[i].mIndices[2]);
+				newSubMesh.indices.push_back(mesh->mFaces[i].mIndices[0]);
+				newSubMesh.indices.push_back(mesh->mFaces[i].mIndices[1]);
+				newSubMesh.indices.push_back(mesh->mFaces[i].mIndices[2]);
 			}
-			newSubMesh.SetIndexBuffer(indices.data(), indices.size());
+			newSubMesh.SetIndexBuffer(newSubMesh.indices.data(), newSubMesh.indices.size());
 
 			//Initializing Material
 			aiMaterial* mat = scene->mMaterials[mesh->mMaterialIndex];
