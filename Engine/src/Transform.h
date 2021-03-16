@@ -38,8 +38,6 @@ public:
 	DirectX::XMVECTOR GetWorldQuaternion() const;
 	const DirectX::XMVECTOR& GetLocalQuaternion() const;
 	void SetLocalRotation(float x, float y, float z);
-	//Z-X-Y
-	DirectX::XMFLOAT3 GetEuler() const;
 
 	//World Space (relative to it's parent)
 	DirectX::XMVECTOR GetUp() const;
@@ -64,18 +62,4 @@ private:
 	DirectX::XMFLOAT3 localScale = { 1.0f,1.0f,1.0f }; //Relative to it's parent.
 	mutable DirectX::XMMATRIX localMatrix = DirectX::XMMatrixIdentity();
 	mutable bool isLocalMatrixUpdated = true;
-
-private:
-	//For adjusting the euler angles in editor mode
-#ifdef EDITOR
-	friend class EditorEntityWindow;
-
-	DirectX::XMFLOAT3 euler;
-	
-	//In degrees Z-X-Y
-	void SetEuler(float x, float y, float z)
-	{
-
-	}
-#endif
 };

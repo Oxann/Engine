@@ -10,10 +10,12 @@
 
 class Renderer final: public Component
 {
+	friend class RendererManager;
 	friend class Phong_Material;
 	friend class Unlit_Material;
 	friend class Engine;
 	friend class Graphics;
+	friend class RenderQueueOutline;
 #ifdef EDITOR
 	friend class EditorEntityWindow;
 	friend class Editor;
@@ -31,7 +33,27 @@ public:
 	void SetMaterial(const Material* material, unsigned int materialIndex);
 	
 	const std::vector<const Material*>& GetMaterials() const;
+
+	//This functions are used by Render Queues. DON'T CALL FROM ELSEWEHERE.
+	//Binded material will be used.
+	void Render(unsigned int subMeshIndex);
+
+	//Custom material needed.
+	void Render(unsigned int subMeshIndex, const Material* material);
+
+	//COLUMN ORDER!!!
+	const DirectX::XMMATRIX& GetWorldMatrix();
+
+	//COLUMN ORDER!!!
+	const DirectX::XMMATRIX& GetWorldViewMatrix();
+
+	//COLUMN ORDER!!!
+	const DirectX::XMMATRIX& GetWorldViewProjectionMatrix();
+
+	//COLUMN ORDER!!!
+	const DirectX::XMMATRIX& GetNormalMatrix();
 private:
+	void Update() override;
 	void UpdateDirectionalLightBuffer() const;
 	void UpdatePointLightBuffer() const;
 public:
@@ -41,7 +63,13 @@ private:
 	std::vector<const Material*> materials;
 
 	//All matrices are column order.
-	DirectX::XMMATRIX MV_Matrix;
-	DirectX::XMMATRIX normalMatrix;
-	DirectX::XMMATRIX MVP_Matrix;
+	DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX worldViewMatrix = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX normalMatrix = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX worldViewProjectionMatrix = DirectX::XMMatrixIdentity();
+
+	bool isWorldMatrixUpdated = false;
+	bool isWorldViewMatrixUpdated = false;
+	bool isWorldViewProjectionMatrixUpdated = false;
+	bool isNormalMatrixUpdated = false;
 };

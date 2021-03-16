@@ -74,7 +74,7 @@ Entity* Scene::NewEntity(std::string name)
 
 Entity* Scene::NewEntity(Entity* cloneFrom)
 {
-	Entities.push_back(std::unique_ptr<Entity>(cloneFrom->Clone()));
+	Entities.push_back(std::unique_ptr<Entity>(cloneFrom->Clone(this)));
 	return Entities.back().get();
 }
 

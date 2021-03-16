@@ -8,7 +8,7 @@
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Light.h"
-#include "Unlit_Material.h"
+
 
 struct Resolution
 {
@@ -41,12 +41,6 @@ public:
 public:
 	static void Init(HWND hWnd);
 
-	static void EndFrame();
-	static void BeginFrame();
-	static void Enable_VSYNC();
-	static void Disable_VSYNC();
-	static void SetClearMode(ClearMode clearMode);
-
 	//Projection
 	static float GetAspectRatio();
 
@@ -62,8 +56,6 @@ public:
 	//If the projection type is perspective then height is vertical FOV angle.
 	static void SetProjection(ProjectionType type, float aspectRatio, float height,float near_z, float far_z);
 
-	static void DrawOutline(Renderer* renderer);
-
 	static void SetAmbientColor(DirectX::XMFLOAT3 color);
 	static void SetAmbientIntensity(float intensity);
 	static DirectX::XMFLOAT3 GetAmbientColor();
@@ -71,11 +63,6 @@ public:
 
 	static const DirectX::XMMATRIX& GetViewMatrix() { return viewMatrix; }
 	static const DirectX::XMMATRIX& GetProjectionMatrix() { return projectionMatrix; }
-	static const DirectX::XMMATRIX& GetViewProjectionMatrix() { return viewProjectionMatrix; }
-private:
-	static void InitRS();
-	static void InitBS();
-	static void InitDSS();
 public:
 	//DX objects
 	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
@@ -84,23 +71,10 @@ public:
 	inline static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil = nullptr;
 
-	//Rasterizer States
-	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_Solid;
-	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_Wireframe;
-	inline static Microsoft::WRL::ComPtr<ID3D11RasterizerState> RS_CullNone;
-
-	//Blend States
-	inline static Microsoft::WRL::ComPtr<ID3D11BlendState> BS_Opaque;
-	inline static Microsoft::WRL::ComPtr<ID3D11BlendState> BS_Transparent;
-
-	//DS States
-	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DSS_Default;
-	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DSS_MaskObject;
-	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilState> DSS_Outline;
-private:
+	inline static float clearColor[4] = {0.22f, 0.22f, 0.22f, 1.0f};
 	inline static bool isVSyncEnabled = false;
-	inline static ClearMode clearMode;
-	inline static float clearColor[4];
+
+private:	
 	inline static Resolution renderResolution;
 
 	//Ambient Light
@@ -113,8 +87,6 @@ private:
 	inline static float horizontalFOV;
 	inline static float aspectRatio;
 	inline static ProjectionType projectionType;
-
-	inline static DirectX::XMMATRIX viewProjectionMatrix;
 
 	//Currently if we are in editor mode, view matrix is editor camera's lookat matrix
 	inline static DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixIdentity();

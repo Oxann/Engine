@@ -355,6 +355,11 @@
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\RendererManager.cpp" />
+    <ClCompile Include="src\RenderQueueOpaque.cpp" />
+    <ClCompile Include="src\RenderQueueOutline.cpp" />
+    <ClCompile Include="src\RenderQueueTransparent.cpp" />
+    <ClCompile Include="src\RenderQueueWireframe.cpp" />
     <ClCompile Include="src\Resources.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
@@ -370,6 +375,12 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\RenderQueueOutline.h" />
+    <ClInclude Include="src\RenderQueueWireframe.h" />
+    <ClInclude Include="src\RendererManager.h" />
+    <ClInclude Include="src\RenderQueueTransparent.h" />
+    <ClInclude Include="src\RenderQueueOpaque.h" />
+    <ClInclude Include="src\RenderQueueBase.h" />
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\EditorEntityWindow.h" />
     <ClInclude Include="src\EditorMaterialEditWindow.h" />

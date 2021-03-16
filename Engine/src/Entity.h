@@ -11,10 +11,12 @@
 #include "Transform.h"
 #include "Renderer.h"
 
+class Scene;
+
 class Entity
 {
 	friend class Model;
-	friend class Scene;
+	friend Scene;
 	friend class EditorSceneHierarchyWindow;
 	friend class Engine;
 
@@ -31,6 +33,7 @@ private:
 	Entity(Entity&& Entity) = delete;
 	Entity& operator= (const Entity& rhs) = delete;
 	Entity& operator= (Entity&& rhs) = delete;
+	Entity* Clone(Scene* scene);
 	Entity* Clone();
 public:
 	//DON'T DELETE ENTITY!!!

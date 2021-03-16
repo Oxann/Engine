@@ -6,7 +6,8 @@
 #include "EngineAssert.h"
 #include "Phong_Material.h"
 #include "Transform.h"
-
+#include "Scene.h"
+#include "Editor.h"
 
 Renderer* Renderer::Clone()
 {
@@ -21,10 +22,12 @@ void Renderer::SetMesh(const Mesh* mesh)
 {
 	this->mesh = mesh;
 	materials.resize(0u);
-	materials.reserve(mesh->GetSubMeshCount());
 
-	for (int i = 0; i < mesh->GetSubMeshCount(); i++)
-		materials.push_back(Phong_Material::GetDefaultMaterial());
+	if (mesh != nullptr)
+	{
+		for (int i = 0; i < mesh->GetSubMeshCount(); i++)
+			materials.push_back(Phong_Material::GetDefaultMaterial());
+	}
 }
 
 const Mesh* Renderer::GetMesh() const
@@ -49,6 +52,47 @@ void Renderer::SetMaterial(const Material* material, unsigned int materialIndex)
 const std::vector<const Material*>& Renderer::GetMaterials() const
 {
 	return materials;
+}
+
+void Renderer::Update()
+{
+	isWorldMatrixUpdated = false;
+	isWorldViewMatrixUpdated = false;
+	isWorldViewProjectionMatrixUpdated = false;
+	isNormalMatrixUpdated = false;
+
+	//Passing to render queues
+	for (int i = 0; i < mesh->GetSubMeshCount(); i++)
+	{
+#ifdef EDITOR
+		if (Editor::isWireframeEnabled)
+		{
+			Scene::GetActiveScene()->rendererManager.renderQueueWireframe.Add(this, i);
+			continue;
+		}			
+#endif
+
+		if (materials[i]->mode == Material::Mode::Opaque)
+		{
+			Scene::GetActiveScene()->rendererManager.renderQueueOpaque.Add(this, i);
+		}
+		else
+		{
+			Scene::GetActiveScene()->rendererManager.renderQueueTransparent.Add(this, i);
+		}
+	}
+}
+
+void Renderer::Render(unsigned int subMeshIndex)
+{
+	materials[subMeshIndex]->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
+	Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
+}
+
+void Renderer::Render(unsigned int subMeshIndex, const Material* material)
+{
+	material->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
+	Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
 }
 
 void Renderer::UpdateDirectionalLightBuffer() const
@@ -143,4 +187,67 @@ void Renderer::UpdatePointLightBuffer() const
 	};
 
 	pointLightBuffer.ChangeData(&toGPU);
+}
+
+const DirectX::XMMATRIX& Renderer::GetWorldMatrix()
+{
+	if (!isWorldMatrixUpdated)
+	{
+		worldMatrix = GetTransform()->GetLocalMatrix();
+		
+		for (const Entity* parent = GetEntity()->GetParent(); parent != nullptr;)
+		{
+			//If the parent entity has a renderer we can use its world matrix.
+			if (Renderer* parentRenderer = parent->GetRenderer())
+			{
+				worldMatrix = worldMatrix * parentRenderer->GetWorldMatrix();
+				break;
+			}
+			else
+			{
+				worldMatrix = worldMatrix * parent->GetTransform()->GetLocalMatrix();
+				parent = parent->GetParent();
+			}
+		}
+
+		//Column order needed.
+		worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
+
+		isWorldMatrixUpdated = true;	
+	}
+
+	return worldMatrix;
+}
+
+const DirectX::XMMATRIX& Renderer::GetWorldViewMatrix()
+{
+	if (!isWorldViewMatrixUpdated)
+	{
+		worldViewMatrix = DirectX::XMMatrixTranspose(Graphics::viewMatrix) * GetWorldMatrix();
+		isWorldViewMatrixUpdated = true;
+	}
+
+	return worldViewMatrix;
+}
+
+const DirectX::XMMATRIX& Renderer::GetWorldViewProjectionMatrix()
+{
+	if (!isWorldViewProjectionMatrixUpdated)
+	{
+		worldViewProjectionMatrix = DirectX::XMMatrixTranspose(Graphics::projectionMatrix) * GetWorldViewMatrix();
+		isWorldViewProjectionMatrixUpdated = true;
+	}
+
+	return worldViewProjectionMatrix;
+}
+
+const DirectX::XMMATRIX& Renderer::GetNormalMatrix()
+{
+	if (!isNormalMatrixUpdated)
+	{
+		normalMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, GetWorldViewMatrix()));
+		isNormalMatrixUpdated = true;
+	}
+
+	return normalMatrix;
 }

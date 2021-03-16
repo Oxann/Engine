@@ -74,13 +74,11 @@ void Editor::Update()
 			{
 				if (ImGui::MenuItem("Solid##drawModeMenu/Solid", nullptr, nullptr))
 				{
-					Graphics::pDeviceContext->RSSetState(Graphics::RS_Solid.Get());
-					isWireframe = false;
+					isWireframeEnabled = false;
 				}
 				if (ImGui::MenuItem("Wireframe##drawModeMenu/Wireframe", nullptr, nullptr))
 				{
-					Graphics::pDeviceContext->RSSetState(Graphics::RS_Wireframe.Get());
-					isWireframe = true;
+					isWireframeEnabled = true;
 				}	
 
 				ImGui::EndMenu();
@@ -100,9 +98,6 @@ void Editor::Update()
 				ImGui::End();
 			}
 		}
-
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	Camera::Update();
@@ -126,6 +121,12 @@ void Editor::Update()
 	}
 }
 
+void Editor::Render()
+{
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+}
+
 bool Editor::WantCaptureKeyboard()
 {
 	return imguiIO->WantCaptureKeyboard;
@@ -140,7 +141,7 @@ void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity
 {
 	if (entity->Renderer_)
 	{
-		DirectX::XMMATRIX inverseMV = DirectX::XMMatrixInverse(nullptr,DirectX::XMMatrixTranspose(entity->Renderer_->MV_Matrix)); //MV is column order
+		DirectX::XMMATRIX inverseMV = DirectX::XMMatrixInverse(nullptr,DirectX::XMMatrixTranspose(entity->Renderer_->GetWorldViewMatrix())); //MV is column order
 
 		DirectX::XMVECTOR rayOrigin = DirectX::XMVector3TransformCoord(DirectX::XMVectorSet(0.0f,0.0f,0.0f,1.0f), inverseMV);
 		DirectX::XMVECTOR rayDirection = DirectX::XMVector3TransformNormal(DirectX::XMVectorSet(viewSpaceX, viewSpaceY, 1.0f, 0.0f), inverseMV);

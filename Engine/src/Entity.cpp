@@ -2,6 +2,7 @@
 #include "EngineException.h"
 #include "Transform.h"
 #include "Renderer.h"
+#include "Scene.h"
 
 Entity::Entity(std::string name)
 {
@@ -10,7 +11,7 @@ Entity::Entity(std::string name)
 	static_cast<Component*>(Transform_.get())->entity = this;
 }
 
-Entity* Entity::Clone()
+Entity* Entity::Clone(Scene* scene)
 {
 	Entity* newEntity = new Entity;
 	newEntity->name = name;
@@ -25,8 +26,42 @@ Entity* Entity::Clone()
 		newEntity->Renderer_ = std::unique_ptr<Renderer>(this->Renderer_->Clone());
 		static_cast<Component*>(newEntity->Renderer_.get())->entity = newEntity;
 		static_cast<Component*>(newEntity->Renderer_.get())->transform = newEntity->Transform_.get();
+		scene->rendererManager.renderers.emplace_back(newEntity->Renderer_.get());
 	}
 			
+	for (auto& component : Components)
+	{
+		auto newComponent = newEntity->Components.insert({ component.first,std::unique_ptr<Component>(component.second->Clone()) });
+		newComponent.first->second->entity = newEntity;
+		newComponent.first->second->transform = newEntity->Transform_.get();
+	}
+
+	for (int i = 0; i < Children.size(); i++)
+	{
+		newEntity->Children.push_back(std::unique_ptr<Entity>(this->Children[i]->Clone(scene)));
+		newEntity->Children.back()->parent = newEntity;
+	}
+
+	return newEntity;
+}
+
+Entity* Entity::Clone()
+{
+	Entity* newEntity = new Entity;
+	newEntity->name = name;
+
+	//Transform
+	newEntity->Transform_ = std::unique_ptr<Transform>(this->Transform_->Clone());
+	static_cast<Component*>(newEntity->Transform_.get())->entity = newEntity;
+
+	//Renderer
+	if (Renderer_)
+	{
+		newEntity->Renderer_ = std::unique_ptr<Renderer>(this->Renderer_->Clone());
+		static_cast<Component*>(newEntity->Renderer_.get())->entity = newEntity;
+		static_cast<Component*>(newEntity->Renderer_.get())->transform = newEntity->Transform_.get();
+	}
+
 	for (auto& component : Components)
 	{
 		auto newComponent = newEntity->Components.insert({ component.first,std::unique_ptr<Component>(component.second->Clone()) });

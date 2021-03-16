@@ -144,9 +144,12 @@ private:
 	void DisplayRenderer()
 	{
 		//Object outline
-		if(!Editor::isWireframe)
-			Graphics::DrawOutline(displayedRenderer);
-
+		if (!Editor::isWireframeEnabled)
+		{
+			for (int i = 0; i < displayedRenderer->GetMesh()->GetSubMeshCount(); i++)
+				Scene::GetActiveScene()->rendererManager.renderQueueOutline.Add(displayedRenderer, i);
+		}
+		
 		if (ImGui::CollapsingHeader("RENDERER"))
 		{
 			//Mesh selection

@@ -152,9 +152,9 @@ void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, Renderer*  renderer
 		false
 	};
 	
-	VS_CB_Slot0_.modelView = renderer->MV_Matrix;
-	VS_CB_Slot0_.normalMatrix = renderer->normalMatrix;
-	VS_CB_Slot0_.MVP = renderer->MVP_Matrix;
+	VS_CB_Slot0_.modelView = renderer->GetWorldViewMatrix();
+	VS_CB_Slot0_.normalMatrix = renderer->GetNormalMatrix();
+	VS_CB_Slot0_.MVP = renderer->GetWorldViewProjectionMatrix();
 
 	VS_CB.ChangeData(&VS_CB_Slot0_);
 	VS_CB.BindPipeline();

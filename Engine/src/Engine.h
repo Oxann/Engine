@@ -14,7 +14,7 @@ public:
 private:
 	static void Update();
 	static void UpdateEntity(std::unique_ptr<Entity>& entity);
-	static void RenderEntity(std::unique_ptr<Entity>& entity, DirectX::XMMATRIX worldMatrix);
+	//static void RenderEntity(std::unique_ptr<Entity>& entity, DirectX::XMMATRIX worldMatrix);
 private:
 	static void ShutDown();
 };

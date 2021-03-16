@@ -71,7 +71,7 @@ void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, Renderer* renderer)
 
 	//Vertex Shader
 	static VS_ConstantBuffer<DirectX::XMMATRIX> VS_CB = {
-		&renderer->MVP_Matrix,
+		&renderer->GetWorldViewProjectionMatrix(),
 		1u,
 		0u,
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
@@ -79,7 +79,7 @@ void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, Renderer* renderer)
 		false
 	};
 
-	VS_CB.ChangeData(&renderer->MVP_Matrix);
+	VS_CB.ChangeData(&renderer->GetWorldViewProjectionMatrix());
 	VS_CB.BindPipeline();
 
 	//Pixel shader

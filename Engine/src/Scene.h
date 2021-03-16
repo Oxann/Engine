@@ -4,11 +4,13 @@
 #include <string>
 
 #include "Entity.h"
+#include "RendererManager.h"
 
 class Scene
 {
 	friend class EditorSceneHierarchyWindow;
 	friend class Engine;
+	friend Entity;
 
 #ifdef EDITOR
 	friend class Editor;
@@ -29,15 +31,16 @@ public:
 	size_t GetEntityCount() const;
 	size_t GetRootEntityCount() const;
 private:
-	Scene(unsigned char index,std::string name)
+	Scene(unsigned char index, std::string name)
 		:Index(index),
 		Name(name)
 	{}
 public:
 	std::string Name;
 	unsigned char Index;
+	RendererManager rendererManager;
 private:
 	std::vector<std::unique_ptr<Entity>> Entities;
-	static std::map<unsigned char,Scene> Scenes;
+	static std::map<unsigned char, Scene> Scenes;
 	static Scene* ActiveScene;
 };

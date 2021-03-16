@@ -245,19 +245,6 @@ void Transform::SetLocalRotation(float x, float y, float z)
 	localQuaternion = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(x), DirectX::XMConvertToRadians(y), DirectX::XMConvertToRadians(z));
 }
 
-DirectX::XMFLOAT3 Transform::GetEuler() const
-{
-	/*DirectX::XMFLOAT3 euler;
-
-	DirectX::XMFLOAT3X3 rotationMatrix;
-	DirectX::XMStoreFloat3x3(&rotationMatrix,GetLocalMatrix());
-
-
-
-	return euler;*/
-	return {};
-}
-
 DirectX::XMMATRIX Transform::GetLocalMatrix() const
 {
 	if (!isLocalMatrixUpdated)

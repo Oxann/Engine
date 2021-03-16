@@ -45,6 +45,7 @@ public:
 	static void ShutDown();
 	static LRESULT EditorInputHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static void Update();
+	static void Render();
 	static bool WantCaptureKeyboard();
 	static bool WantCaptureMouse();
 
@@ -64,7 +65,7 @@ public:
 	inline static bool isActive = true;
 	inline static ImGuiIO* imguiIO = nullptr;
 	inline static std::vector<std::unique_ptr<EditorWindowBase>> windows;
-	inline static bool isWireframe = false;
+	inline static bool isWireframeEnabled = false;
 };
 
 

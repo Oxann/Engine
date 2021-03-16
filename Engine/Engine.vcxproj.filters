@@ -122,6 +122,19 @@
       <Filter>Editor</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\RenderQueueOpaque.cpp">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueueTransparent.cpp">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueueWireframe.cpp">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RenderQueueOutline.cpp">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RendererManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -254,6 +267,24 @@
       <Filter>Editor</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine.h" />
+    <ClInclude Include="src\RenderQueueBase.h">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderQueueOpaque.h">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderQueueTransparent.h">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererManager.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderQueueWireframe.h">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RenderQueueOutline.h">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -314,6 +345,9 @@
     </Filter>
     <Filter Include="Shaders\Unlit">
       <UniqueIdentifier>{1d5c18a0-1e22-43b3-8b36-56482d01b7fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Render Queue">
+      <UniqueIdentifier>{280460ca-b3b3-424b-a6d6-ce7f4754130b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

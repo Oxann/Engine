@@ -7,7 +7,7 @@ template <class DataType>
 class ConstantBuffer : public D3DBase
 {
 public:
-	ConstantBuffer(DataType* data, UINT size, UINT slot, D3D11_USAGE usage = D3D11_USAGE_DEFAULT, UINT cpuAccess = 0u)
+	ConstantBuffer(const DataType* data, UINT size, UINT slot, D3D11_USAGE usage = D3D11_USAGE_DEFAULT, UINT cpuAccess = 0u)
 		:size(size),
 		slot(slot)
 	{
@@ -47,7 +47,7 @@ template<class DataType>
 class VS_ConstantBuffer : public ConstantBuffer<DataType>
 {
 public:
-	VS_ConstantBuffer(DataType* data, UINT size, UINT slot, D3D11_USAGE usage = D3D11_USAGE_DEFAULT, UINT cpuAccess = 0u, bool bind = false)
+	VS_ConstantBuffer(const DataType* data, UINT size, UINT slot, D3D11_USAGE usage = D3D11_USAGE_DEFAULT, UINT cpuAccess = 0u, bool bind = false)
 		:ConstantBuffer<DataType>(data,size,slot,usage,cpuAccess)
 	{
 		if (bind)
@@ -63,7 +63,7 @@ template<class DataType>
 class PS_ConstantBuffer : public ConstantBuffer<DataType>
 {
 public:
-	PS_ConstantBuffer(DataType* data, UINT size, UINT slot, D3D11_USAGE usage = D3D11_USAGE_DEFAULT, UINT cpuAccess = 0u, bool bind = false)
+	PS_ConstantBuffer(const DataType* data, UINT size, UINT slot, D3D11_USAGE usage = D3D11_USAGE_DEFAULT, UINT cpuAccess = 0u, bool bind = false)
 		:ConstantBuffer<DataType>(data, size, slot, usage, cpuAccess)
 	{
 		if (bind)
