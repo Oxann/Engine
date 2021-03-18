@@ -1,6 +1,7 @@
 #include "RendererManager.h"
 #include "Editor.h"
 #include "Graphics.h"
+#include "MainWindow.h"
 
 void RendererManager::Update()
 {
@@ -26,7 +27,7 @@ void RendererManager::Update()
 #ifndef NDEBUG
 	if (MainWindow::isMinimized())
 	{
-		CHECK_DX_ERROR(pSwapChain->Present(isVSyncEnabled, 0u));
+		CHECK_DX_ERROR(Graphics::pSwapChain->Present(Graphics::isVSyncEnabled, 0u));
 	}
 #else
 	Graphics::pSwapChain->Present(Graphics::isVSyncEnabled, 0u);

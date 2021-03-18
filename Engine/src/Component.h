@@ -8,12 +8,6 @@ class Component
 {
 	friend Entity;
 public:
-	enum class State : unsigned char
-	{
-		Start = 0,
-		Update = 1
-	};
-public:
 	Component() = default;
 	virtual ~Component() = default;
 	Component(const Component& component) = delete;
@@ -25,8 +19,6 @@ public:
 	Entity* GetEntity() const { return entity; }
 	Transform* GetTransform() const { return transform; };
 	virtual Component* Clone() = 0;
-public:
-	State state = State::Start;
 private:
 	Entity* entity = nullptr;
 	Transform* transform = nullptr;

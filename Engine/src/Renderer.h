@@ -53,6 +53,7 @@ public:
 	//COLUMN ORDER!!!
 	const DirectX::XMMATRIX& GetNormalMatrix();
 private:
+	void Start();
 	void Update() override;
 	void UpdateDirectionalLightBuffer() const;
 	void UpdatePointLightBuffer() const;

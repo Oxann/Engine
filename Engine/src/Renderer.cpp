@@ -54,6 +54,11 @@ const std::vector<const Material*>& Renderer::GetMaterials() const
 	return materials;
 }
 
+void Renderer::Start()
+{
+	Scene::GetActiveScene()->rendererManager.renderers.push_back(this);
+}
+
 void Renderer::Update()
 {
 	isWorldMatrixUpdated = false;

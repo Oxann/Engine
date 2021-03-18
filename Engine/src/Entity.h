@@ -33,8 +33,9 @@ private:
 	Entity(Entity&& Entity) = delete;
 	Entity& operator= (const Entity& rhs) = delete;
 	Entity& operator= (Entity&& rhs) = delete;
-	Entity* Clone(Scene* scene);
 	Entity* Clone();
+	void Start();
+	void Update();
 public:
 	//DON'T DELETE ENTITY!!!
 	//USE DeletePrefab instead.

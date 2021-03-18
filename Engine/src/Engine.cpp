@@ -91,7 +91,7 @@ void Engine::Update()
 	//Updating Components
 	for (auto& entity : Scene::ActiveScene->Entities)
 	{
-		UpdateEntity(entity);
+        entity->Update();
 	}
 
 #ifdef EDITOR
@@ -103,28 +103,6 @@ void Engine::Update()
 
 	//Render
 	Scene::ActiveScene->rendererManager.Update();
-}
-
-void Engine::UpdateEntity(std::unique_ptr<Entity>& entity)
-{
-	for (auto& component : entity->Components)
-	{
-		switch (component.second->state)
-		{
-		[[unlikely]] case Component::State::Start:
-			component.second->Start();
-			component.second->state = Component::State::Update;
-			break;
-		[[likely]] case Component::State::Update:
-			component.second->Update();
-			break;
-		default:
-			break;
-		}
-	}
-
-	for (int i = 0; i < entity->GetChildrenCount(); i++)
-		UpdateEntity(entity->Children[i]);
 }
 
 void Engine::ShutDown()

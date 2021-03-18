@@ -52,6 +52,11 @@ void Scene::LoadScene(unsigned char index)
 	auto scene = Scenes.find(index);
 	ENGINEASSERT(scene != Scenes.end(), "Specified scene index is not correct");
 	ActiveScene = &scene->second;
+
+	for (const auto& entity : ActiveScene->Entities)
+	{
+		entity->Start();
+	}
 }
 
 void Scene::LoadScene(std::string name)
@@ -64,6 +69,11 @@ void Scene::LoadScene(std::string name)
 	}
 	ENGINEASSERT(scene != nullptr, "Specified scene name is not correct");
 	ActiveScene = scene;
+
+	for (const auto& entity : ActiveScene->Entities)
+	{
+		entity->Start();
+	}
 }
 
 Entity* Scene::NewEntity(std::string name)
@@ -74,7 +84,7 @@ Entity* Scene::NewEntity(std::string name)
 
 Entity* Scene::NewEntity(Entity* cloneFrom)
 {
-	Entities.push_back(std::unique_ptr<Entity>(cloneFrom->Clone(this)));
+	Entities.push_back(std::unique_ptr<Entity>(cloneFrom->Clone()));
 	return Entities.back().get();
 }
 
