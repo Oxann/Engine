@@ -5,7 +5,7 @@
 class RenderQueueWireframe : public RenderQueueBase
 {
 public:
-	RenderQueueWireframe();
+	RenderQueueWireframe(RendererManager* const rendererManager);
 	void Add(Renderer* renderer, unsigned int index);
 	void Render() override;
 private:

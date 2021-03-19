@@ -15,7 +15,13 @@ class RendererManager
 	friend class EditorEntityWindow;
 	friend class Entity;
 private:
+	RendererManager();
 	void Update();
+public:
+	unsigned long long meshCount;
+	unsigned long long vertexCount;
+	unsigned long long triangleCount;
+
 private:
 	std::vector<Renderer*> renderers;
 

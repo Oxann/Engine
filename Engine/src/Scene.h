@@ -30,7 +30,7 @@ public:
 	Entity* GetEntity(std::string name);
 	size_t GetEntityCount() const;
 	size_t GetRootEntityCount() const;
-private:
+
 	Scene(unsigned char index, std::string name)
 		:Index(index),
 		Name(name)
@@ -38,7 +38,7 @@ private:
 public:
 	std::string Name;
 	unsigned char Index;
-	RendererManager rendererManager;
+	RendererManager rendererManager{};
 private:
 	std::vector<std::unique_ptr<Entity>> Entities;
 	static std::map<unsigned char, Scene> Scenes;

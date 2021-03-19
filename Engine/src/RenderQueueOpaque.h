@@ -8,7 +8,7 @@
 class RenderQueueOpaque : public RenderQueueBase
 {
 public:
-	RenderQueueOpaque();
+	RenderQueueOpaque(RendererManager* const rendererManager);
 	void Add(Renderer* renderer, unsigned int index);
 	void Render() override;
 private:

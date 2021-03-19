@@ -1,8 +1,10 @@
 #include "RenderQueueWireframe.h"
 #include "Graphics.h"
 #include "Renderer.h"
+#include "RendererManager.h"
 
-RenderQueueWireframe::RenderQueueWireframe()
+RenderQueueWireframe::RenderQueueWireframe(RendererManager* const rendererManager)
+	:RenderQueueBase(rendererManager)
 {
 	queue.reserve(500u);
 
@@ -51,10 +53,18 @@ void RenderQueueWireframe::Render()
 	Graphics::pDeviceContext->OMSetBlendState(blendState.Get(), NULL, 0xffffffff);
 	Graphics::pDeviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0u);
 
+	//Counting rendered meshes.
+	rendererManager->meshCount += queue.size();
+
 	for (const auto& renderItem : queue)
 	{
 		static Material* wireframeMaterial = Resources::FindMaterial("$Default\\wireframeMaterial");
 		renderItem.renderer->Render(renderItem.subMeshIndex, wireframeMaterial);
+
+		//Counting rendered vertices.
+		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+		rendererManager->vertexCount += subMesh.GetVertexCount();
+		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
 	}
 
 	queue.clear();

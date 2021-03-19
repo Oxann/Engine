@@ -1,9 +1,12 @@
 #include "RenderQueueTransparent.h"
 #include "Graphics.h"
 #include "Renderer.h"
+#include "RendererManager.h"
 #include <algorithm>
 
-RenderQueueTransparent::RenderQueueTransparent()
+
+RenderQueueTransparent::RenderQueueTransparent(RendererManager* const rendererManager)
+	:RenderQueueBase(rendererManager)
 {
 	queue.reserve(500u);
 
@@ -55,11 +58,19 @@ void RenderQueueTransparent::Render()
 	Graphics::pDeviceContext->OMSetBlendState(blendState.Get(), NULL, 0xffffffff);
 	Graphics::pDeviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0u);
 
+	//Counting rendered meshes.
+	rendererManager->meshCount += queue.size();
+
 	std::sort(queue.begin(), queue.end());
 
 	for (const auto& renderItem : queue)
 	{
 		renderItem.renderer->Render(renderItem.subMeshIndex);
+
+		//Counting rendered vertices.
+		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+		rendererManager->vertexCount += subMesh.GetVertexCount();
+		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
 	}
 
 	queue.clear();

@@ -1,8 +1,10 @@
 #include "RenderQueueOutline.h"
 #include "Graphics.h"
 #include "Renderer.h"
+#include "RendererManager.h"
 
-RenderQueueOutline::RenderQueueOutline()
+RenderQueueOutline::RenderQueueOutline(RendererManager* const rendererManager)
+	:RenderQueueBase(rendererManager)
 {
 	queue.reserve(100u);
 
@@ -76,6 +78,9 @@ void RenderQueueOutline::Render()
 	Graphics::pDeviceContext->RSSetState(rasterizerState.Get());
 	Graphics::pDeviceContext->OMSetBlendState(blendState.Get(), NULL, 0xffffffff);
 	
+	//Counting rendered meshes.
+	rendererManager->meshCount += queue.size();
+
 	for (const auto& renderItem : queue)
 	{
 		//Masking
@@ -92,6 +97,11 @@ void RenderQueueOutline::Render()
 		
 		renderItem.renderer->worldViewProjectionMatrix = MVP * DirectX::XMMatrixScaling(0.99f, 0.99f, 0.99f); //Scaling MVP by a factor, !!!MVP is column order!!!
 		renderItem.renderer->Render(renderItem.subMeshIndex, outlineMaterial);
+
+		//Counting rendered vertices.
+		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+		rendererManager->vertexCount += subMesh.GetVertexCount();
+		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
 	}
 
 	queue.clear();

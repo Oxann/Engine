@@ -1,13 +1,12 @@
 #pragma once
 #include "RenderQueueBase.h"
-#include "Shader.h"
 #include <vector>
 
 
 class RenderQueueOutline : public RenderQueueBase
 {
 public:
-	RenderQueueOutline();
+	RenderQueueOutline(RendererManager* const rendererManager);
 	void Add(Renderer* renderer, unsigned int index);
 	void Render() override;
 private:

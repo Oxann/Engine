@@ -1,9 +1,11 @@
 #include "RenderQueueOpaque.h"
 #include "Graphics.h"
 #include "Renderer.h"
+#include "RendererManager.h"
+#include "Scene.h"
 
-
-RenderQueueOpaque::RenderQueueOpaque()
+RenderQueueOpaque::RenderQueueOpaque(RendererManager* const rendererManager)
+	:RenderQueueBase(rendererManager)
 {
 	queue.reserve(500u);
 
@@ -53,9 +55,17 @@ void RenderQueueOpaque::Render()
 	Graphics::pDeviceContext->OMSetBlendState(blendState.Get(), NULL, 0xffffffff);
 	Graphics::pDeviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0u);
 
+	//Counting rendered meshes.
+	rendererManager->meshCount += queue.size();
+
 	for (const auto& renderItem : queue)
 	{
 		renderItem.renderer->Render(renderItem.subMeshIndex);
+
+		//Counting rendered vertices.
+		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+		rendererManager->vertexCount += subMesh.GetVertexCount();
+		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
 	}
 
 	queue.clear();

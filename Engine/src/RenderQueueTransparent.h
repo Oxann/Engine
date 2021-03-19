@@ -16,7 +16,7 @@ private:
 		float Z = 0.0f;
 	};
 public:
-	RenderQueueTransparent();
+	RenderQueueTransparent(RendererManager* const rendererManager);
 	void Add(Renderer* renderer, unsigned int index);
 	virtual void Render() override;
 private:

@@ -17,11 +17,11 @@ void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
 	Scene::LoadScene(1);
-}
+};
 
 void Scene::CreateNewScene(unsigned char index, std::string name)
 {
-	auto scene = Scenes.insert(std::pair<unsigned char, Scene>(index, Scene(index, name)));
+	auto scene = Scenes.emplace(std::piecewise_construct, std::forward_as_tuple(index), std::forward_as_tuple(index,name));
 	ENGINEASSERT(scene.second, "Duplicate scene index.");
 }
 
