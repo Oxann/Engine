@@ -61,31 +61,49 @@ void Renderer::Start()
 
 void Renderer::Update()
 {
-	isWorldMatrixUpdated = false;
-	isWorldViewMatrixUpdated = false;
-	isWorldViewProjectionMatrixUpdated = false;
-	isNormalMatrixUpdated = false;
+	UpdateMatrices();
+
+	//Frustum culling on merged AABB.
+	if (mesh->GetSubMeshCount() > 1)
+	{
+		DirectX::BoundingBox viewSpaceAABB;
+		mesh->AABB.Transform(viewSpaceAABB, worldViewMatrix);
+		
+		//If merged AABB is not inside the frustum we can return here.
+		if (Scene::GetActiveScene()->rendererManager.frustum.Contains(viewSpaceAABB) == DirectX::ContainmentType::DISJOINT)
+			return;
+	}
 
 	//Passing to render queues
 	for (int i = 0; i < mesh->GetSubMeshCount(); i++)
 	{
-#ifdef EDITOR
-		if (Editor::isWireframeEnabled)
+		//Frustum culling on submesh.
+		DirectX::BoundingBox viewSpaceAABB;
+		mesh->GetSubMeshes()[i].AABB.Transform(viewSpaceAABB, worldViewMatrix);
+
+		if (Scene::GetActiveScene()->rendererManager.frustum.Contains(viewSpaceAABB) != DirectX::ContainmentType::DISJOINT)
 		{
-			Scene::GetActiveScene()->rendererManager.renderQueueWireframe.Add(this, i);
-			continue;
-		}			
+#ifdef EDITOR
+			if (Editor::isWireframeEnabled)
+			{
+				Scene::GetActiveScene()->rendererManager.renderQueueWireframe.Add(this, i);
+				continue;
+			}
 #endif
 
-		if (materials[i]->mode == Material::Mode::Opaque)
-		{
-			Scene::GetActiveScene()->rendererManager.renderQueueOpaque.Add(this, i);
-		}
-		else
-		{
-			Scene::GetActiveScene()->rendererManager.renderQueueTransparent.Add(this, i);
+			if (materials[i]->mode == Material::Mode::Opaque)
+			{
+				Scene::GetActiveScene()->rendererManager.renderQueueOpaque.Add(this, i);
+			}
+			else
+			{
+				Scene::GetActiveScene()->rendererManager.renderQueueTransparent.Add(this, i);
+			}
 		}
 	}
+
+	//Matrices need to be converted to column order before passing them to shaders.
+	TransposeMatrices();
 }
 
 void Renderer::Render(unsigned int subMeshIndex)
@@ -194,62 +212,56 @@ void Renderer::UpdatePointLightBuffer() const
 	pointLightBuffer.ChangeData(&toGPU);
 }
 
-const DirectX::XMMATRIX& Renderer::GetWorldMatrix()
+void Renderer::UpdateMatrices()
 {
-	if (!isWorldMatrixUpdated)
+	worldMatrix = GetTransform()->GetLocalMatrix();
+
+	for (const Entity* parent = GetEntity()->GetParent(); parent != nullptr;)
 	{
-		worldMatrix = GetTransform()->GetLocalMatrix();
-		
-		for (const Entity* parent = GetEntity()->GetParent(); parent != nullptr;)
+		//If the parent entity has a renderer we can use its world matrix.
+		if (Renderer* parentRenderer = parent->GetRenderer())
 		{
-			//If the parent entity has a renderer we can use its world matrix.
-			if (Renderer* parentRenderer = parent->GetRenderer())
-			{
-				worldMatrix = worldMatrix * parentRenderer->GetWorldMatrix();
-				break;
-			}
-			else
-			{
-				worldMatrix = worldMatrix * parent->GetTransform()->GetLocalMatrix();
-				parent = parent->GetParent();
-			}
+			worldMatrix = worldMatrix * parentRenderer->worldMatrix;
+			break;
 		}
-
-		//Column order needed.
-		worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
-
-		isWorldMatrixUpdated = true;	
+		else
+		{
+			worldMatrix = worldMatrix * parent->GetTransform()->GetLocalMatrix();
+			parent = parent->GetParent();
+		}
 	}
 
+	worldViewMatrix = worldMatrix * Graphics::viewMatrix;
+	worldViewProjectionMatrix = worldViewMatrix * Graphics::projectionMatrix;
+}
+
+void Renderer::TransposeMatrices()
+{
+	worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
+	worldViewMatrix = DirectX::XMMatrixTranspose(worldViewMatrix);
+	worldViewProjectionMatrix = DirectX::XMMatrixTranspose(worldViewProjectionMatrix);
+}
+
+const DirectX::XMMATRIX& Renderer::GetWorldMatrix()
+{
 	return worldMatrix;
 }
 
 const DirectX::XMMATRIX& Renderer::GetWorldViewMatrix()
 {
-	if (!isWorldViewMatrixUpdated)
-	{
-		worldViewMatrix = DirectX::XMMatrixTranspose(Graphics::viewMatrix) * GetWorldMatrix();
-		isWorldViewMatrixUpdated = true;
-	}
-
 	return worldViewMatrix;
 }
 
 const DirectX::XMMATRIX& Renderer::GetWorldViewProjectionMatrix()
 {
-	if (!isWorldViewProjectionMatrixUpdated)
-	{
-		worldViewProjectionMatrix = DirectX::XMMatrixTranspose(Graphics::projectionMatrix) * GetWorldViewMatrix();
-		isWorldViewProjectionMatrixUpdated = true;
-	}
-
-	return worldViewProjectionMatrix;
+	return worldViewProjectionMatrix;;
 }
 
 const DirectX::XMMATRIX& Renderer::GetNormalMatrix()
 {
 	if (!isNormalMatrixUpdated)
 	{
+		//Matrices need to be converted to column order before passing them to shaders.
 		normalMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, GetWorldViewMatrix()));
 		isNormalMatrixUpdated = true;
 	}

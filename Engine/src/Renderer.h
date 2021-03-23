@@ -57,13 +57,15 @@ private:
 	void Update() override;
 	void UpdateDirectionalLightBuffer() const;
 	void UpdatePointLightBuffer() const;
+	void UpdateMatrices();
+	void TransposeMatrices();
 public:
 	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 private:
 	const Mesh* mesh = nullptr;
 	std::vector<const Material*> materials;
 
-	//All matrices are column order.
+	//All matrices are column order after renderer updated.
 	DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX worldViewMatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX normalMatrix = DirectX::XMMatrixIdentity();

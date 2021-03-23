@@ -22,7 +22,7 @@ public:
 	unsigned long long vertexCount;
 	unsigned long long triangleCount;
 
-private:
+private:	
 	std::vector<Renderer*> renderers;
 
 	//Render Queues
@@ -30,4 +30,7 @@ private:
 	RenderQueueTransparent renderQueueTransparent;
 	RenderQueueWireframe renderQueueWireframe;
 	RenderQueueOutline renderQueueOutline;
+
+	//Frustum
+	DirectX::BoundingFrustum frustum;
 };

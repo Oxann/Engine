@@ -10,10 +10,10 @@ class Component
 public:
 	Component() = default;
 	virtual ~Component() = default;
-	Component(const Component& component) = delete;
-	Component& operator=(const Component&) = delete;
-	Component(Component&& component) = delete;
-	Component& operator=(Component&&) = delete;
+	Component(const Component& component) = default;
+	Component& operator=(const Component&) = default;
+	Component(Component&& component) = default;
+	Component& operator=(Component&&) = default;
 	virtual void Start() {}
 	virtual void Update() {}
 	Entity* GetEntity() const { return entity; }

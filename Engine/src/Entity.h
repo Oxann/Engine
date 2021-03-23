@@ -25,14 +25,9 @@ class Entity
 #endif
 
 public:
-	Entity(std::string name);
-	~Entity() = default;
-private:
 	Entity() = default;
-	Entity(const Entity& entity) = delete;
-	Entity(Entity&& Entity) = delete;
-	Entity& operator= (const Entity& rhs) = delete;
-	Entity& operator= (Entity&& rhs) = delete;
+	Entity(std::string name);
+private:
 	Entity* Clone();
 	void Start();
 	void Update();

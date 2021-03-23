@@ -23,6 +23,9 @@ void RendererManager::Update()
 	meshCount = 0;
 	triangleCount = 0;
 
+	//Creating frustum.
+	DirectX::BoundingFrustum::CreateFromMatrix(frustum,Graphics::GetProjectionMatrix());
+
 	for (const auto& renderer : renderers)
 	{
 		renderer->Update();
