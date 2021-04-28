@@ -1,16 +1,13 @@
 #pragma once
 #include <unordered_map>
+#include <set>
 #include <string>
-#include <d3d11.h>
-#include <wrl.h>
-#include "D3DBase.h"
+#include <d3dcompiler.h>
+
+#include "ShaderVariant.h"
 #include "ResourceBase.h"
 
 /*///////////////////////////////////
-//	All shader binaries must be inside Resources/Shaders directory. 
-//
-//	Vertex shaders must start with VS_
-//	Pixel shaders must start with PS_
 //
 //	--- Default Input Slots For Vertex Elements ---
 //  Position	=	0
@@ -21,31 +18,58 @@
 *////////////////////////////////////
 
 
-class VertexShader final : public D3DBase, public ResourceBase
+class Shader
 {
-public:
-	VertexShader(std::filesystem::path file);
-	void BindPipeline() const override
-	{
-		GetDeviceContext()->VSSetShader(vs.Get(), nullptr, 0u);
-		GetDeviceContext()->IASetInputLayout(layout.Get());
-	}
-private:
-	void InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob);
-private:
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> vs;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> layout;
-};
+	typedef std::vector<std::pair<std::set<unsigned char>, VertexShaderVariant>> VSMAP;
+	typedef std::vector<std::pair<std::set<unsigned char>, PixelShaderVariant>> PSMAP;
 
-
-class PixelShader final : public D3DBase, public ResourceBase
-{
+	friend class Resources;
+	friend class ShaderView;
 public:
-	PixelShader(std::filesystem::path file);
-	void BindPipeline() const override
-	{
-		GetDeviceContext()->PSSetShader(ps.Get(), nullptr, 0u);
-	}
+	Shader(const std::string& name, const std::filesystem::path& VS_Path, const std::filesystem::path& PS_Path);
+
+	const std::vector<std::string>& GetVertexShaderMacros() const;
+	const std::vector<std::string>& GetPixelShaderMacros() const;
+
+	const size_t GetVertexShaderMacroCount() const;
+
+	const size_t GetPixelShaderMacroCount() const;
+
+	VertexShaderVariant* const GetVertexShaderVariant(const std::set<unsigned char>& macroIndices) const;
+	PixelShaderVariant* const GetPixelShaderVariant(const std::set<unsigned char>& macroIndices) const;
+
+	VertexShaderVariant* const GetDefaultVertexShaderVariant() const;
+	PixelShaderVariant* const GetDefaultPixelShaderVariant() const;
+
 private:
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> ps;
+	void ExtractMacrosFromSource(std::stringstream& source, std::vector<std::string>& macros);
+	Microsoft::WRL::ComPtr<ID3DBlob> CompileVS(const std::set<unsigned char>& macroIndices) const;
+	Microsoft::WRL::ComPtr<ID3DBlob> CompilePS(const std::set<unsigned char>& macroIndices) const;
+
+public:
+	const std::string name;
+	const std::string VS_SourceName;
+	const std::string PS_SourceName;
+
+private:
+	mutable VertexShaderVariant VS_Default;
+	mutable PixelShaderVariant PS_Default;
+
+	mutable VSMAP VS_Variants;
+	mutable PSMAP PS_Variants;
+
+	std::vector<std::string> VS_Macros;
+	std::vector<std::string> PS_Macros;
+
+	std::string VS_Source;
+	std::string PS_Source;
+
+private:
+#ifdef NDEBUG
+	inline static const UINT flags1 = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
+#else
+	inline static const UINT flags1 = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_DEBUG;
+#endif	
+	inline static const std::string VS_Model = "vs_5_0";
+	inline static const std::string PS_Model = "ps_5_0";
 };

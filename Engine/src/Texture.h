@@ -25,7 +25,7 @@ public:
 		ANISOTROPIC = D3D11_FILTER_ANISOTROPIC
 	};
 public:
-	Texture(std::filesystem::path file);
+	Texture(const std::filesystem::path& file);
 
 	bool HasAlpha() const;
 

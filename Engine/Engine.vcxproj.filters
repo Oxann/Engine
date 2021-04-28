@@ -1,47 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <FxCompile Include="src\Shaders\PS_Phong.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Phong_D.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Phong_D_S.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Phong_D_S_N.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Phong_S.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\VS_Phong_D_S.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\VS_Phong.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\VS_Phong_D_S_N.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Phong_N.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Phong_D_N.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Unlit_T.hlsl">
+    <FxCompile Include="src\Shaders\Unlit.vs">
       <Filter>Shaders\Unlit</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\PS_Unlit.hlsl">
+    <FxCompile Include="src\Shaders\Unlit.ps">
       <Filter>Shaders\Unlit</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\VS_Unlit.hlsl">
-      <Filter>Shaders\Unlit</Filter>
+    <FxCompile Include="src\Shaders\Phong.ps">
+      <Filter>Shaders\Phong</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\VS_Unlit_T.hlsl">
-      <Filter>Shaders\Unlit</Filter>
+    <FxCompile Include="src\Shaders\Phong.vs">
+      <Filter>Shaders\Phong</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,9 +64,6 @@
     <ClCompile Include="src\Resources.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shader.cpp">
-      <Filter>Graphics\D3D</Filter>
-    </ClCompile>
     <ClCompile Include="src\Renderer.cpp">
       <Filter>ECS</Filter>
     </ClCompile>
@@ -135,6 +102,15 @@
       <Filter>Graphics\Render Queue</Filter>
     </ClCompile>
     <ClCompile Include="src\RendererManager.cpp" />
+    <ClCompile Include="src\Shader.cpp">
+      <Filter>Graphics\Shader System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderVariant.cpp">
+      <Filter>Graphics\Shader System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderView.cpp">
+      <Filter>Graphics\Shader System</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -209,9 +185,6 @@
     <ClInclude Include="src\Resources.h">
       <Filter>Resources</Filter>
     </ClInclude>
-    <ClInclude Include="src\Shader.h">
-      <Filter>Graphics\D3D</Filter>
-    </ClInclude>
     <ClInclude Include="src\Renderer.h">
       <Filter>ECS</Filter>
     </ClInclude>
@@ -285,6 +258,15 @@
     <ClInclude Include="src\RenderQueueOutline.h">
       <Filter>Graphics\Render Queue</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShaderVariant.h">
+      <Filter>Graphics\Shader System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Shader.h">
+      <Filter>Graphics\Shader System</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ShaderView.h">
+      <Filter>Graphics\Shader System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -293,14 +275,8 @@
     <None Include="thirdparty\assimp\Release\assimp-vc142-mt.dll">
       <Filter>thirdparty\assimp</Filter>
     </None>
-    <None Include="src\Shaders\Light.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="src\Shaders\VS_Unlit.hlsli">
-      <Filter>Shaders\Unlit</Filter>
-    </None>
-    <None Include="src\Shaders\PS_Unlit.hlsli">
-      <Filter>Shaders\Unlit</Filter>
+    <None Include="src\Shaders\Light.hlsli">
+      <Filter>Shaders\Phong</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -348,6 +324,12 @@
     </Filter>
     <Filter Include="Graphics\Render Queue">
       <UniqueIdentifier>{280460ca-b3b3-424b-a6d6-ce7f4754130b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Phong">
+      <UniqueIdentifier>{965110d6-226e-4102-b048-f93a2009e887}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Shader System">
+      <UniqueIdentifier>{a282c12a-8244-4c0c-8762-2b4e5827b9d5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -3,11 +3,9 @@
 #include "Renderer.h"
 #include "Graphics.h"
 
-Unlit_Material::Unlit_Material(std::string name)
-	:Material(name)
+Unlit_Material::Unlit_Material(const std::string& name)
+	:Material(name, Resources::FindShader("Unlit"))
 {
-	vertexShader = Resources::FindVertexShader("Unlit.cso");
-	pixelShader = Resources::FindPixelShader("Unlit.cso");
 }
 
 void Unlit_Material::Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const
@@ -32,14 +30,14 @@ void Unlit_Material::SetTexture(const Texture* texture)
 	if (texture)
 	{
 		Bind_ = &Unlit_Material::BindUnlit_T;
-		vertexShader = Resources::FindVertexShader("Unlit_T.cso");
-		pixelShader = Resources::FindPixelShader("Unlit_T.cso");
+		shaderView.ActivateMacro_PS("COLORTEXTURE");
+		shaderView.ActivateMacro_VS("COLORTEXTURE");
 	}	
 	else
 	{
 		Bind_ = &Unlit_Material::BindUnlit;
-		vertexShader = Resources::FindVertexShader("Unlit.cso");
-		pixelShader = Resources::FindPixelShader("Unlit.cso");
+		shaderView.DeactivateMacro_PS("COLORTEXTURE");
+		shaderView.DeactivateMacro_VS("COLORTEXTURE");
 	}
 }
 
@@ -62,8 +60,7 @@ const Material* Unlit_Material::GetDefaultMaterial()
 void Unlit_Material::BindUnlit(const Mesh::SubMesh* subMesh, Renderer* renderer) const
 {
 	//Binding shaders
-	vertexShader->BindPipeline();
-	pixelShader->BindPipeline();
+	shaderView.Bind();
 
 	//Binding mesh
 	subMesh->GetVertexElement(VertexBuffer::ElementType::Position3D)->BindPipeline();

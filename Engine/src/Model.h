@@ -36,10 +36,10 @@ private:
 		std::vector<Material*> materials;
 	};
 public:
-	Model(std::filesystem::path file);
+	Model(const std::filesystem::path& file);
 	size_t GetMeshCount() const;
-	const Mesh* FindMesh(std::string name) const;
-	const Material* FindMaterial(std::string name) const;
+	const Mesh* FindMesh(const std::string& name) const;
+	const Material* FindMaterial(const std::string& name) const;
 	const std::unordered_map<std::string, std::unique_ptr<Mesh>>& GetMeshes() const;
 	const std::unordered_map<std::string, std::unique_ptr<Material>>& GetMaterials() const;
 private:

@@ -12,7 +12,7 @@ class Unlit_Material : public Material
 #endif
 
 public:
-	Unlit_Material(std::string name);
+	Unlit_Material(const std::string& name);
 
 	void Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const override;
 

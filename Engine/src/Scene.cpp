@@ -19,7 +19,7 @@ void Scene::Init()
 	Scene::LoadScene(1);
 };
 
-void Scene::CreateNewScene(unsigned char index, std::string name)
+void Scene::CreateNewScene(unsigned char index, const std::string& name)
 {
 	auto scene = Scenes.emplace(std::piecewise_construct, std::forward_as_tuple(index), std::forward_as_tuple(index,name));
 	ENGINEASSERT(scene.second, "Duplicate scene index.");
@@ -32,7 +32,7 @@ Scene* Scene::GetScene(unsigned char index)
 	return &scene->second;
 }
 
-Scene* Scene::GetScene(std::string name)
+Scene* Scene::GetScene(const std::string& name)
 {
 	for (auto& s : Scenes)
 	{
@@ -59,7 +59,7 @@ void Scene::LoadScene(unsigned char index)
 	}
 }
 
-void Scene::LoadScene(std::string name)
+void Scene::LoadScene(const std::string& name)
 {
 	Scene* scene = nullptr;
 	for (auto& s : Scenes)
@@ -76,7 +76,7 @@ void Scene::LoadScene(std::string name)
 	}
 }
 
-Entity* Scene::NewEntity(std::string name)
+Entity* Scene::NewEntity(const std::string& name)
 {
 	Entities.push_back(std::make_unique<Entity>(name));
 	return Entities.back().get();
@@ -88,7 +88,7 @@ Entity* Scene::NewEntity(Entity* cloneFrom)
 	return Entities.back().get();
 }
 
-Entity* Scene::GetEntity(std::string name)
+Entity* Scene::GetEntity(const std::string& name)
 {
 	for (const auto& entity : Entities)
 	{

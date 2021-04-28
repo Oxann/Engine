@@ -26,7 +26,7 @@ class Entity
 
 public:
 	Entity() = default;
-	Entity(std::string name);
+	Entity(const std::string& name);
 private:
 	Entity* Clone();
 	void Start();
@@ -34,7 +34,7 @@ private:
 public:
 	//DON'T DELETE ENTITY!!!
 	//USE DeletePrefab instead.
-	static Entity* FindPrefab(std::string name);
+	static Entity* FindPrefab(const std::string& name);
 
 	static void MakePrefab(Entity* entity);
 public:
@@ -98,6 +98,10 @@ public:
 
 	//Returns newly added child.
 	Entity* AddChild(Entity* entity);
+
+	Entity* GetChild(const std::string& name) const;
+
+	Entity* GetChild(unsigned int index) const;
 
 	Entity* GetParent() const;
 

@@ -13,50 +13,20 @@ void Resources::Init()
 {
 	ENGINE_LOG(ENGINE_INFO, "Resources loading...");
 
-#if defined NDEBUG && defined EDITOR
-	shaderDir = "Shaders\\Release-Editor\\";
-#elif defined NDEBUG && !defined EDITOR
-	shaderDir = "Shaders\\Release\\";
-#elif !defined NDEBUG && defined EDITOR
-	shaderDir = "Shaders\\Debug-Editor\\";
-#else
-	shaderDir = "Shaders\\Debug\\";
-#endif
-
 	for (auto& file : recursive_directory_iterator(shaderDir))
 	{
-		std::string extension = file.path().extension().string();
-
-		if (!file.is_directory())
+		if (!file.is_directory() && file.path().extension() != ".hlsli")
 		{
-			if (extension == ".cso")
-			{
-				std::string fileName = file.path().filename().string();
-				std::string shaderType = { fileName[0],fileName[1] };
+			const std::string shaderName = file.path().filename().replace_extension().string();
 
-				if (shaderType == "VS")
-				{
-					VertexShaders.insert({ file.path().string(),std::make_unique<VertexShader>(file.path()) });
-				}
-				else if (shaderType == "PS")
-				{
-					PixelShaders.insert({ file.path().string(),std::make_unique<PixelShader>(file.path()) });
-				}
-				else
-				{
-					std::stringstream msg;
-					msg << "Shader name is incorrect: " << file.path().string()
-						<< "\nPixel shaders must start with PS_ and vertex shaders must start with VS_";
-					THROW_ENGINE_EXCEPTION(msg.str(), true);
-				}
-			}
-			else
-			{
-				std::stringstream msg;
-				msg << "Resources\\Shaders can only contain precompiled shaders."
-					<< file.path().string() << "\n";					
-				THROW_ENGINE_EXCEPTION(msg.str(), true);
-			}
+			path vsPath = file.path();
+			vsPath.replace_extension(".vs");
+			
+			path psPath = file.path();
+			psPath.replace_extension(".ps");
+
+			const auto& shader = shaders.emplace(shaderName, 
+				std::make_unique<Shader>(shaderName, vsPath, psPath));
 		}
 	}
 
@@ -90,7 +60,7 @@ void Resources::Init()
 	ENGINE_LOG(ENGINE_INFO, "Resources successfully loaded.");
 }
 
-Texture* Resources::FindTexture(std::string file)
+Texture* Resources::FindTexture(const std::string& file)
 {
 	const auto& texture = Textures.find(file);
 
@@ -100,27 +70,17 @@ Texture* Resources::FindTexture(std::string file)
 		return texture->second.get();
 }
 
-VertexShader* Resources::FindVertexShader(std::string file)
+Shader* Resources::FindShader(const std::string& shaderName)
 {
-	const auto& vs = VertexShaders.find(shaderDir + "VS_" + file);
+	const auto& shader = shaders.find(shaderName);
 
-	if (vs == VertexShaders.end())
+	if (shader == shaders.end())
 		return nullptr;
 	else
-		return vs->second.get();
+		return shader->second.get();
 }
 
-PixelShader* Resources::FindPixelShader(std::string file)
-{
-	const auto& ps = PixelShaders.find(shaderDir + "PS_" + file);
-
-	if (ps == PixelShaders.end())
-		return nullptr;
-	else
-		return ps->second.get();
-}
-
-Model* Resources::FindModel(std::string file)
+Model* Resources::FindModel(const std::string& file)
 {
 	const auto& model = Models.find(file);
 
@@ -130,7 +90,7 @@ Model* Resources::FindModel(std::string file)
 		return model->second.get();
 }
 
-Material* Resources::FindMaterial(std::string file)
+Material* Resources::FindMaterial(const std::string& file)
 {
 	const auto& material = Materials.find(file);
 

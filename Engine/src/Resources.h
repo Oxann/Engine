@@ -18,23 +18,20 @@ class Resources
 	friend Model;
 	friend class EditorResourceSelectionWindow;
 public:
-	static Texture* FindTexture(std::string file);
+	static Texture* FindTexture(const std::string& file);
 
-	static VertexShader* FindVertexShader(std::string file);
+	static Shader* FindShader(const std::string& shaderName);
 
-	static PixelShader* FindPixelShader(std::string file);
+	static Model* FindModel(const std::string& file);
 
-	static Model* FindModel(std::string file);
-
-	static Material* FindMaterial(std::string file);
+	static Material* FindMaterial(const std::string& file);
 private:
 	static void Init();
 private:
 	static inline std::unordered_map<std::string, std::unique_ptr<Texture>> Textures;
-	static inline std::unordered_map<std::string, std::unique_ptr<VertexShader>> VertexShaders;
-	static inline std::unordered_map<std::string, std::unique_ptr<PixelShader>> PixelShaders;
+	static inline std::unordered_map<std::string, std::unique_ptr<Shader>> shaders;
 	static inline std::unordered_map<std::string, std::unique_ptr<Model>> Models;
 	static inline std::unordered_map<std::string, std::unique_ptr<Material>> Materials;
 
-	static inline std::string shaderDir;
+	static inline const std::string shaderDir = "src\\Shaders";
 };

@@ -11,7 +11,7 @@
 
 using namespace Assimp;
 
-Model::Model(std::filesystem::path file)
+Model::Model(const std::filesystem::path& file)
 	:ResourceBase(file)
 {
 	Importer importer;
@@ -63,7 +63,7 @@ size_t Model::GetMeshCount() const
 	return meshes.size();
 }
 
-const Mesh* Model::FindMesh(std::string name) const
+const Mesh* Model::FindMesh(const std::string& name) const
 {
 	auto result = meshes.find(name);
 	if (result == meshes.end())
@@ -75,7 +75,7 @@ const Mesh* Model::FindMesh(std::string name) const
 	return result->second.get();
 }
 
-const Material* Model::FindMaterial(std::string name) const
+const Material* Model::FindMaterial(const std::string& name) const
 {
 	auto result = materials.find(name);
 	if (result == materials.end())

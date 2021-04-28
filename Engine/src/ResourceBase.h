@@ -5,11 +5,11 @@
 class ResourceBase
 {
 public:
-	ResourceBase(std::filesystem::path file)
+	ResourceBase(const std::filesystem::path& file)
 		:file(file)
 	{}
 	virtual ~ResourceBase() = 0;
-	std::filesystem::path GetPath() const
+	const std::filesystem::path& GetPath() const
 	{
 		return file;
 	}

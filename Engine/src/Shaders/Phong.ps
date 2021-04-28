@@ -1,7 +1,25 @@
-//Phong pixel shader with diffuse and specular mapping.
+// VARIANTS BEGIN
+// DIFFUSETEXTURE
+// SPECULARTEXTURE
+// NORMALTEXTURE
+// VARIANTS END
 
-#include "Light.hlsl"
+#include "Light.hlsli"
 
+struct IN
+{
+    float3 viewSpacePosition : VIEWSPACEPOSITION;
+    float3 normal : VIEWSPACENORMAL;
+    
+#if defined(DIFFUSETEXTURE) || defined(SPECULARTEXTURE) || defined(NORMALTEXTURE)
+    float2 texCoord : TEXCOORD;
+#endif 
+    
+#ifdef NORMALTEXTURE
+    float3 tangent : TANGENT;
+    float3 bitangent : BITANGENT;
+#endif
+};
 
 //Material 
 cbuffer Material : register(b3)
@@ -12,12 +30,21 @@ cbuffer Material : register(b3)
     float matShininessStrength;
 }
 
-Texture2D diffuseMap : register(t0);
-SamplerState diffuseMapSampler : register(s0);
+//Textures
+#ifdef DIFFUSETEXTURE
+Texture2D diffuseTexture : register(t0);
+SamplerState diffuseTextureSampler : register(s0);
+#endif
 
-Texture2D specularMap : register(t1);
-SamplerState specularMapSampler : register(s1);
+#ifdef SPECULARTEXTURE
+Texture2D specularTexture : register(t1);
+SamplerState specularTextureSampler : register(s1);
+#endif
 
+#ifdef NORMALTEXTURE
+Texture2D normalTexture : register(t2);
+SamplerState normalTextureSampler : register(s2);
+#endif
 
 float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor, float3 specularColor, float shininess)
 {
@@ -39,7 +66,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
         totalSpecular += specular * directionalLights[i].ligth.rgb;
     }
             
-    return totalDiffuse * diffuseColor + totalSpecular * specularColor * matShininessStrength;
+    return totalDiffuse * diffuseColor.rgb + totalSpecular * specularColor.rgb * matShininessStrength;
 }
 
 float3 CalculatePointLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor, float3 specularColor, float shininess)
@@ -66,26 +93,37 @@ float3 CalculatePointLights(float3 normal, float3 viewSpacePosition, float3 diff
         totalSpecular += specular * pointLights[i].light.rgb * attenuation;
     }
     
-    return totalDiffuse * diffuseColor + totalSpecular * specularColor * matShininessStrength;
+    return totalDiffuse * diffuseColor.rgb + totalSpecular * specularColor.rgb * matShininessStrength;
 }
 
-float4 main(float3 viewSpacePos : VIEWSPACEPOSITION,
-            float3 normal : VIEWSPACENORMAL,
-            float2 texCoord : TEXCOORD) : SV_Target
+float4 main(IN in_) : SV_Target
 {
-    normal = normalize(normal);
+    in_.normal = normalize(in_.normal);
     
-    float4 diffuseColor = matDiffuseColor * diffuseMap.Sample(diffuseMapSampler, texCoord).rgba;
+	float4 diffuseColor = matDiffuseColor;
+	float4 specularColor = matSpecularColor;
     
-    float4 specularColor = specularMap.Sample(specularMapSampler, texCoord);
-    specularColor.rgb = specularColor.rgb * matSpecularColor.rgb;
-    
+#ifdef DIFFUSETEXTURE
+    diffuseColor *= diffuseTexture.Sample(diffuseTextureSampler, in_.texCoord); 
+#endif
+  
+#ifdef SPECULARTEXTURE
+    specularColor *= specularTexture.Sample(specularTextureSampler, in_.texCoord);
     float shininess = pow(2.0f, 13.0f * matShininess * specularColor.a);
-     
+#else
+	float shininess = pow(2.0f, 13.0f * matShininess);
+#endif
+   
+#ifdef NORMALTEXTURE
+    in_.normal = normalize(mul(normalTexture.Sample(normalTextureSampler, in_.texCoord).rgb * 2.0f - 1.0f,
+                 float3x3(normalize(in_.tangent), normalize(in_.bitangent), normalize(in_.normal))));
+#endif
+    
     //Lighting   
     float3 phong = AmbientLight.rgb * AmbientLight.a * diffuseColor.rgb +
-               CalculateDirectionalLights(normal, viewSpacePos, diffuseColor.rgb, specularColor.rgb, shininess) +
-               CalculatePointLights(normal, viewSpacePos, diffuseColor.rgb, specularColor.rgb, shininess);
+               CalculateDirectionalLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess) +
+               CalculatePointLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess);
     
     return saturate(float4(phong, diffuseColor.a));
+
 }

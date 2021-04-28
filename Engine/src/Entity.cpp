@@ -4,7 +4,7 @@
 #include "Renderer.h"
 #include "Scene.h"
 
-Entity::Entity(std::string name)
+Entity::Entity(const std::string& name)
 {
 	this->name = name;
 	Transform_ = std::make_unique<Transform>();
@@ -73,7 +73,7 @@ void Entity::Update()
 	}
 }
 
-Entity* Entity::FindPrefab(std::string name)
+Entity* Entity::FindPrefab(const std::string& name)
 {
 	auto result = Prefabs.find(name);
 	if (result == Prefabs.end())
@@ -105,6 +105,20 @@ Entity* Entity::AddChild(Entity* entity)
 	Children.push_back(std::move(newChild));
 
 	return Children.back().get();
+}
+
+Entity* Entity::GetChild(const std::string& name) const
+{
+	for (const auto& child : Children)
+	{
+		if (name == child->name)
+			return child.get();
+	}
+}
+
+Entity* Entity::GetChild(unsigned int index) const
+{
+	return Children[index].get();
 }
 
 Entity* Entity::GetParent() const

@@ -8,7 +8,7 @@
 
 using namespace Microsoft::WRL;
 
-Texture::Texture(std::filesystem::path file)
+Texture::Texture(const std::filesystem::path& file)
 	:ResourceBase(file)
 {
 	unsigned char* img_data = stbi_load(file.string().c_str() , const_cast<int*>(&width), const_cast<int*>(&height), const_cast<int*>(&nChannels), 4);

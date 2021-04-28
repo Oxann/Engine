@@ -2,7 +2,7 @@
 #include <DirectXMath.h>
 #include "Texture.h"
 #include "ConstantBuffer.h"
-#include "Shader.h"
+#include "ShaderView.h"
 #include "Mesh.h"
 
 
@@ -18,8 +18,9 @@ public:
 	};
 
 public:
-	Material(std::string name)
-		:ResourceBase(name)
+	Material(const std::string& name, const Shader* shader)
+		:ResourceBase(name), 
+		shaderView(shader)
 	{}
 
 	virtual ~Material() = default;
@@ -31,7 +32,6 @@ public:
 
 protected:
 	//Shaders
-	VertexShader* vertexShader = nullptr;
-	PixelShader* pixelShader = nullptr;
+	ShaderView shaderView;
 	static constexpr unsigned int PS_MaterialSlot = 3u;	
 };

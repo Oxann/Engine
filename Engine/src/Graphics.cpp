@@ -96,7 +96,7 @@ void Graphics::Init(HWND hWnd)
 	SetProjection(ProjectionType::Perspective, (float)MainWindow::GetDisplayResolution().width / (float)MainWindow::GetDisplayResolution().height, 60.0f, 0.05f, 10000.0f);
 
 	//Ambient Lighting
-	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.5f);
+	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 	ambientLightBuffer = new PS_ConstantBuffer<DirectX::XMVECTOR>(&ambientLight, 1u, 0u, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
 	
 	ENGINE_LOG(ENGINE_INFO, "Graphics Ready!");

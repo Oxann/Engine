@@ -233,6 +233,8 @@ void Renderer::UpdateMatrices()
 
 	worldViewMatrix = worldMatrix * Graphics::viewMatrix;
 	worldViewProjectionMatrix = worldViewMatrix * Graphics::projectionMatrix;
+
+	isNormalMatrixUpdated = false;
 }
 
 void Renderer::TransposeMatrices()
