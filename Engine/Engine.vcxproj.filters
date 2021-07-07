@@ -119,15 +119,8 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>ECS</Filter>
     </ClCompile>
-    <ClCompile Include="src\PlayerController.cpp">
-      <Filter>ECS</Filter>
-    </ClCompile>
     <ClCompile Include="src\RendererManager.cpp">
       <Filter>Graphics\Render Queue</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlanetGenerator.cpp" />
-    <ClCompile Include="src\StarMaterial.cpp">
-      <Filter>Graphics\Material System</Filter>
     </ClCompile>
     <ClCompile Include="src\Skybox.cpp">
       <Filter>Graphics</Filter>
@@ -135,7 +128,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
-    <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h">
       <Filter>thirdparty\imgui</Filter>
@@ -288,18 +280,11 @@
     <ClInclude Include="src\Camera.h">
       <Filter>ECS</Filter>
     </ClInclude>
-    <ClInclude Include="src\PlayerController.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
     <ClInclude Include="src\RendererManager.h">
       <Filter>Graphics\Render Queue</Filter>
     </ClInclude>
     <ClInclude Include="src\Skybox.h">
       <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PlanetGenerator.h" />
-    <ClInclude Include="src\StarMaterial.h">
-      <Filter>Graphics\Material System</Filter>
     </ClInclude>
     <ClInclude Include="thirdparty\FastNoiseLite.h">
       <Filter>thirdparty</Filter>
