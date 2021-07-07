@@ -12,6 +12,7 @@ class EditorEntityWindow : public EditorWindowBase
 public:
 	void Start() override
 	{
+		isActive = false;
 		name = "Entity";
 		editorRSW = Editor::GetWindow<EditorResourceSelectionWindow>();
 		editorMEW = Editor::GetWindow<EditorMaterialEditWindow>();
@@ -142,14 +143,7 @@ private:
 	}
 
 	void DisplayRenderer()
-	{
-		//Object outline
-		if (!Editor::isWireframeEnabled)
-		{
-			for (int i = 0; i < displayedRenderer->GetMesh()->GetSubMeshCount(); i++)
-				Scene::GetActiveScene()->rendererManager.renderQueueOutline.Add(displayedRenderer, i);
-		}
-		
+	{		
 		if (ImGui::CollapsingHeader("RENDERER"))
 		{
 			//Mesh selection
@@ -185,6 +179,13 @@ private:
 				}				
 				ImGui::TreePop();
 			}
+		}
+
+		//Object outline
+		if (!Editor::isWireframeEnabled)
+		{
+			for (int i = 0; i < displayedRenderer->GetMesh()->GetSubMeshCount(); i++)
+				Scene::GetActiveScene()->rendererManager.renderQueueOutline.Add(displayedRenderer, i);
 		}
 	}
 

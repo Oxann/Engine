@@ -13,22 +13,7 @@ void Resources::Init()
 {
 	ENGINE_LOG(ENGINE_INFO, "Resources loading...");
 
-	for (auto& file : recursive_directory_iterator(shaderDir))
-	{
-		if (!file.is_directory() && file.path().extension() != ".hlsli")
-		{
-			const std::string shaderName = file.path().filename().replace_extension().string();
-
-			path vsPath = file.path();
-			vsPath.replace_extension(".vs");
-			
-			path psPath = file.path();
-			psPath.replace_extension(".ps");
-
-			const auto& shader = shaders.emplace(shaderName, 
-				std::make_unique<Shader>(shaderName, vsPath, psPath));
-		}
-	}
+	LoadShaders();
 
 	for (auto& file : recursive_directory_iterator("Resources"))
 	{
@@ -58,6 +43,26 @@ void Resources::Init()
 #endif
 
 	ENGINE_LOG(ENGINE_INFO, "Resources successfully loaded.");
+}
+
+void Resources::LoadShaders()
+{
+	for (auto& file : recursive_directory_iterator(shaderDir))
+	{
+		if (!file.is_directory() && file.path().extension() != ".hlsli")
+		{
+			const std::string shaderName = file.path().filename().replace_extension().string();
+
+			path vsPath = file.path();
+			vsPath.replace_extension(".vs");
+
+			path psPath = file.path();
+			psPath.replace_extension(".ps");
+
+			const auto& shader = shaders.emplace(shaderName,
+				std::make_unique<Shader>(shaderName, vsPath, psPath));
+		}
+	}
 }
 
 Texture* Resources::FindTexture(const std::string& file)

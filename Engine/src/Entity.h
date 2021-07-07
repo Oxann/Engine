@@ -36,7 +36,9 @@ public:
 	//USE DeletePrefab instead.
 	static Entity* FindPrefab(const std::string& name);
 
-	static void MakePrefab(Entity* entity);
+	static Entity* NewPrefab(const std::string& name);
+
+	static Entity* NewPrefab(Entity* cloneFrom);
 public:
 	template<class ComponentType>
 	ComponentType* GetComponent() const

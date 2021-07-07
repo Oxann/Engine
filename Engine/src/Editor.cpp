@@ -63,7 +63,7 @@ void Editor::Update()
 			{
 				if (ImGui::MenuItem("Scene##windowsMenu/Scene", nullptr, nullptr))
 					windows[1]->isActive = true;
-				
+
 				if (ImGui::MenuItem("Metrics##windowsMenu/Metrics", nullptr, nullptr))
 					windows[5]->isActive = true;
 
@@ -79,12 +79,13 @@ void Editor::Update()
 				if (ImGui::MenuItem("Wireframe##drawModeMenu/Wireframe", nullptr, nullptr))
 				{
 					isWireframeEnabled = true;
-				}	
+				}
 
 				ImGui::EndMenu();
 			}
 
 			ImGui::EndMainMenuBar();
+
 		}
 
 		//Windows update calls	
@@ -100,7 +101,7 @@ void Editor::Update()
 		}
 	}
 
-	Camera::Update();
+	EditorCamera::Update();
 	
 	if (Input::GetKeyDown(VK_LBUTTON))
 	{
@@ -123,8 +124,11 @@ void Editor::Update()
 
 void Editor::Render()
 {
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	if (Editor::isActive)
+	{
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
 }
 
 bool Editor::WantCaptureKeyboard()
@@ -182,7 +186,7 @@ void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity
 		MousePick(child.get(), minDistance, pickedEntity, viewSpaceX, viewSpaceY);
 }
 
-void Editor::Camera::Update()
+void Editor::EditorCamera::Update()
 {
 	if (!(WantCaptureKeyboard() || WantCaptureMouse()))
 	{
@@ -199,9 +203,9 @@ void Editor::Camera::Update()
 			//Reset camera transform
 			if (Input::GetKeyDown(VK_SPACE))
 			{
-				Camera::pitch = 0.0f;
-				Camera::yaw = 0.0f;
-				Camera::position = { 0.0f,0.0f,0.0f };
+				EditorCamera::pitch = 0.0f;
+				EditorCamera::yaw = 0.0f;
+				EditorCamera::position = { 0.0f,0.0f,0.0f };
 			}
 
 			//Updating movement speed
@@ -244,7 +248,7 @@ void Editor::Camera::Update()
 	}
 }
 
-void Editor::Camera::Focus(const Entity* entity)
+void Editor::EditorCamera::Focus(const Entity* entity)
 {
 	if (entity->Renderer_)
 	{
@@ -259,7 +263,7 @@ void Editor::Camera::Focus(const Entity* entity)
 	}
 }
 
-void Editor::Camera::UpdateViewMatrix()
+void Editor::EditorCamera::UpdateViewMatrix()
 {
 	Graphics::viewMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMVectorNegate(position)) * DirectX::XMMatrixTranspose(rotationMatrix);
 }

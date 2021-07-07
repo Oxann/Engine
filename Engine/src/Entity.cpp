@@ -44,26 +44,22 @@ Entity* Entity::Clone()
 	return newEntity;
 }
 
-void Entity::Start()
-{
-	if (Renderer_)
-		((Component*)Renderer_.get())->Start();
-
-	for (const auto& component : Components)
-	{
-		component.second->Start();
-	}
-
-	for (const auto& child : Children)
-	{
-		child->Start();
-	}
-}
-
 void Entity::Update()
 {
+	if (Renderer_ && Renderer_->state == Component::State::START)
+	{
+		((Component*)Renderer_.get())->Start();
+		Renderer_->state = Component::State::UPDATE;
+	}
+
 	for (auto& component : Components)
 	{
+		if (component.second->state == Component::State::START)
+		{
+			component.second->Start();
+			component.second->state = Component::State::UPDATE;
+		}
+
 		component.second->Update();
 	}
 
@@ -85,9 +81,30 @@ Entity* Entity::FindPrefab(const std::string& name)
 	return result->second.get();
 }
 
-void Entity::MakePrefab(Entity* entity)
+
+Entity* Entity::NewPrefab(const std::string& name)
 {
-	Prefabs.insert({ entity->name,std::unique_ptr<Entity>(entity->Clone()) });
+	auto newPrefab = Prefabs.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(new Entity(name)));
+	
+	if (newPrefab.second)
+		return newPrefab.first->second.get();
+	else
+		return nullptr;
+}
+
+Entity* Entity::NewPrefab(Entity* cloneFrom)
+{
+	if (cloneFrom)
+	{
+		auto newPrefab = Prefabs.emplace(std::piecewise_construct, std::forward_as_tuple(cloneFrom->name), std::forward_as_tuple(cloneFrom->Clone()));
+	
+		if (newPrefab.second)
+			return newPrefab.first->second.get();
+		else
+			return nullptr;
+	}
+	else
+		return nullptr;
 }
 
 Entity* Entity::AddChild(std::string name)

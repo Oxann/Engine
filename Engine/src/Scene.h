@@ -6,6 +6,8 @@
 #include "Entity.h"
 #include "RendererManager.h"
 
+class Camera;
+
 class Scene
 {
 	friend class EditorSceneHierarchyWindow;
@@ -41,6 +43,6 @@ public:
 	RendererManager rendererManager{};
 private:
 	std::vector<std::unique_ptr<Entity>> Entities;
-	static std::map<unsigned char, Scene> Scenes;
-	static Scene* ActiveScene;
+	inline static std::map<unsigned char, std::unique_ptr<Scene>> Scenes;
+	inline static Scene* ActiveScene;
 };

@@ -22,6 +22,7 @@ class Graphics
 	friend class Renderer;
 	friend class MainWindow;
 	friend class Engine;
+	friend class Camera;
 
 #ifdef EDITOR
 	friend class Editor;

@@ -10,8 +10,6 @@
 
 #include <set>
 
-std::map<unsigned char,Scene> Scene::Scenes;
-Scene* Scene::ActiveScene;
 
 void Scene::Init()
 {
@@ -21,7 +19,7 @@ void Scene::Init()
 
 void Scene::CreateNewScene(unsigned char index, const std::string& name)
 {
-	auto scene = Scenes.emplace(std::piecewise_construct, std::forward_as_tuple(index), std::forward_as_tuple(index,name));
+	auto scene = Scenes.emplace(std::piecewise_construct, std::forward_as_tuple(index), std::forward_as_tuple(std::make_unique<Scene>(index,name)));
 	ENGINEASSERT(scene.second, "Duplicate scene index.");
 }
 
@@ -29,15 +27,15 @@ Scene* Scene::GetScene(unsigned char index)
 {
 	auto scene = Scenes.find(index);
 	ENGINEASSERT(scene != Scenes.end(), "Scene index is not correct");
-	return &scene->second;
+	return scene->second.get();
 }
 
 Scene* Scene::GetScene(const std::string& name)
 {
 	for (auto& s : Scenes)
 	{
-		if (s.second.Name == name)
-			return &s.second;
+		if (s.second->Name == name)
+			return s.second.get();
 	}
 	ENGINEASSERT(false, "Specified scene name is not correct");
 }
@@ -51,12 +49,7 @@ void Scene::LoadScene(unsigned char index)
 {
 	auto scene = Scenes.find(index);
 	ENGINEASSERT(scene != Scenes.end(), "Specified scene index is not correct");
-	ActiveScene = &scene->second;
-
-	for (const auto& entity : ActiveScene->Entities)
-	{
-		entity->Start();
-	}
+	ActiveScene = scene->second.get();
 }
 
 void Scene::LoadScene(const std::string& name)
@@ -64,16 +57,11 @@ void Scene::LoadScene(const std::string& name)
 	Scene* scene = nullptr;
 	for (auto& s : Scenes)
 	{
-		if (s.second.Name == name)
-			scene = &s.second;
+		if (s.second->Name == name)
+			scene = s.second.get();
 	}
 	ENGINEASSERT(scene != nullptr, "Specified scene name is not correct");
 	ActiveScene = scene;
-
-	for (const auto& entity : ActiveScene->Entities)
-	{
-		entity->Start();
-	}
 }
 
 Entity* Scene::NewEntity(const std::string& name)

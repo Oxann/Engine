@@ -50,7 +50,7 @@ public:
 
 	//Relative to it's parent.
 	DirectX::XMMATRIX GetLocalMatrix() const;
-	void SetLocalMatrix(DirectX::XMMATRIX matrix);
+	void SetLocalMatrix(const DirectX::XMMATRIX& matrix);
 
 	//Transform's world space matrix.
 	DirectX::XMMATRIX GetWorldMatrix() const;

@@ -108,14 +108,20 @@ void Renderer::Update()
 
 void Renderer::Render(unsigned int subMeshIndex)
 {
-	materials[subMeshIndex]->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
-	Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
+	if (subMeshIndex < mesh->GetSubMeshCount())
+	{
+		materials[subMeshIndex]->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
+		Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
+	}
 }
 
 void Renderer::Render(unsigned int subMeshIndex, const Material* material)
 {
-	material->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
-	Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
+	if (subMeshIndex < mesh->GetSubMeshCount())
+	{
+		material->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
+		Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
+	}
 }
 
 void Renderer::UpdateDirectionalLightBuffer() const
@@ -159,6 +165,7 @@ void Renderer::UpdateDirectionalLightBuffer() const
 	};
 		
 	directionalLightBuffer.ChangeData(&toGPU);
+	directionalLightBuffer.BindPipeline();
 }
 
 void Renderer::UpdatePointLightBuffer() const
@@ -210,6 +217,7 @@ void Renderer::UpdatePointLightBuffer() const
 	};
 
 	pointLightBuffer.ChangeData(&toGPU);
+	pointLightBuffer.BindPipeline();
 }
 
 void Renderer::UpdateMatrices()

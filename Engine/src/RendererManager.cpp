@@ -16,9 +16,13 @@ RendererManager::RendererManager()
 
 void RendererManager::Update()
 {
+#ifndef EDITOR
+	activeCamera->UpdateViewMatrix();
+#endif
+
 	Graphics::pDeviceContext->ClearRenderTargetView(Graphics::pView.Get(), Graphics::clearColor);
 	Graphics::pDeviceContext->ClearDepthStencilView(Graphics::pDepthStencil.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0u);
-
+	
 	vertexCount = 0;
 	meshCount = 0;
 	triangleCount = 0;
@@ -34,6 +38,9 @@ void RendererManager::Update()
 	//Render queues
 	renderQueueOpaque.Render();
 	renderQueueTransparent.Render();
+
+	if (skybox)
+		skybox->Draw();
 
 #ifdef EDITOR
 	renderQueueWireframe.Render();

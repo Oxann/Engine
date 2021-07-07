@@ -14,7 +14,7 @@ public:
 public:
 	static constexpr unsigned int MaxCount = 4u;
 private:
-	static std::vector<const DirectionalLight*> lights;
+	inline static std::vector<const DirectionalLight*> lights;
 };
 
 class PointLight final : public Component
@@ -28,10 +28,10 @@ public:
 	float intensity = 1.0f;
 	float range = 5.0f;
 public:
-	static float constant;
-	static float linear;
-	static float quadratic;
-	static constexpr unsigned int MaxCount = 4u;
+	inline static float constant = 1.0f;
+	inline static float linear = 0.14f;
+	inline static float quadratic = 0.07f;
+	inline static constexpr unsigned int MaxCount = 4u;
 private:
-	static std::vector<const PointLight*> lights;
+	inline static std::vector<const PointLight*> lights;
 };

@@ -98,10 +98,13 @@ void RenderQueueOutline::Render()
 		renderItem.renderer->worldViewProjectionMatrix = MVP * DirectX::XMMatrixScaling(0.99f, 0.99f, 0.99f); //Scaling MVP by a factor, !!!MVP is column order!!!
 		renderItem.renderer->Render(renderItem.subMeshIndex, outlineMaterial);
 
-		//Counting rendered vertices.
-		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
-		rendererManager->vertexCount += subMesh.GetVertexCount();
-		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
+		//Counting rendered vertices.		
+		if (renderItem.subMeshIndex < renderItem.renderer->GetMesh()->GetSubMeshCount())
+		{
+			const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+			rendererManager->vertexCount += subMesh.GetVertexCount();
+			rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
+		}
 	}
 
 	queue.clear();

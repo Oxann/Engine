@@ -83,7 +83,7 @@ int Engine::Start()
 
     Engine::ShutDown();
 
-    return -1;
+    return 0;
 }
 
 void Engine::Update()

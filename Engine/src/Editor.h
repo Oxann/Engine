@@ -20,7 +20,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 class Editor
 {
 public:
-	class Camera
+	class EditorCamera
 	{
 		friend Editor;
 	private:

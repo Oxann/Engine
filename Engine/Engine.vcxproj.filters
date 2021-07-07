@@ -13,6 +13,12 @@
     <FxCompile Include="src\Shaders\Phong.vs">
       <Filter>Shaders\Phong</Filter>
     </FxCompile>
+    <FxCompile Include="src\Shaders\Star.vs">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\Star.ps">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Input.cpp" />
@@ -101,7 +107,6 @@
     <ClCompile Include="src\RenderQueueOutline.cpp">
       <Filter>Graphics\Render Queue</Filter>
     </ClCompile>
-    <ClCompile Include="src\RendererManager.cpp" />
     <ClCompile Include="src\Shader.cpp">
       <Filter>Graphics\Shader System</Filter>
     </ClCompile>
@@ -110,6 +115,22 @@
     </ClCompile>
     <ClCompile Include="src\ShaderView.cpp">
       <Filter>Graphics\Shader System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Camera.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerController.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RendererManager.cpp">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlanetGenerator.cpp" />
+    <ClCompile Include="src\StarMaterial.cpp">
+      <Filter>Graphics\Material System</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Skybox.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -249,9 +270,6 @@
     <ClInclude Include="src\RenderQueueTransparent.h">
       <Filter>Graphics\Render Queue</Filter>
     </ClInclude>
-    <ClInclude Include="src\RendererManager.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
     <ClInclude Include="src\RenderQueueWireframe.h">
       <Filter>Graphics\Render Queue</Filter>
     </ClInclude>
@@ -267,6 +285,25 @@
     <ClInclude Include="src\ShaderView.h">
       <Filter>Graphics\Shader System</Filter>
     </ClInclude>
+    <ClInclude Include="src\Camera.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlayerController.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererManager.h">
+      <Filter>Graphics\Render Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Skybox.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlanetGenerator.h" />
+    <ClInclude Include="src\StarMaterial.h">
+      <Filter>Graphics\Material System</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\FastNoiseLite.h">
+      <Filter>thirdparty</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -277,6 +314,12 @@
     </None>
     <None Include="src\Shaders\Light.hlsli">
       <Filter>Shaders\Phong</Filter>
+    </None>
+    <None Include="src\Shaders\Skybox.vs">
+      <Filter>Shaders\Skybox</Filter>
+    </None>
+    <None Include="src\Shaders\Skybox.ps">
+      <Filter>Shaders\Skybox</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -294,9 +337,6 @@
     </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{c1955c10-4962-478c-be27-6da200f4fc38}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Graphics\D3D">
-      <UniqueIdentifier>{c12efcb2-b998-4067-bfa9-78b4c5b04607}</UniqueIdentifier>
     </Filter>
     <Filter Include="ECS">
       <UniqueIdentifier>{5ffcc7e5-bada-47d6-b7d2-4e5d437e03ae}</UniqueIdentifier>
@@ -330,6 +370,15 @@
     </Filter>
     <Filter Include="Graphics\Shader System">
       <UniqueIdentifier>{a282c12a-8244-4c0c-8762-2b4e5827b9d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Skybox">
+      <UniqueIdentifier>{ebe6c8c3-70a9-4b9f-ab05-b9b8c87b6bbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Test">
+      <UniqueIdentifier>{dabe9ab6-086a-453d-a826-c589b0f381f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\D3D">
+      <UniqueIdentifier>{c12efcb2-b998-4067-bfa9-78b4c5b04607}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

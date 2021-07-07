@@ -341,6 +341,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Phong_Material.cpp" />
@@ -354,6 +355,8 @@
     <ClCompile Include="src\MainWindow.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\PlanetGenerator.cpp" />
+    <ClCompile Include="src\PlayerController.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\RendererManager.cpp" />
     <ClCompile Include="src\RenderQueueOpaque.cpp" />
@@ -365,6 +368,8 @@
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderVariant.cpp" />
     <ClCompile Include="src\ShaderView.cpp" />
+    <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\StarMaterial.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Unlit_Material.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
@@ -377,6 +382,9 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\PlanetGenerator.h" />
+    <ClInclude Include="src\PlayerController.h" />
     <ClInclude Include="src\RenderQueueOutline.h" />
     <ClInclude Include="src\RenderQueueWireframe.h" />
     <ClInclude Include="src\RendererManager.h" />
@@ -415,7 +423,10 @@
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderVariant.h" />
     <ClInclude Include="src\ShaderView.h" />
+    <ClInclude Include="src\Skybox.h" />
+    <ClInclude Include="src\StarMaterial.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="thirdparty\FastNoiseLite.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h" />
     <ClInclude Include="thirdparty\imgui\imgui.h" />
     <ClInclude Include="thirdparty\imgui\imgui_impl_dx11.h" />
@@ -433,6 +444,26 @@
     <ClInclude Include="src\Unlit_Material.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="src\Shaders\Star.vs">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\Star.ps">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release-Editor|Win32'">Pixel</ShaderType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="src\Shaders\Unlit.ps">
       <FileType>Document</FileType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -475,6 +506,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
     </FxCompile>
+    <None Include="src\Shaders\Skybox.vs" />
+    <None Include="src\Shaders\Skybox.ps" />
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll" />
     <None Include="thirdparty\assimp\Release\assimp-vc142-mt.dll" />
   </ItemGroup>

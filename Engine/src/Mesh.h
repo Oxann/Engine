@@ -30,9 +30,7 @@ public:
 		unsigned int GetVertexCount() const;
 		size_t GetElementCount() const;
 
-		bool HasPositions() const;
-		bool HasNormals() const;
-		bool HasTextureCoords() const;
+		bool HasVertexElement(VertexBuffer::ElementType type) const;
 	public:		
 		DirectX::BoundingBox AABB;
 		std::vector<DirectX::XMFLOAT3> positions;

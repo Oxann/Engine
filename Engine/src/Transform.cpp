@@ -258,8 +258,10 @@ DirectX::XMMATRIX Transform::GetLocalMatrix() const
 	return localMatrix;
 }
 
-void Transform::SetLocalMatrix(DirectX::XMMATRIX matrix)
+void Transform::SetLocalMatrix(const DirectX::XMMATRIX& matrix)
 {	
+	isLocalMatrixUpdated = false;
+
 	localMatrix = matrix;
 
 	DirectX::XMVECTOR pos;

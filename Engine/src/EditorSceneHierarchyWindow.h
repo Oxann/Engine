@@ -11,6 +11,7 @@ public:
 	{
 		name = "Scene";
 		entityWindow = Editor::GetWindow<EditorEntityWindow>();
+		isActive = false;
 	}
 
 	void Update() override
@@ -40,7 +41,7 @@ private:
 		//Focusing on selected entity
 		if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
 		{
-			Editor::Camera::Focus(entity);
+			Editor::EditorCamera::Focus(entity);
 		}
 
 		

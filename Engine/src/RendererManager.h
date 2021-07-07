@@ -4,6 +4,8 @@
 #include "RenderQueueTransparent.h"
 #include "RenderQueueWireframe.h"
 #include "RenderQueueOutline.h"
+#include "Camera.h"
+#include "Skybox.h"
 #include <vector>
 
 
@@ -22,6 +24,7 @@ public:
 	unsigned long long vertexCount;
 	unsigned long long triangleCount;
 
+	Camera* activeCamera = nullptr;
 private:	
 	std::vector<Renderer*> renderers;
 
@@ -33,4 +36,7 @@ private:
 
 	//Frustum
 	DirectX::BoundingFrustum frustum;
+
+	//Skybox
+	Skybox* skybox = nullptr;
 };

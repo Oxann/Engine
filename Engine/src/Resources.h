@@ -27,6 +27,8 @@ public:
 	static Material* FindMaterial(const std::string& file);
 private:
 	static void Init();
+	static void LoadShaders();
+
 private:
 	static inline std::unordered_map<std::string, std::unique_ptr<Texture>> Textures;
 	static inline std::unordered_map<std::string, std::unique_ptr<Shader>> shaders;

@@ -51,19 +51,9 @@ size_t Mesh::SubMesh::GetElementCount() const
     return vertexElements.size();
 }
 
-bool Mesh::SubMesh::HasPositions() const
+bool Mesh::SubMesh::HasVertexElement(VertexBuffer::ElementType type) const
 {
-    return vertexElements.find(VertexBuffer::ElementType::Position3D) != vertexElements.end();
-}
-
-bool Mesh::SubMesh::HasNormals() const
-{
-    return vertexElements.find(VertexBuffer::ElementType::Normal) != vertexElements.end();
-}
-
-bool Mesh::SubMesh::HasTextureCoords() const
-{
-    return vertexElements.find(VertexBuffer::ElementType::TexCoord) != vertexElements.end();
+    return vertexElements.find(type) != vertexElements.end();
 }
 
 size_t Mesh::GetSubMeshCount() const

@@ -6,6 +6,13 @@ class Entity;
 
 class Component
 {
+public:
+	enum class State
+	{
+		START,
+		UPDATE
+	};
+
 	friend Entity;
 public:
 	Component() = default;
@@ -19,6 +26,9 @@ public:
 	Entity* GetEntity() const { return entity; }
 	Transform* GetTransform() const { return transform; };
 	virtual Component* Clone() = 0;
+
+public:
+	State state = State::START;
 private:
 	Entity* entity = nullptr;
 	Transform* transform = nullptr;

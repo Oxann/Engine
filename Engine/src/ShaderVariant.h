@@ -2,9 +2,6 @@
 #include <d3d11.h>
 #include <wrl.h>
 
-class Shader;
-class ShaderView;
-
 class ShaderVariantBase
 {
 public:
