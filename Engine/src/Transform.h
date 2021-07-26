@@ -27,16 +27,19 @@ public:
 
 	//Angles are in degrees.
 	//Rotation order is Z-X-Y.
-	//Axis must be normalized.
 	void RotateWorld(const DirectX::XMFLOAT3& eulerAngles);
 	void RotateWorld(float x, float y, float z);
 	void RotateWorld(const DirectX::XMFLOAT3& axis, float angle);
+
 	void RotateLocal(const DirectX::XMFLOAT3& eulerAngles);
 	void RotateLocal(float x, float y, float z);
 	void RotateLocal(const DirectX::XMFLOAT3& axis, float angle);
+	
 	void RotateAround(DirectX::XMFLOAT3 point, DirectX::XMFLOAT3 axis, float angle);
+	
 	DirectX::XMVECTOR GetWorldQuaternion() const;
 	const DirectX::XMVECTOR& GetLocalQuaternion() const;
+	
 	void SetLocalRotation(float x, float y, float z);
 
 	//World Space (relative to it's parent)
