@@ -63,6 +63,8 @@ public:
 			if(ImGui::IsItemDeactivatedAfterEdit())
 				texture->SetAnisotropy(anisotropy);
 		}		
+		const float textureRatio = (float)texture->width / texture->height;
+		ImGui::Image((void*)(texture->GetResourceView().Get()), ImVec2(textureRatio * 300.0f, 300));
 	}
 
 	void PopUp(Texture* texture)

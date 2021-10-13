@@ -43,6 +43,8 @@ public:
 
 	unsigned int GetAnisotropy() const;
 
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetResourceView() const;
+
 public:
 	const int width = 0;
 	const int height = 0;

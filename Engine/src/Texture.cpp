@@ -111,3 +111,8 @@ unsigned int Texture::GetAnisotropy() const
 {
 	return anisotropy;
 }
+
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Texture::GetResourceView() const
+{
+	return pSRV;
+}
