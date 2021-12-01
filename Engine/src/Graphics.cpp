@@ -33,6 +33,7 @@ void Graphics::Init(HWND hWnd)
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swapChainDesc.Flags = 0;
 
+	renderResolution = MainWindow::GetDisplayResolution();
 
 	UINT flags = 0u;
 #ifndef NDEBUG
@@ -54,7 +55,7 @@ void Graphics::Init(HWND hWnd)
 	));
 
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	
 	//Viewport
 	D3D11_VIEWPORT vp;
 	vp.TopLeftX = 0.0f;
@@ -93,56 +94,22 @@ void Graphics::Init(HWND hWnd)
 
 
 	//Initializing projection matrix
-	SetProjection(ProjectionType::Perspective, (float)MainWindow::GetDisplayResolution().width / (float)MainWindow::GetDisplayResolution().height, 60.0f, 0.05f, 10000.0f);
 
 	//Ambient Lighting
 	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 	ambientLightBuffer = new PS_ConstantBuffer<DirectX::XMVECTOR>(&ambientLight, 1u, 0u, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
-	
+
 	ENGINE_LOG(ENGINE_INFO, "Graphics Ready!");
+}
+
+const Resolution& Graphics::GetResolution()
+{
+	return renderResolution;
 }
 
 float Graphics::GetAspectRatio()
 {
 	return aspectRatio;
-}
-
-float Graphics::GetVerticalFOV()
-{
-	if (projectionType == ProjectionType::Perspective)
-		return verticalFOV;
-	else
-		return -1.0f;
-}
-
-float Graphics::GetHorizontalFOV()
-{
-	if (projectionType == ProjectionType::Perspective)
-		return horizontalFOV;
-	else
-		return -1.0f;
-}
-
-
-void Graphics::SetProjection(ProjectionType type, float aspectRatio, float height,float near_z,float far_z)
-{
-	projectionType = type;
-	switch (projectionType)
-	{
-	case Graphics::ProjectionType::Orthographic:
-		Graphics::aspectRatio = aspectRatio;
-		projectionMatrix = DirectX::XMMatrixOrthographicLH(height * aspectRatio, height , near_z, far_z);
-		break;
-	case Graphics::ProjectionType::Perspective:
-		Graphics::aspectRatio = aspectRatio;
-		verticalFOV = height;
-		horizontalFOV = DirectX::XMConvertToDegrees(2.0f * std::atan(aspectRatio * std::tan(DirectX::XMConvertToRadians(height / 2.0f))));
-		projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(verticalFOV),aspectRatio,near_z, far_z);
-		break;
-	default:
-		ENGINEASSERT(false, "Invalid ProjectionType");
-		break;
-	}
 }
 
 void Graphics::SetAmbientColor(DirectX::XMFLOAT3 color)

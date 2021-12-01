@@ -17,7 +17,7 @@ RendererManager::RendererManager()
 void RendererManager::Update()
 {
 #ifndef EDITOR
-	activeCamera->UpdateViewMatrix();
+	activeCamera->UpdateMatrices();
 #endif
 
 	Graphics::pDeviceContext->ClearRenderTargetView(Graphics::pView.Get(), Graphics::clearColor);
