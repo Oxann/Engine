@@ -16,9 +16,12 @@ class RendererManager
 	friend Renderer;
 	friend class EditorEntityWindow;
 	friend class Entity;
+	friend PointLight;
+	friend DirectionalLight;
 private:
 	RendererManager();
 	void Update();
+	void UpdateShadowMaps();
 public:
 	unsigned long long meshCount;
 	unsigned long long vertexCount;
@@ -27,6 +30,8 @@ public:
 	Camera* activeCamera = nullptr;
 private:	
 	std::vector<Renderer*> renderers;
+	std::vector<const DirectionalLight*> directionalLights;
+	std::vector<const PointLight*> pointLights;
 
 	//Render Queues
 	RenderQueueOpaque renderQueueOpaque;

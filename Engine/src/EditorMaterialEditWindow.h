@@ -141,6 +141,12 @@ private:
 			if(phongMaterial->normalMap)
 				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->normalMap));
 		}
+
+		//Shadows
+		bool receiveShadows = phongMaterial->receiveShadows;
+		ImGui::AlignTextToFramePadding();
+		if(ImGui::Checkbox("Receive Shadows##receiveShadows", &receiveShadows))
+			phongMaterial->SetReceiveShadows(receiveShadows);
 	}
 
 	void EditUnlit(Material* material)

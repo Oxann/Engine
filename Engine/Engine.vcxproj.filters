@@ -125,6 +125,9 @@
     <ClCompile Include="src\Skybox.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\ShadowMap.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -289,6 +292,9 @@
     <ClInclude Include="thirdparty\FastNoiseLite.h">
       <Filter>thirdparty</Filter>
     </ClInclude>
+    <ClInclude Include="src\ShadowMap.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -305,6 +311,12 @@
     </None>
     <None Include="src\Shaders\Skybox.ps">
       <Filter>Shaders\Skybox</Filter>
+    </None>
+    <None Include="src\Shaders\ShadowCast.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\ShadowCast.vs">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

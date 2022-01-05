@@ -61,6 +61,7 @@ public:
 	static void SetAmbientIntensity(float intensity);
 	static DirectX::XMFLOAT3 GetAmbientColor();
 	static float GetAmbientIntensity();
+	static const Resolution& GetRenderResolution() { return renderResolution; }
 
 	static const DirectX::XMMATRIX& GetViewMatrix() { return viewMatrix; }
 	static const DirectX::XMMATRIX& GetProjectionMatrix() { return projectionMatrix; }
@@ -71,6 +72,7 @@ public:
 	inline static Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil = nullptr;
+	inline static D3D11_VIEWPORT viewport;
 
 	inline static float clearColor[4] = {0.22f, 0.22f, 0.22f, 1.0f};
 	inline static bool isVSyncEnabled = false;

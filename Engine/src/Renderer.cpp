@@ -57,6 +57,7 @@ const std::vector<const Material*>& Renderer::GetMaterials() const
 void Renderer::Start()
 {
 	Scene::GetActiveScene()->rendererManager.renderers.push_back(this);
+	rendererManager = &Scene::GetActiveScene()->rendererManager;
 }
 
 void Renderer::Update()
@@ -131,18 +132,20 @@ void Renderer::UpdateDirectionalLightBuffer() const
 		alignas(16) unsigned int Count;
 		struct PerLightInfo
 		{
-			alignas(16) DirectX::XMFLOAT3 ligth; //color * intensity
+			float depthBias;
+			DirectX::XMFLOAT3 ligth; //color * intensity
 			alignas(16) DirectX::XMFLOAT3 direction;
 		};
 		PerLightInfo lights[4];
 	};
 
 	static DirectionalLights_TO_GPU toGPU;	
-	toGPU.Count = DirectionalLight::lights.size();
+	toGPU.Count = rendererManager->directionalLights.size();
 
 	for (unsigned int i = 0; i < DirectionalLight::MaxCount && i < toGPU.Count; i++)
 	{
-		const DirectionalLight& currentLight = *DirectionalLight::lights[i];
+		const DirectionalLight& currentLight = *rendererManager->directionalLights[i];
+		toGPU.lights[i].depthBias = currentLight.depthBias;
 
 		DirectX::XMMATRIX lightModelView = DirectX::XMMatrixMultiply(
 			DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion()), Graphics::viewMatrix);
@@ -185,14 +188,14 @@ void Renderer::UpdatePointLightBuffer() const
 	};
 	
 	static PointLights_TO_GPU toGPU;
-	toGPU.Count = PointLight::lights.size();
+	toGPU.Count = rendererManager->pointLights.size();
 	toGPU.Constant = PointLight::constant;
 	toGPU.Linear = PointLight::linear;
 	toGPU.Quadratic = PointLight::quadratic;
 
 	for (unsigned int i = 0; i < PointLight::MaxCount && i < toGPU.Count; i++)
 	{
-		const PointLight& currentLight = *PointLight::lights[i];
+		const PointLight& currentLight = *rendererManager->pointLights[i];
 		DirectX::XMFLOAT3 worldPos = currentLight.GetEntity()->GetTransform()->GetWorldPosition();
 
 		//Light calculations in view space
@@ -250,6 +253,11 @@ void Renderer::TransposeMatrices()
 	worldMatrix = DirectX::XMMatrixTranspose(worldMatrix);
 	worldViewMatrix = DirectX::XMMatrixTranspose(worldViewMatrix);
 	worldViewProjectionMatrix = DirectX::XMMatrixTranspose(worldViewProjectionMatrix);
+}
+
+void Renderer::SetLightSpaceMatrix(const DirectX::XMMATRIX lightSpaceMatrix)
+{
+	this->lightSpaceMatrix = lightSpaceMatrix;
 }
 
 const DirectX::XMMATRIX& Renderer::GetWorldMatrix()

@@ -8,9 +8,11 @@
 #include "Material.h"
 #include "Component.h"
 
+class RendererManager;
+
 class Renderer final: public Component
 {
-	friend class RendererManager;
+	friend RendererManager;
 	friend class Phong_Material;
 	friend class Unlit_Material;
 	friend class Engine;
@@ -59,8 +61,10 @@ private:
 	void UpdatePointLightBuffer() const;
 	void UpdateMatrices();
 	void TransposeMatrices();
+	void SetLightSpaceMatrix(const DirectX::XMMATRIX lightSpaceMatrix);
 public:
 	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	bool castShadows = true;
 private:
 	const Mesh* mesh = nullptr;
 	std::vector<const Material*> materials;
@@ -70,9 +74,13 @@ private:
 	DirectX::XMMATRIX worldViewMatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX normalMatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX worldViewProjectionMatrix = DirectX::XMMatrixIdentity();
+	DirectX::XMMATRIX lightSpaceMatrix = DirectX::XMMatrixIdentity();
 
 	bool isWorldMatrixUpdated = false;
 	bool isWorldViewMatrixUpdated = false;
 	bool isWorldViewProjectionMatrixUpdated = false;
 	bool isNormalMatrixUpdated = false;
+
+private:
+	RendererManager* rendererManager;
 };

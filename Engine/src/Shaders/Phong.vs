@@ -2,6 +2,7 @@
 // DIFFUSETEXTURE
 // SPECULARTEXTURE
 // NORMALTEXTURE
+// SHADOW
 // VARIANTS END
 
 struct OUT
@@ -17,6 +18,10 @@ struct OUT
     float3 Tangent : TANGENT;
     float3 Bitangent : BITANGENT;
 #endif    
+
+#ifdef SHADOW
+    float4 lightSpacePosition : LIGHTSPACEPOSITION;
+#endif
 
     float4 Position : SV_POSITION;
 };
@@ -41,6 +46,9 @@ cbuffer Transform : register(b0)
     matrix modelView;
     matrix normalMatrix;
     matrix MVP;
+#ifdef SHADOW
+    matrix lightSpaceMatrix;
+#endif
 };
 
 
@@ -60,6 +68,9 @@ OUT main( IN in_ )
     Out.Tangent = normalize(mul(in_.Tangent, (float3x3)normalMatrix));
     Out.Bitangent = normalize(mul(in_.Bitangent, (float3x3)normalMatrix));
 #endif
-    
+
+#ifdef SHADOW    
+    Out.lightSpacePosition = mul(float4(in_.position, 1.0f), lightSpaceMatrix);
+#endif
     return Out;
 }

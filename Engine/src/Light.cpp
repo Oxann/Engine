@@ -1,11 +1,9 @@
 #include "Light.h"
+#include "Scene.h"
 
 void DirectionalLight::Start()
 {
-	if (lights.size() == 0u)
-		lights.reserve(4u);
-	
-	lights.push_back(this);
+	Scene::GetActiveScene()->rendererManager.directionalLights.push_back(this);
 }
 
 DirectionalLight* DirectionalLight::Clone()
@@ -15,10 +13,7 @@ DirectionalLight* DirectionalLight::Clone()
 
 void PointLight::Start()
 {
-	if (lights.size() == 0u)
-		lights.reserve(4u);
-	
-	lights.push_back(this);
+	Scene::GetActiveScene()->rendererManager.pointLights.push_back(this);
 }
 
 PointLight* PointLight::Clone()

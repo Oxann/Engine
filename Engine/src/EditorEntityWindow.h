@@ -159,6 +159,9 @@ private:
 					});
 			}
 
+			ImGui::AlignTextToFramePadding();
+			ImGui::Checkbox("Cast Shadows##castShadows", &displayedRenderer->castShadows);
+
 			//Material selection
 			bool isMaterialsExpanded = ImGui::TreeNodeEx("Materials");
 			ImGui::SameLine();
@@ -203,7 +206,12 @@ private:
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Color: ");
 			ImGui::SameLine();
-			ImGui::ColorEdit3("##directionalLightColor", reinterpret_cast<float*>(&displayedDirectionalLight->color));		
+			ImGui::ColorEdit3("##directionalLightColor", reinterpret_cast<float*>(&displayedDirectionalLight->color));
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Depth Bias: ");
+			ImGui::SameLine();
+			ImGui::DragFloat("##depthBias", &displayedDirectionalLight->depthBias, 0.001f, 0.0f, 1.0f);
 		}
 	}
 

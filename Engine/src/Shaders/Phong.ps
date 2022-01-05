@@ -2,6 +2,7 @@
 // DIFFUSETEXTURE
 // SPECULARTEXTURE
 // NORMALTEXTURE
+// SHADOW
 // VARIANTS END
 
 #include "Light.hlsli"
@@ -18,6 +19,10 @@ struct IN
 #ifdef NORMALTEXTURE
     float3 tangent : TANGENT;
     float3 bitangent : BITANGENT;
+#endif
+
+#ifdef SHADOW
+    float4 lightSpacePosition : LIGHTSPACEPOSITION;
 #endif
 };
 
@@ -46,15 +51,32 @@ Texture2D normalTexture : register(t2);
 SamplerState normalTextureSampler : register(s2);
 #endif
 
+#ifdef SHADOW
+Texture2D shadowMap : register(t3);
+SamplerComparisonState shadowMapSampler : register(s3);
+#endif
+
+
+#ifdef SHADOW
+float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor, float3 specularColor, float shininess, float3 lightSpacePosition)
+#else
 float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor, float3 specularColor, float shininess)
+#endif
 {
     float3 totalDiffuse = { 0.0f, 0.0f, 0.0f };
     float3 totalSpecular = { 0.0f, 0.0f, 0.0f };
     
     float3 viewVec = normalize(-viewSpacePosition);
-    
+
     for (uint i = 0; i < DirectionalLightCount && i < MAX_DIRECTIONAL_LIGHT_COUNT; i++)
     {
+#ifdef SHADOW
+        float2 shadowMapCoord;
+        shadowMapCoord.x = lightSpacePosition.x;
+        shadowMapCoord.y = -lightSpacePosition.y;
+        shadowMapCoord = shadowMapCoord * 0.5f + 0.5f;
+        float lit = shadowMap.SampleCmpLevelZero(shadowMapSampler, shadowMapCoord, lightSpacePosition.z);
+#endif        
         float diffuse = max(dot(-directionalLights[i].direction, normal), 0.0f);
         if (diffuse < MINLIGHT)
             continue;
@@ -64,6 +86,11 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
         
         totalDiffuse += diffuse * directionalLights[i].ligth.rgb;
         totalSpecular += specular * directionalLights[i].ligth.rgb;
+
+#ifdef SHADOW
+        totalDiffuse *= lit;
+        totalSpecular *= lit;
+#endif
     }
             
     return totalDiffuse * diffuseColor.rgb + totalSpecular * specularColor.rgb * matShininessStrength;
@@ -119,11 +146,14 @@ float4 main(IN in_) : SV_Target
                  float3x3(normalize(in_.tangent), normalize(in_.bitangent), normalize(in_.normal))));
 #endif
     
+
     //Lighting   
     float3 phong = AmbientLight.rgb * AmbientLight.a * diffuseColor.rgb +
+#ifdef SHADOW
+               CalculateDirectionalLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess, in_.lightSpacePosition.xyz) +
+#else
                CalculateDirectionalLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess) +
+#endif
                CalculatePointLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess);
-    
     return saturate(float4(phong, diffuseColor.a));
-
 }

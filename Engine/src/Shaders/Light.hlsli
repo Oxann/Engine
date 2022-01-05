@@ -14,8 +14,10 @@ cbuffer DirectionalLights : register(b1)
     float3 padding;
     struct DirectionalLight
     {
+        float depthBias;
         float3 ligth; //color * intensity
         float3 direction;
+        float padding;
     } directionalLights[MAX_DIRECTIONAL_LIGHT_COUNT];
 };
 

@@ -56,14 +56,12 @@ void Graphics::Init(HWND hWnd)
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	//Viewport
-	D3D11_VIEWPORT vp;
-	vp.TopLeftX = 0.0f;
-	vp.TopLeftY = 0.0f;
-	vp.Width = (float)MainWindow::GetDisplayResolution().width;
-	vp.Height = (float)MainWindow::GetDisplayResolution().height;
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 1.0f;
-	pDeviceContext->RSSetViewports(1, &vp);
+	viewport.TopLeftX = 0.0f;
+	viewport.TopLeftY = 0.0f;
+	viewport.Width = (float)MainWindow::GetDisplayResolution().width;
+	viewport.Height = (float)MainWindow::GetDisplayResolution().height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
 
 	//Depth and stencil buffer
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> dsBuffer;
@@ -91,6 +89,7 @@ void Graphics::Init(HWND hWnd)
 	CHECK_DX_ERROR(pDevice->CreateRenderTargetView(resource.Get(), nullptr, &pView));
 	pDeviceContext->OMSetRenderTargets(1u, pView.GetAddressOf(), pDepthStencil.Get());
 
+	renderResolution = MainWindow::GetDisplayResolution();
 
 	//Initializing projection matrix
 	SetProjection(ProjectionType::Perspective, (float)MainWindow::GetDisplayResolution().width / (float)MainWindow::GetDisplayResolution().height, 60.0f, 0.05f, 10000.0f);

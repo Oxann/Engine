@@ -12,6 +12,8 @@ public:
 
 	void Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const override;
 
+	void SetReceiveShadows(bool receiveShadows);
+
 	//Diffuse
 	void SetDiffuseColor(const DirectX::XMFLOAT4& color);
 	void SetDiffuseMap(const Texture* texture);
@@ -84,12 +86,15 @@ private:
 
 	const Texture* normalMap = nullptr;
 
+	bool receiveShadows = true;
+
 private:
 	struct VS_CB_Slot0
 	{
 		DirectX::XMMATRIX modelView;
 		DirectX::XMMATRIX normalMatrix;
 		DirectX::XMMATRIX MVP;
+		DirectX::XMMATRIX lightSpaceMatrix;
 	};
 	inline static VS_CB_Slot0 VS_CB_Slot0_;
 

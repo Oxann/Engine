@@ -6,11 +6,28 @@
 Phong_Material::Phong_Material(std::string name)
 	:Material(name, Resources::FindShader("Phong"))
 {
+	SetReceiveShadows(receiveShadows);
 }
 
 void Phong_Material::Bind(const Mesh::SubMesh* subMesh, Renderer*  renderer) const
 {
 	(this->*(this->Bind_))(subMesh, renderer);
+}
+
+void Phong_Material::SetReceiveShadows(bool receiveShadows)
+{
+	this->receiveShadows = receiveShadows;
+
+	if (receiveShadows)
+	{
+		shaderView.ActivateMacro_VS("SHADOW");
+		shaderView.ActivateMacro_PS("SHADOW");
+	}
+	else
+	{
+		shaderView.DeactivateMacro_VS("SHADOW");
+		shaderView.DeactivateMacro_PS("SHADOW");
+	}
 }
 
 void Phong_Material::SetDiffuseColor(const DirectX::XMFLOAT4& color)
@@ -176,6 +193,9 @@ void Phong_Material::BindPhong(const Mesh::SubMesh* subMesh, Renderer*  renderer
 	VS_CB_Slot0_.modelView = renderer->GetWorldViewMatrix();
 	VS_CB_Slot0_.normalMatrix = renderer->GetNormalMatrix();
 	VS_CB_Slot0_.MVP = renderer->GetWorldViewProjectionMatrix();
+
+	if (receiveShadows)
+		VS_CB_Slot0_.lightSpaceMatrix = renderer->lightSpaceMatrix;
 
 	VS_CB.ChangeData(&VS_CB_Slot0_);
 	VS_CB.BindPipeline();
