@@ -34,6 +34,8 @@ void Editor::Init(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* 
 	//Windows start calls
 	for (const auto& window : windows)
 		window->Start();
+
+	EditorCamera::SetProjection(Camera::ProjectionType::Perspective, (float)MainWindow::GetDisplayResolution().width / (float)MainWindow::GetDisplayResolution().height, 60.0f, 0.05f, 10000.0f);
 }
 
 LRESULT Editor::EditorInputHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -215,8 +217,8 @@ void Editor::EditorCamera::Update()
 				movementSpeed -= 10.0f;
 
 			//Update camera rotation
-			yaw += rotationSpeed * (float)Input::GetMouseDeltaX() * (Graphics::GetHorizontalFOV() / (float)MainWindow::GetDisplayResolution().width);
-			pitch += rotationSpeed * (float)Input::GetMouseDeltaY() * (Graphics::GetVerticalFOV() / (float)MainWindow::GetDisplayResolution().height);
+			yaw += rotationSpeed * (float)Input::GetMouseDeltaX() * (horizontalFOV / (float)MainWindow::GetDisplayResolution().width);
+			pitch += rotationSpeed * (float)Input::GetMouseDeltaY() * (verticalFOV / (float)MainWindow::GetDisplayResolution().height);
 			if (pitch > 360.0f)
 				pitch -= 360.0f;
 			if (pitch < -360.0f)
@@ -244,7 +246,7 @@ void Editor::EditorCamera::Update()
 	if (isChanged)
 	{
 		isChanged = false;
-		UpdateViewMatrix();
+		UpdateMatrices();
 	}
 }
 
@@ -259,13 +261,35 @@ void Editor::EditorCamera::Focus(const Entity* entity)
 		
 		position = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&worldAABB.Center), DirectX::XMVectorScale( rotationMatrix.r[2], -distanceMultiplier));
 	
-		UpdateViewMatrix();
+		UpdateMatrices();
 	}
 }
 
-void Editor::EditorCamera::UpdateViewMatrix()
+void Editor::EditorCamera::UpdateMatrices()
 {
 	Graphics::viewMatrix = DirectX::XMMatrixTranslationFromVector(DirectX::XMVectorNegate(position)) * DirectX::XMMatrixTranspose(rotationMatrix);
+	Graphics::projectionMatrix = projectionMatrix;
+}
+
+void Editor::EditorCamera::SetProjection(Camera::ProjectionType type, float aspectRatio, float height, float near_z, float far_z)
+{
+	projectionType = type;
+	switch (projectionType)
+	{
+	case Camera::ProjectionType::Orthographic:
+		aspectRatio = aspectRatio;
+		projectionMatrix = DirectX::XMMatrixOrthographicLH(height * aspectRatio, height, near_z, far_z);
+		break;
+	case Camera::ProjectionType::Perspective:
+		Graphics::aspectRatio = aspectRatio;
+		verticalFOV = height;
+		horizontalFOV = DirectX::XMConvertToDegrees(2.0f * std::atan(aspectRatio * std::tan(DirectX::XMConvertToRadians(height / 2.0f))));
+		projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(verticalFOV), aspectRatio, near_z, far_z);
+		break;
+	default:
+		ENGINEASSERT(false, "Setting invalid projection type in editor camera.");
+		break;
+	}
 }
 
 

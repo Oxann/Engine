@@ -18,7 +18,7 @@ RendererManager::RendererManager()
 void RendererManager::Update()
 {
 #ifndef EDITOR
-	activeCamera->UpdateViewMatrix();
+	activeCamera->UpdateMatrices();
 #endif
 	vertexCount = 0;
 	meshCount = 0;

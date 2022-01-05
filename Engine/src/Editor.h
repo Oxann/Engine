@@ -12,6 +12,7 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
+#include "Camera.h"
 
 class Entity;
 
@@ -27,7 +28,10 @@ public:
 		static void Update();
 	public:
 		static void Focus(const Entity* entity);
-		static void UpdateViewMatrix();
+		static void UpdateMatrices();
+		static float GetHorizontalFOV() { return horizontalFOV; }
+		static float GetVerticalFOV() { return verticalFOV; }
+		static void SetProjection(Camera::ProjectionType type, float aspectRatio, float height, float near_z, float far_z);
 	public:
 		inline static DirectX::XMVECTOR position = DirectX::XMVectorZero();
 		inline static DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixIdentity();
@@ -39,6 +43,12 @@ public:
 		inline static float yaw = 0.0f;
 
 		inline static bool isChanged = true;
+	
+	private:
+		inline static float horizontalFOV;
+		inline static float verticalFOV;
+		inline static DirectX::XMMATRIX projectionMatrix;
+		inline static Camera::ProjectionType projectionType;
 	};
 public:
 	static void Init(HWND hWnd, ID3D11DeviceContext* pDeviceContext, ID3D11Device* pDevice);

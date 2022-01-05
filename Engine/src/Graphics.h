@@ -9,7 +9,6 @@
 #include "ConstantBuffer.h"
 #include "Light.h"
 
-
 struct Resolution
 {
 	int width;
@@ -29,11 +28,7 @@ class Graphics
 #endif
 
 public:
-	enum class ProjectionType
-	{
-		Orthographic,
-		Perspective
-	};
+
 	enum class ClearMode
 	{
 		Black,
@@ -42,20 +37,13 @@ public:
 public:
 	static void Init(HWND hWnd);
 
+	static const Resolution& GetResolution();
+
 	//Projection
 	static float GetAspectRatio();
-
-	//If the projection type is orthographic then this returns less than 0.
-	//Angle in degrees.
-	static float GetVerticalFOV();
-
-	//If the projection type is orthographic then this returns less than 0.
-	//Angle in degrees.
-	static float GetHorizontalFOV();
 	
 	//Height is in camera space from top to bottom. (NOT HALF!!!)
 	//If the projection type is perspective then height is vertical FOV angle.
-	static void SetProjection(ProjectionType type, float aspectRatio, float height,float near_z, float far_z);
 
 	static void SetAmbientColor(DirectX::XMFLOAT3 color);
 	static void SetAmbientIntensity(float intensity);
@@ -86,10 +74,7 @@ private:
 
 	//Projection stuff
 	inline static DirectX::XMMATRIX projectionMatrix;
-	inline static float verticalFOV;
-	inline static float horizontalFOV;
 	inline static float aspectRatio;
-	inline static ProjectionType projectionType;
 
 	//Currently if we are in editor mode, view matrix is editor camera's lookat matrix
 	inline static DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixIdentity();
