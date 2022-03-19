@@ -344,6 +344,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Phong_Material.cpp" />
     <ClCompile Include="src\D3DBase.cpp" />
     <ClCompile Include="src\EngineException.cpp" />
@@ -369,6 +370,7 @@
     <ClCompile Include="src\ShadowMap.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\ThreadPool.cpp" />
     <ClCompile Include="src\Unlit_Material.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
@@ -421,6 +423,7 @@
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\ThreadPool.h" />
     <ClInclude Include="thirdparty\FastNoiseLite.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h" />
     <ClInclude Include="thirdparty\imgui\imgui.h" />

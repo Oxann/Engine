@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Entity.h"
+#include "ThreadPool.h"
 
 
 class Engine
@@ -15,5 +16,7 @@ private:
 	static void Update();
 private:
 	static void ShutDown();
+public:
+	static inline ThreadPool threadPool;
 };
 
