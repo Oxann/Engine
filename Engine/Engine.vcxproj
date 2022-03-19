@@ -344,7 +344,6 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
-    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Phong_Material.cpp" />
     <ClCompile Include="src\D3DBase.cpp" />
     <ClCompile Include="src\EngineException.cpp" />
