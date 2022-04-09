@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "Shader.h"
 #include "Unlit_Material.h"
+#include "Engine.h"
 
 using namespace std::filesystem;
 
@@ -13,7 +14,14 @@ void Resources::Init()
 {
 	ENGINE_LOG(ENGINE_INFO, "Resources loading...");
 
+	auto time1 = std::chrono::steady_clock::now();
+
 	LoadShaders();
+
+	std::vector<path> texturesToLoad;
+	std::vector<path> modelsToLoad;
+	texturesToLoad.reserve(100);
+	modelsToLoad.reserve(100);
 
 	for (auto& file : recursive_directory_iterator("Resources"))
 	{
@@ -23,15 +31,26 @@ void Resources::Init()
 
 			if (extension == ".png" || extension == ".jpg")
 			{
-				Textures.insert({ file.path().string(),std::make_unique<Texture>(file.path()) });
+				texturesToLoad.emplace_back(file.path());
+				//Textures.insert({ file.path().string(),std::make_unique<Texture>(file.path()) });
 			}
 			else if (extension == ".obj" || extension == ".fbx" || extension == ".max" || extension == ".FBX")
 			{
-				Models.insert({ file.path().string(),std::make_unique<Model>(file.path()) });
+				modelsToLoad.emplace_back(file.path());
+				//Models.insert({ file.path().string(),std::make_unique<Model>(file.path()) });
 			}
 		}
 	}
 
+	LoadTextures(texturesToLoad);
+
+	for (auto& modelToLoad : modelsToLoad)
+	{
+		Models.emplace(std::piecewise_construct, std::forward_as_tuple(modelToLoad.string()), std::forward_as_tuple(std::make_unique<Model>(modelToLoad)));
+	}
+
+	auto time2 = std::chrono::steady_clock::now();
+	ENGINE_LOG(ENGINE_INFO, std::to_string(std::chrono::duration<float>(time2 - time1).count()))
 
 	//Some default resources
 #ifdef EDITOR
@@ -47,6 +66,8 @@ void Resources::Init()
 
 void Resources::LoadShaders()
 {
+	auto shadersLoadBegin = std::chrono::steady_clock::now();
+
 	for (auto& file : recursive_directory_iterator(shaderDir))
 	{
 		if (!file.is_directory() && file.path().extension() != ".hlsli")
@@ -63,6 +84,34 @@ void Resources::LoadShaders()
 				std::make_unique<Shader>(shaderName, vsPath, psPath));
 		}
 	}
+
+	auto shadersLoadEnd = std::chrono::steady_clock::now();
+	ENGINE_LOG(ENGINE_INFO, "Shaders loaded in " + std::to_string(std::chrono::duration<float>(shadersLoadEnd - shadersLoadBegin).count()) + " seconds.")
+}
+
+void Resources::LoadTextures(const std::vector<path>& texturePaths)
+{
+	std::mutex textureLoadMutex;
+	std::vector<std::future<void>> textureLoadHandles;
+
+	auto texturesLoadBegin = std::chrono::steady_clock::now();
+
+	for (int i = 0; i < texturePaths.size(); i++)
+	{
+		textureLoadHandles.push_back(Engine::threadPool.AddTask<void>([&texturePath = texturePaths[i], &textureLoadMutex]{
+			auto newTexture = std::make_unique<Texture>(texturePath);
+
+			textureLoadMutex.lock();
+			Textures.emplace(std::piecewise_construct, std::forward_as_tuple(texturePath.string()), std::forward_as_tuple(std::move(newTexture)));
+			textureLoadMutex.unlock();
+			}));
+	}
+
+	for (auto& textureLoadHandle : textureLoadHandles)
+		textureLoadHandle.get();
+
+	auto texturesLoadEnd = std::chrono::steady_clock::now();
+	ENGINE_LOG(ENGINE_INFO, "Textures loaded in " + std::to_string(std::chrono::duration<float>(texturesLoadEnd - texturesLoadBegin).count()) + " seconds.")
 }
 
 Texture* Resources::FindTexture(const std::string& file)

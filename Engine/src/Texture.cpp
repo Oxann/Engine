@@ -5,6 +5,7 @@
 #include <filesystem>
 #include "EngineAssert.h"
 #include "EngineException.h"
+#include "Graphics.h"
 
 using namespace Microsoft::WRL;
 
@@ -29,8 +30,14 @@ Texture::Texture(const std::filesystem::path& file)
 		textureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 
 		ComPtr<ID3D11Texture2D> texture2D;
+		D3D11_SUBRESOURCE_DATA data;
+		data.pSysMem = img_data;
+		data.SysMemPitch = sizeof(unsigned char) * 4 * width;
 		CHECK_DX_ERROR(GetDevice()->CreateTexture2D(&textureDesc, nullptr, &texture2D));
+
+		Graphics::immediateContextMutex.lock();
 		GetDeviceContext()->UpdateSubresource(texture2D.Get(), 0, nullptr, img_data, sizeof(unsigned char) * 4 * width, 0);
+		Graphics::immediateContextMutex.unlock();
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRV_Desc = {};
 		SRV_Desc.Format = textureDesc.Format;
@@ -39,7 +46,10 @@ Texture::Texture(const std::filesystem::path& file)
 		SRV_Desc.Texture2D.MipLevels = -1;
 		
 		GetDevice()->CreateShaderResourceView(texture2D.Get(), &SRV_Desc, &pSRV);
+
+		Graphics::immediateContextMutex.lock();
 		GetDeviceContext()->GenerateMips(pSRV.Get());
+		Graphics::immediateContextMutex.unlock();
 
 		//Sampler
 		filterMode = FilterMode::ANISOTROPIC;
@@ -54,7 +64,6 @@ Texture::Texture(const std::filesystem::path& file)
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		samplerDesc.MaxAnisotropy = anisotropy;
 		GetDevice()->CreateSamplerState(&samplerDesc, &sampler);
-
 
 		stbi_image_free(img_data);
 	}

@@ -8,6 +8,8 @@
 #include <DirectXMath.h>
 #include "ConstantBuffer.h"
 #include "Light.h"
+#include <mutex>
+
 
 struct Resolution
 {
@@ -53,6 +55,8 @@ public:
 
 	static const DirectX::XMMATRIX& GetViewMatrix() { return viewMatrix; }
 	static const DirectX::XMMATRIX& GetProjectionMatrix() { return projectionMatrix; }
+
+	static bool IsMultithreadedResourceCreationActive() { return isMultithreadedResourceCreationActive; }
 public:
 	//DX objects
 	inline static Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain = nullptr;
@@ -61,12 +65,15 @@ public:
 	inline static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pView = nullptr;
 	inline static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencil = nullptr;
 	inline static D3D11_VIEWPORT viewport;
-
+	
 	inline static float clearColor[4] = {0.22f, 0.22f, 0.22f, 1.0f};
 	inline static bool isVSyncEnabled = false;
 
+	inline static std::mutex immediateContextMutex;
+
 private:	
 	inline static Resolution renderResolution;
+	inline static bool isMultithreadedResourceCreationActive = false;
 
 	//Ambient Light
 	inline static DirectX::XMVECTOR ambientLight; // w is intensity

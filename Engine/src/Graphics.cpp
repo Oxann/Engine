@@ -54,6 +54,11 @@ void Graphics::Init(HWND hWnd)
 		&pDeviceContext
 	));
 
+	D3D11_FEATURE_DATA_THREADING threading;
+	if (pDevice->CheckFeatureSupport(D3D11_FEATURE_THREADING, &threading, sizeof(D3D11_FEATURE_DATA_THREADING)) == S_OK)
+		isMultithreadedResourceCreationActive = threading.DriverConcurrentCreates == TRUE;
+
+
 	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	
 	//Viewport
@@ -63,7 +68,7 @@ void Graphics::Init(HWND hWnd)
 	viewport.Height = (float)MainWindow::GetDisplayResolution().height;
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
-
+	
 	//Depth and stencil buffer
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> dsBuffer;
 	D3D11_TEXTURE2D_DESC desc_dsBuffer = {};
@@ -95,7 +100,7 @@ void Graphics::Init(HWND hWnd)
 	//Initializing projection matrix
 
 	//Ambient Lighting
-	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 	ambientLightBuffer = new PS_ConstantBuffer<DirectX::XMVECTOR>(&ambientLight, 1u, 0u, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
 
 	ENGINE_LOG(ENGINE_INFO, "Graphics Ready!");
