@@ -17,6 +17,11 @@ void VertexShaderVariant::Bind() const
 	Graphics::pDeviceContext->IASetInputLayout(inputLayout.Get());
 }
 
+const std::vector<VertexBuffer::ElementType>& VertexShaderVariant::GetVertexElements() const
+{
+	return vertexElements;
+}
+
 void VertexShaderVariant::InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 {
 	//Reflection
@@ -52,9 +57,11 @@ void VertexShaderVariant::InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 				break;
 			case 3:
 				temp_ilo.Format = DXGI_FORMAT_R32G32_FLOAT;
+				vertexElements.emplace_back(VertexBuffer::ElementType::Position2D);
 				break;
 			case 7:
 				temp_ilo.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+				vertexElements.emplace_back(VertexBuffer::ElementType::Position3D);
 				break;
 			case 15:
 				temp_ilo.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -67,21 +74,25 @@ void VertexShaderVariant::InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 		{
 			temp_ilo.InputSlot = 1u;
 			temp_ilo.Format = DXGI_FORMAT_R32G32_FLOAT;
+			vertexElements.emplace_back(VertexBuffer::ElementType::TexCoord);
 		}
 		else if (semanticName == "NORMAL")
 		{
 			temp_ilo.InputSlot = 2u;
 			temp_ilo.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+			vertexElements.emplace_back(VertexBuffer::ElementType::Normal);
 		}
 		else if (semanticName == "TANGENT")
 		{
 			temp_ilo.InputSlot = 3u;
 			temp_ilo.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+			vertexElements.emplace_back(VertexBuffer::ElementType::Tangent);
 		}
 		else if (semanticName == "BITANGENT")
 		{
 			temp_ilo.InputSlot = 4u;
 			temp_ilo.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+			vertexElements.emplace_back(VertexBuffer::ElementType::Bitangent);
 		}
 		ilo.push_back(temp_ilo);
 	}

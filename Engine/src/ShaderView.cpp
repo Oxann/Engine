@@ -58,6 +58,16 @@ void ShaderView::Bind() const
 	PS_ActiveVariant->Bind();
 }
 
+const VertexShaderVariant& ShaderView::GetActiveVertexShader() const
+{
+	return *VS_ActiveVariant;
+}
+
+const PixelShaderVariant& ShaderView::GetActivePixelShader() const
+{
+	return *PS_ActiveVariant;
+}
+
 bool ShaderView::DeactivateMacro_VS(const std::string& macro)
 {
 	for (int i = 0; i < shader->VS_Macros.size(); i++)

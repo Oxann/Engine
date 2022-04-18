@@ -344,6 +344,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Phong_Material.cpp" />
     <ClCompile Include="src\D3DBase.cpp" />
     <ClCompile Include="src\EngineException.cpp" />
@@ -441,26 +442,6 @@
     <ClInclude Include="src\Unlit_Material.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\Shaders\Star.vs">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\Star.ps">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release-Editor|Win32'">Pixel</ShaderType>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
-    </FxCompile>
     <FxCompile Include="src\Shaders\Unlit.ps">
       <FileType>Document</FileType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -507,6 +488,7 @@
     <None Include="src\Shaders\ShadowCast.vs" />
     <None Include="src\Shaders\Skybox.vs" />
     <None Include="src\Shaders\Skybox.ps" />
+    <None Include="src\Shaders\TransformBuffers.hlsli" />
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll" />
     <None Include="thirdparty\assimp\Release\assimp-vc142-mt.dll" />
   </ItemGroup>

@@ -1,6 +1,7 @@
 #pragma once
 #include <d3d11.h>
 #include <wrl.h>
+#include "VertexBuffer.h"
 
 class ShaderVariantBase
 {
@@ -15,11 +16,13 @@ public:
 	VertexShaderVariant() = default;
 	VertexShaderVariant(Microsoft::WRL::ComPtr<ID3DBlob> blob);
 	void Bind() const override;
+	const std::vector<VertexBuffer::ElementType>& GetVertexElements() const;
 private:
 	void InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob);
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout = nullptr;
+	std::vector<VertexBuffer::ElementType> vertexElements;
 };
 
 class PixelShaderVariant : public ShaderVariantBase

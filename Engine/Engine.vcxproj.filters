@@ -13,12 +13,6 @@
     <FxCompile Include="src\Shaders\Phong.vs">
       <Filter>Shaders\Phong</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\Star.vs">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Shaders\Star.ps">
-      <Filter>Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Input.cpp" />
@@ -129,6 +123,7 @@
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\ThreadPool.cpp" />
+    <ClCompile Include="src\Material.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -318,6 +313,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\Shaders\ShadowCast.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\TransformBuffers.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

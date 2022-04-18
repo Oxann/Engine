@@ -25,7 +25,7 @@ public:
 
 	virtual ~Material() = default;
 
-	virtual void Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const = 0;
+	virtual void Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const;
 
 public:
 	Mode mode = Mode::Opaque;

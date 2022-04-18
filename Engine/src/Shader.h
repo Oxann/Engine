@@ -6,6 +6,7 @@
 
 #include "ShaderVariant.h"
 #include "ResourceBase.h"
+#include "ConstantBuffer.h"
 
 /*///////////////////////////////////
 //
@@ -20,6 +21,26 @@
 
 class Shader
 {
+	struct VertexShaderPerObjectBuffer
+	{
+		DirectX::XMMATRIX model;
+		DirectX::XMMATRIX modelView;
+		DirectX::XMMATRIX modelViewProjection;
+		DirectX::XMMATRIX normal;
+
+		static constexpr int slot = 0;
+		static VertexShaderPerObjectBuffer buffer;
+	};
+
+	struct VertexShaderPerFrameBuffer
+	{
+		DirectX::XMMATRIX view;
+		DirectX::XMMATRIX projection;
+
+		static constexpr int slot = 1;
+		static VertexShaderPerFrameBuffer buffer;
+	};
+
 	typedef std::vector<std::pair<std::set<unsigned char>, VertexShaderVariant>> VSMAP;
 	typedef std::vector<std::pair<std::set<unsigned char>, PixelShaderVariant>> PSMAP;
 
@@ -40,6 +61,9 @@ public:
 
 	VertexShaderVariant* const GetDefaultVertexShaderVariant() const;
 	PixelShaderVariant* const GetDefaultPixelShaderVariant() const;
+
+	static const VS_ConstantBuffer<VertexShaderPerObjectBuffer>* GetVertexShaderPerObjectBuffer();
+	static const VS_ConstantBuffer<VertexShaderPerFrameBuffer>* GetVertexShaderPerFrameBuffer();
 
 private:
 	void ExtractMacrosFromSource(std::stringstream& source, std::vector<std::string>& macros);
@@ -72,4 +96,6 @@ private:
 #endif	
 	inline static const std::string VS_Model = "vs_5_0";
 	inline static const std::string PS_Model = "ps_5_0";
+
 };
+

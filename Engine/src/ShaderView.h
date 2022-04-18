@@ -15,6 +15,9 @@ public:
 	bool DeactivateMacro_PS(const std::string& macro);
  
 	void Bind() const;
+
+	const VertexShaderVariant& GetActiveVertexShader() const;
+	const PixelShaderVariant& GetActivePixelShader() const;
 private:
 	const Shader* shader;
 

@@ -8,6 +8,7 @@
 #include "Shader.h"
 #include "Log.h"
 #include "EngineAssert.h"
+#include "VertexBuffer.h"
 
 
 using namespace Microsoft::WRL;
@@ -98,6 +99,29 @@ VertexShaderVariant* const Shader::GetDefaultVertexShaderVariant() const
 PixelShaderVariant* const Shader::GetDefaultPixelShaderVariant() const
 {
 	return &PS_Default;
+}
+
+const VS_ConstantBuffer<Shader::VertexShaderPerObjectBuffer>* Shader::GetVertexShaderPerObjectBuffer()
+{
+	static VS_ConstantBuffer<Shader::VertexShaderPerObjectBuffer> perObjectBuffer(	&Shader::VertexShaderPerObjectBuffer::buffer, 
+																					1, 
+																					Shader::VertexShaderPerObjectBuffer::slot,
+																					D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+																					D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+																					true);
+	return &perObjectBuffer;
+}
+
+const VS_ConstantBuffer<Shader::VertexShaderPerFrameBuffer>* Shader::GetVertexShaderPerFrameBuffer()
+{
+	static VS_ConstantBuffer<Shader::VertexShaderPerFrameBuffer> perFrameBuffer(	&Shader::VertexShaderPerFrameBuffer::buffer,
+																					1,
+																					Shader::VertexShaderPerFrameBuffer::slot,
+																					D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+																					D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+																					true);
+
+	return &perFrameBuffer;
 }
 
 void Shader::ExtractMacrosFromSource(std::stringstream& source, std::vector<std::string>& macros)
