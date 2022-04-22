@@ -21,6 +21,7 @@
 
 class Shader
 {
+public:
 	struct VertexShaderPerObjectBuffer
 	{
 		DirectX::XMMATRIX model;
@@ -41,6 +42,7 @@ class Shader
 		static VertexShaderPerFrameBuffer buffer;
 	};
 
+private:
 	typedef std::vector<std::pair<std::set<unsigned char>, VertexShaderVariant>> VSMAP;
 	typedef std::vector<std::pair<std::set<unsigned char>, PixelShaderVariant>> PSMAP;
 
@@ -62,8 +64,8 @@ public:
 	VertexShaderVariant* const GetDefaultVertexShaderVariant() const;
 	PixelShaderVariant* const GetDefaultPixelShaderVariant() const;
 
-	static const VS_ConstantBuffer<VertexShaderPerObjectBuffer>* GetVertexShaderPerObjectBuffer();
-	static const VS_ConstantBuffer<VertexShaderPerFrameBuffer>* GetVertexShaderPerFrameBuffer();
+	static VS_ConstantBuffer<VertexShaderPerObjectBuffer>* const GetVertexShaderPerObjectBuffer();
+	static VS_ConstantBuffer<VertexShaderPerFrameBuffer>* const GetVertexShaderPerFrameBuffer();
 
 private:
 	void ExtractMacrosFromSource(std::stringstream& source, std::vector<std::string>& macros);

@@ -8,7 +8,7 @@ using namespace Microsoft::WRL;
 VertexShaderVariant::VertexShaderVariant(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 {
 	CHECK_DX_ERROR(Graphics::pDevice->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
-	InitLayout(blob);
+	InitInputLayoutAndBuffers(blob);
 }
 
 void VertexShaderVariant::Bind() const
@@ -22,7 +22,7 @@ const std::vector<VertexBuffer::ElementType>& VertexShaderVariant::GetVertexElem
 	return vertexElements;
 }
 
-void VertexShaderVariant::InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob)
+void VertexShaderVariant::InitInputLayoutAndBuffers(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 {
 	//Reflection
 	ComPtr<ID3D11ShaderReflection> vertexShaderReflection;
@@ -96,6 +96,10 @@ void VertexShaderVariant::InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 		}
 		ilo.push_back(temp_ilo);
 	}
+
+	//Transform buffer
+	ID3D11ShaderReflectionConstantBuffer* perObjectBuffer = vertexShaderReflection->GetConstantBufferByName(perObjectBufferName.c_str());
+
 
 	CHECK_DX_ERROR(Graphics::pDevice->CreateInputLayout(ilo.data(), (UINT)ilo.size(), blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout));
 }

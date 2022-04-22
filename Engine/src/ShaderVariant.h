@@ -18,11 +18,12 @@ public:
 	void Bind() const override;
 	const std::vector<VertexBuffer::ElementType>& GetVertexElements() const;
 private:
-	void InitLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob);
+	void InitInputLayoutAndBuffers(Microsoft::WRL::ComPtr<ID3DBlob> blob);
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader = nullptr;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout = nullptr;
 	std::vector<VertexBuffer::ElementType> vertexElements;
+	inline static const std::string perObjectBufferName = "PerObject";
 };
 
 class PixelShaderVariant : public ShaderVariantBase

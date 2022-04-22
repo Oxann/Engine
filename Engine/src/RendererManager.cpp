@@ -24,6 +24,9 @@ void RendererManager::Update()
 	meshCount = 0;
 	triangleCount = 0;
 
+	//Updating per frame constant buffer
+	UpdateVertexShaderPerFrameBuffer();
+
 	//Creating frustum.
 	DirectX::BoundingFrustum::CreateFromMatrix(frustum,Graphics::GetProjectionMatrix());
 
@@ -108,4 +111,11 @@ void RendererManager::UpdateShadowMaps()
 			}
 		}
 	}
+}
+
+void RendererManager::UpdateVertexShaderPerFrameBuffer()
+{
+	Shader::VertexShaderPerFrameBuffer::buffer.view = Graphics::GetViewMatrix();
+	Shader::VertexShaderPerFrameBuffer::buffer.projection = Graphics::GetProjectionMatrix();
+	Shader::GetVertexShaderPerFrameBuffer()->ChangeData(&Shader::VertexShaderPerFrameBuffer::buffer);
 }

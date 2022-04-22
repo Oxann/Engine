@@ -101,7 +101,7 @@ PixelShaderVariant* const Shader::GetDefaultPixelShaderVariant() const
 	return &PS_Default;
 }
 
-const VS_ConstantBuffer<Shader::VertexShaderPerObjectBuffer>* Shader::GetVertexShaderPerObjectBuffer()
+VS_ConstantBuffer<Shader::VertexShaderPerObjectBuffer>* const Shader::GetVertexShaderPerObjectBuffer()
 {
 	static VS_ConstantBuffer<Shader::VertexShaderPerObjectBuffer> perObjectBuffer(	&Shader::VertexShaderPerObjectBuffer::buffer, 
 																					1, 
@@ -112,7 +112,7 @@ const VS_ConstantBuffer<Shader::VertexShaderPerObjectBuffer>* Shader::GetVertexS
 	return &perObjectBuffer;
 }
 
-const VS_ConstantBuffer<Shader::VertexShaderPerFrameBuffer>* Shader::GetVertexShaderPerFrameBuffer()
+VS_ConstantBuffer<Shader::VertexShaderPerFrameBuffer>* const Shader::GetVertexShaderPerFrameBuffer()
 {
 	static VS_ConstantBuffer<Shader::VertexShaderPerFrameBuffer> perFrameBuffer(	&Shader::VertexShaderPerFrameBuffer::buffer,
 																					1,

@@ -22,6 +22,7 @@ private:
 	RendererManager();
 	void Update();
 	void UpdateShadowMaps();
+	void UpdateVertexShaderPerFrameBuffer();
 public:
 	unsigned long long meshCount;
 	unsigned long long vertexCount;
