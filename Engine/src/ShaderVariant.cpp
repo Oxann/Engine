@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "EngineAssert.h"
 #include <d3dcompiler.h>
+#include "Shader.h"
 
 using namespace Microsoft::WRL;
 
@@ -99,7 +100,26 @@ void VertexShaderVariant::InitInputLayoutAndBuffers(Microsoft::WRL::ComPtr<ID3DB
 
 	//Transform buffer
 	ID3D11ShaderReflectionConstantBuffer* perObjectBuffer = vertexShaderReflection->GetConstantBufferByName(perObjectBufferName.c_str());
+	
+	auto modelMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::model.c_str());
+	D3D11_SHADER_VARIABLE_DESC modelMatrixDesc;
+	modelMatrix->GetDesc(&modelMatrixDesc);
+	perObjectBufferUsageFlags |= modelMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::ModelMatrix : PerObjectBufferUsageFlags::None;
 
+	auto modelViewMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::modelView.c_str());
+	D3D11_SHADER_VARIABLE_DESC modelViewMatrixDesc;
+	modelViewMatrix->GetDesc(&modelViewMatrixDesc);
+	perObjectBufferUsageFlags |= modelViewMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::ModelViewMatrix : PerObjectBufferUsageFlags::None;
+
+	auto modelViewProjectionMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::modelViewProjection.c_str());
+	D3D11_SHADER_VARIABLE_DESC modelViewProjectionMatrixDesc;
+	modelViewProjectionMatrix->GetDesc(&modelViewProjectionMatrixDesc);
+	perObjectBufferUsageFlags |= modelViewProjectionMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::ModelViewProjectionMatrix : PerObjectBufferUsageFlags::None;
+
+	auto normalMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::normalMatrix.c_str());
+	D3D11_SHADER_VARIABLE_DESC normalMatrixDesc;
+	normalMatrix->GetDesc(&normalMatrixDesc);
+	perObjectBufferUsageFlags |= modelMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::NormalMatrix : PerObjectBufferUsageFlags::None;
 
 	CHECK_DX_ERROR(Graphics::pDevice->CreateInputLayout(ilo.data(), (UINT)ilo.size(), blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout));
 }

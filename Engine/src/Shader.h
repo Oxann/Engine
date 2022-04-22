@@ -32,6 +32,14 @@ public:
 		static constexpr int slot = 0;
 		static VertexShaderPerObjectBuffer buffer;
 	};
+	
+	struct VertexShaderPerObjectBufferNames
+	{
+		inline static const std::string model = "model";
+		inline static const std::string modelView = "modelView";
+		inline static const std::string modelViewProjection = "modelViewProjection";
+		inline static const std::string normalMatrix = "normalMatrix";
+	};
 
 	struct VertexShaderPerFrameBuffer
 	{

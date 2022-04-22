@@ -24,6 +24,16 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout = nullptr;
 	std::vector<VertexBuffer::ElementType> vertexElements;
 	inline static const std::string perObjectBufferName = "PerObject";
+
+	enum PerObjectBufferUsageFlags
+	{
+		None = 0,
+		ModelMatrix = 1,
+		ModelViewMatrix = 2,
+		ModelViewProjectionMatrix = 4,
+		NormalMatrix = 8
+	};
+	unsigned int perObjectBufferUsageFlags = None;
 };
 
 class PixelShaderVariant : public ShaderVariantBase
