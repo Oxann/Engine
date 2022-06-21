@@ -36,25 +36,17 @@ cbuffer Material : register(b3)
 }
 
 //Textures
-#ifdef DIFFUSETEXTURE
 Texture2D diffuseTexture : register(t0);
 SamplerState diffuseTextureSampler : register(s0);
-#endif
 
-#ifdef SPECULARTEXTURE
 Texture2D specularTexture : register(t1);
 SamplerState specularTextureSampler : register(s1);
-#endif
 
-#ifdef NORMALTEXTURE
 Texture2D normalTexture : register(t2);
 SamplerState normalTextureSampler : register(s2);
-#endif
 
-#ifdef SHADOW
 Texture2D shadowMap : register(t3);
 SamplerComparisonState shadowMapSampler : register(s3);
-#endif
 
 
 #ifdef SHADOW
@@ -68,6 +60,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
     
     float3 viewVec = normalize(-viewSpacePosition);
 
+    [unroll]
     for (uint i = 0; i < DirectionalLightCount && i < MAX_DIRECTIONAL_LIGHT_COUNT; i++)
     {
 #ifdef SHADOW
@@ -76,7 +69,7 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
         shadowMapCoord.y = -lightSpacePosition.y;
         shadowMapCoord = shadowMapCoord * 0.5f + 0.5f;
         float lit = shadowMap.SampleCmpLevelZero(shadowMapSampler, shadowMapCoord, lightSpacePosition.z);
-#endif        
+#endif              
         float diffuse = max(dot(-directionalLights[i].direction, normal), 0.0f);
         if (diffuse < MINLIGHT)
             continue;

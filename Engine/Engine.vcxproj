@@ -196,6 +196,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -225,6 +226,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -298,6 +300,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -326,6 +329,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -345,7 +349,6 @@
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\Phong_Material.cpp" />
     <ClCompile Include="src\D3DBase.cpp" />
     <ClCompile Include="src\EngineException.cpp" />
     <ClCompile Include="src\Entity.cpp" />
@@ -371,7 +374,6 @@
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\ThreadPool.cpp" />
-    <ClCompile Include="src\Unlit_Material.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
@@ -398,7 +400,6 @@
     <ClInclude Include="src\EditorTextureEditWindow.h" />
     <ClInclude Include="src\EditorWindowBase.h" />
     <ClInclude Include="src\Engine.h" />
-    <ClInclude Include="src\Phong_Material.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Component.h" />
     <ClInclude Include="src\ResourceBase.h" />
@@ -439,7 +440,6 @@
     <ClInclude Include="src\VertexBuffer.h" />
     <ClInclude Include="src\ConstantBuffer.h" />
     <ClInclude Include="src\Win.h" />
-    <ClInclude Include="src\Unlit_Material.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Shaders\Unlit.ps">
@@ -470,14 +470,14 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\Shaders\Phong.ps">
+    <FxCompile Include="src\Shaders\Lit.ps">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
     </FxCompile>
-    <FxCompile Include="src\Shaders\Phong.vs">
+    <FxCompile Include="src\Shaders\Lit.vs">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>

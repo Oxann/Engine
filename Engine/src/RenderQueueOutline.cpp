@@ -73,7 +73,7 @@ void RenderQueueOutline::Add(Renderer* renderer, unsigned int index)
 
 void RenderQueueOutline::Render()
 {
-	static Material* outlineMaterial = Resources::FindMaterial("$Default\\outlineMaterial");
+	static Material* outlineMaterial = Resources::FindMaterial("$Default\\Outline");
 
 	Graphics::pDeviceContext->RSSetState(rasterizerState.Get());
 	Graphics::pDeviceContext->OMSetBlendState(blendState.Get(), NULL, 0xffffffff);

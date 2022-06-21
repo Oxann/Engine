@@ -3,7 +3,6 @@
 #include "EngineAssert.h"
 #include "Renderer.h"
 #include "Resources.h"
-#include "Unlit_Material.h"
 #include "Light.h"
 #include "Graphics.h"
 #include "Editor.h"
@@ -14,6 +13,14 @@
 void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
+
+	Entity* e2 = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("sponza.obj"));
+	e2->GetTransform()->SetLocalScale({ 0.01f,0.01f ,0.01f });
+
+	Entity* light = Scene::GetScene(1)->NewEntity("Light");
+	light->AddComponent<DirectionalLight>();
+	light->GetTransform()->SetLocalRotation(90.0f, 0.0f, 0.0f);
+
 	Scene::LoadScene(1);
 };
 

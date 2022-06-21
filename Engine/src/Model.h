@@ -22,7 +22,7 @@ private:
 		Node(DirectX::XMMATRIX localMatrix)
 			:localMatrix(localMatrix)
 		{}
-		const Mesh* GetMesh() const
+		Mesh* GetMesh() const
 		{
 			return mesh;
 		}
@@ -32,7 +32,7 @@ private:
 		std::vector<std::unique_ptr<Node>> children;
 		const DirectX::XMMATRIX localMatrix;
 	private:
-		const Mesh* mesh = nullptr;
+		Mesh* mesh = nullptr;
 		std::vector<Material*> materials;
 	};
 public:

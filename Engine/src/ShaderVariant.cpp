@@ -18,6 +18,11 @@ void VertexShaderVariant::Bind() const
 	Graphics::pDeviceContext->IASetInputLayout(inputLayout.Get());
 }
 
+bool VertexShaderVariant::HasShadows() const
+{
+	return hasShadows;
+}
+
 const std::vector<VertexBuffer::ElementType>& VertexShaderVariant::GetVertexElements() const
 {
 	return vertexElements;
@@ -97,39 +102,83 @@ void VertexShaderVariant::InitInputLayoutAndBuffers(Microsoft::WRL::ComPtr<ID3DB
 		}
 		ilo.push_back(temp_ilo);
 	}
+	CHECK_DX_ERROR(Graphics::pDevice->CreateInputLayout(ilo.data(), (UINT)ilo.size(), blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout));
 
-	//Transform buffer
-	ID3D11ShaderReflectionConstantBuffer* perObjectBuffer = vertexShaderReflection->GetConstantBufferByName(perObjectBufferName.c_str());
-	
-	auto modelMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::model.c_str());
+	//Reflecting transform buffer
+	ID3D11ShaderReflectionConstantBuffer* perObjectBuffer = vertexShaderReflection->GetConstantBufferByName(Shader::VertexShaderPerObjectBuffer::bufferName.c_str());
+
+	auto modelMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBuffer::modelName.c_str());
 	D3D11_SHADER_VARIABLE_DESC modelMatrixDesc;
 	modelMatrix->GetDesc(&modelMatrixDesc);
-	perObjectBufferUsageFlags |= modelMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::ModelMatrix : PerObjectBufferUsageFlags::None;
+	perObjectBufferUsageFlags |= modelMatrixDesc.uFlags & D3D_SVF_USED ? PerObjectBufferUsageFlags::ModelMatrix : PerObjectBufferUsageFlags::None;
 
-	auto modelViewMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::modelView.c_str());
+	auto modelViewMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBuffer::modelViewName.c_str());
 	D3D11_SHADER_VARIABLE_DESC modelViewMatrixDesc;
 	modelViewMatrix->GetDesc(&modelViewMatrixDesc);
-	perObjectBufferUsageFlags |= modelViewMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::ModelViewMatrix : PerObjectBufferUsageFlags::None;
+	perObjectBufferUsageFlags |= modelViewMatrixDesc.uFlags & D3D_SVF_USED ? PerObjectBufferUsageFlags::ModelViewMatrix : PerObjectBufferUsageFlags::None;
 
-	auto modelViewProjectionMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::modelViewProjection.c_str());
+	auto modelViewProjectionMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBuffer::modelViewProjectionName.c_str());
 	D3D11_SHADER_VARIABLE_DESC modelViewProjectionMatrixDesc;
 	modelViewProjectionMatrix->GetDesc(&modelViewProjectionMatrixDesc);
-	perObjectBufferUsageFlags |= modelViewProjectionMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::ModelViewProjectionMatrix : PerObjectBufferUsageFlags::None;
+	perObjectBufferUsageFlags |= modelViewProjectionMatrixDesc.uFlags & D3D_SVF_USED ? PerObjectBufferUsageFlags::ModelViewProjectionMatrix : PerObjectBufferUsageFlags::None;
 
-	auto normalMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBufferNames::normalMatrix.c_str());
+	auto normalMatrix = perObjectBuffer->GetVariableByName(Shader::VertexShaderPerObjectBuffer::normalMatrixName.c_str());
 	D3D11_SHADER_VARIABLE_DESC normalMatrixDesc;
 	normalMatrix->GetDesc(&normalMatrixDesc);
-	perObjectBufferUsageFlags |= modelMatrixDesc.uFlags & 2 ? PerObjectBufferUsageFlags::NormalMatrix : PerObjectBufferUsageFlags::None;
+	perObjectBufferUsageFlags |= modelMatrixDesc.uFlags & D3D_SVF_USED ? PerObjectBufferUsageFlags::NormalMatrix : PerObjectBufferUsageFlags::None;
 
-	CHECK_DX_ERROR(Graphics::pDevice->CreateInputLayout(ilo.data(), (UINT)ilo.size(), blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout));
+	//Shadow buffer
+	ID3D11ShaderReflectionConstantBuffer* shadowBuffer = vertexShaderReflection->GetConstantBufferByName(Shader::VertexShaderShadowBuffer::bufferName.c_str());
+	
+	D3D11_SHADER_BUFFER_DESC shadowBufferDesc;
+
+	//Check if the current variant has shadows
+	hasShadows = shadowBuffer->GetDesc(&shadowBufferDesc) != E_FAIL;
 }
 
 PixelShaderVariant::PixelShaderVariant(Microsoft::WRL::ComPtr<ID3DBlob> blob)
 {
 	CHECK_DX_ERROR(Graphics::pDevice->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader));
+	InitTextureLayout(blob);
 }
 
 void PixelShaderVariant::Bind() const
 {
 	Graphics::pDeviceContext->PSSetShader(pixelShader.Get(), nullptr, 0u);
+}
+
+const std::vector<PixelShaderVariant::ResourceDefinition>& PixelShaderVariant::GetTexture2Ds() const
+{
+	return texture2Ds;
+}
+
+void PixelShaderVariant::InitTextureLayout(Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob)
+{
+	//Reflection
+	ComPtr<ID3D11ShaderReflection> pixelShaderReflection;
+	CHECK_DX_ERROR(D3DReflect(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, &pixelShaderReflection));
+
+	D3D11_SHADER_DESC desc;
+	pixelShaderReflection->GetDesc(&desc);
+
+	for (int i = 0; i < desc.BoundResources; i++)
+	{
+		D3D11_SHADER_INPUT_BIND_DESC resourceDesc;
+		pixelShaderReflection->GetResourceBindingDesc(i, &resourceDesc);
+		switch (resourceDesc.Type)
+		{
+		case D3D_SHADER_INPUT_TYPE::D3D_SIT_TEXTURE:
+			switch (resourceDesc.Dimension)
+			{
+			case D3D_SRV_DIMENSION::D3D_SRV_DIMENSION_TEXTURE2D:
+				texture2Ds.emplace_back(resourceDesc.Name, resourceDesc.BindPoint);
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+	}
 }

@@ -68,7 +68,7 @@ private:
 			ImGui::Text("NAME:");
 			ImGui::SameLine();
 			ImGui::InputText("##name", displayedName, 128u);
-			if (ImGui::IsItemDeactivatedAfterEdit)
+			if (ImGui::IsItemDeactivatedAfterEdit())
 			{
 				displayedEntity->name = displayedName;
 			}
@@ -154,8 +154,8 @@ private:
 			{
 				editorRSW->PopUp(EditorResourceSelectionWindow::Type::Mesh,
 					displayedRenderer->mesh,
-					[this](const ResourceBase* newResource) {
-						displayedRenderer->SetMesh(static_cast<const Mesh*>(newResource));
+					[this](ResourceBase* newResource) {
+						displayedRenderer->SetMesh(static_cast<Mesh*>(newResource));
 					});
 			}
 
@@ -172,11 +172,11 @@ private:
 				{
 					if (ImGui::RadioButton(displayedRenderer->GetMaterials()[i]->GetFileName().c_str(), true))
 					{
-						editorMEW->PopUp(const_cast<Material*>(displayedRenderer->materials[i]));
+						editorMEW->PopUp(displayedRenderer->materials[i]);
 						editorRSW->PopUp(EditorResourceSelectionWindow::Type::Material,
 							displayedRenderer->materials[i],
-							[this,i](const ResourceBase* newResource) {
-								displayedRenderer->SetMaterial(static_cast<const Material*>(newResource),i);
+							[this,i](ResourceBase* newResource) {
+								displayedRenderer->SetMaterial(static_cast<Material*>(newResource),i);
 							});
 					}						
 				}				

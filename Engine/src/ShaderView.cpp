@@ -7,7 +7,7 @@ ShaderView::ShaderView(const Shader* shader)
 	PS_ActiveVariant = shader->GetDefaultPixelShaderVariant();
 }
 
-bool ShaderView::ActivateMacro_VS(const std::string& macro)
+bool ShaderView::ActivateMacro_VS(std::string_view macro)
 {
 	for (int i = 0; i < shader->VS_Macros.size(); i++)
 	{
@@ -22,7 +22,7 @@ bool ShaderView::ActivateMacro_VS(const std::string& macro)
 	return false;
 }
 
-bool ShaderView::ActivateMacro_PS(const std::string& macro)
+bool ShaderView::ActivateMacro_PS(std::string_view macro)
 {
 	for (int i = 0; i < shader->PS_Macros.size(); i++)
 	{
@@ -37,7 +37,7 @@ bool ShaderView::ActivateMacro_PS(const std::string& macro)
 	return false;
 }
 
-bool ShaderView::DeactivateMacro_PS(const std::string& macro)
+bool ShaderView::DeactivateMacro_PS(std::string_view macro)
 {
 	for (int i = 0; i < shader->PS_Macros.size(); i++)
 	{
@@ -68,7 +68,7 @@ const PixelShaderVariant& ShaderView::GetActivePixelShader() const
 	return *PS_ActiveVariant;
 }
 
-bool ShaderView::DeactivateMacro_VS(const std::string& macro)
+bool ShaderView::DeactivateMacro_VS(std::string_view macro)
 {
 	for (int i = 0; i < shader->VS_Macros.size(); i++)
 	{

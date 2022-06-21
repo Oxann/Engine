@@ -13,11 +13,11 @@ class RendererManager;
 class Renderer final: public Component
 {
 	friend RendererManager;
-	friend class Phong_Material;
-	friend class Unlit_Material;
 	friend class Engine;
 	friend class Graphics;
 	friend class RenderQueueOutline;
+	friend Material;
+
 #ifdef EDITOR
 	friend class EditorEntityWindow;
 	friend class Editor;
@@ -27,14 +27,14 @@ public:
 	Renderer* Clone() override;
 
 	//If renderer already has a mesh this function also resets all materials to default.
-	void SetMesh(const Mesh* mesh);
+	void SetMesh(Mesh* mesh);
 
 	const Mesh* GetMesh() const;
 
 	//materialIndex = index of the sub mesh, first index is 0.
-	void SetMaterial(const Material* material, unsigned int materialIndex);
+	void SetMaterial(Material* material, unsigned int materialIndex);
 	
-	const std::vector<const Material*>& GetMaterials() const;
+	const std::vector<Material*>& GetMaterials() const;
 
 	//This functions are used by Render Queues. DON'T CALL FROM ELSEWEHERE.
 	//Binded material will be used.
@@ -57,17 +57,10 @@ public:
 private:
 	void Start();
 	void Update() override;
-	void UpdateDirectionalLightBuffer() const;
-	void UpdatePointLightBuffer() const;
 	void UpdateMatrices();
 	void TransposeMatrices();
 	void SetLightSpaceMatrix(const DirectX::XMMATRIX lightSpaceMatrix);
-public:
-	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	bool castShadows = true;
 private:
-	const Mesh* mesh = nullptr;
-	std::vector<const Material*> materials;
 
 	//All matrices are column order after renderer updated.
 	DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
@@ -76,11 +69,15 @@ private:
 	DirectX::XMMATRIX worldViewProjectionMatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX lightSpaceMatrix = DirectX::XMMatrixIdentity();
 
+	std::vector<Material*> materials;
+	Mesh* mesh = nullptr;
+	RendererManager* rendererManager;
+	
+	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+	bool castShadows = true;
 	bool isWorldMatrixUpdated = false;
 	bool isWorldViewMatrixUpdated = false;
 	bool isWorldViewProjectionMatrixUpdated = false;
 	bool isNormalMatrixUpdated = false;
-
-private:
-	RendererManager* rendererManager;
 };

@@ -9,13 +9,6 @@ class Texture : public ResourceBase, public D3DBase
 {
 	friend class Material;
 public:
-	enum Type
-	{
-		DIFFUSE,
-		SPECULAR,
-		NORMAL
-	};
-
 	enum FilterMode
 	{
 		POINT = D3D11_FILTER_MIN_MAG_MIP_POINT,
@@ -32,7 +25,7 @@ public:
 	//Also binds sampler.
 	void BindPipeline() const override {};
 
-	void BindPipeline(Texture::Type slot) const;
+	void BindPipeline(unsigned int slot) const;
 
 	void SetFilterMode(FilterMode fm);
 	

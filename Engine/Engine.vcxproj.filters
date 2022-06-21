@@ -7,10 +7,10 @@
     <FxCompile Include="src\Shaders\Unlit.ps">
       <Filter>Shaders\Unlit</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\Phong.ps">
+    <FxCompile Include="src\Shaders\Lit.ps">
       <Filter>Shaders\Phong</Filter>
     </FxCompile>
-    <FxCompile Include="src\Shaders\Phong.vs">
+    <FxCompile Include="src\Shaders\Lit.vs">
       <Filter>Shaders\Phong</Filter>
     </FxCompile>
   </ItemGroup>
@@ -78,12 +78,6 @@
     </ClCompile>
     <ClCompile Include="src\Scene.cpp">
       <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Phong_Material.cpp">
-      <Filter>Graphics\Material System</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Unlit_Material.cpp">
-      <Filter>Graphics\Material System</Filter>
     </ClCompile>
     <ClCompile Include="src\Editor.cpp">
       <Filter>Editor</Filter>
@@ -219,12 +213,6 @@
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Material.h">
-      <Filter>Graphics\Material System</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Phong_Material.h">
-      <Filter>Graphics\Material System</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Unlit_Material.h">
       <Filter>Graphics\Material System</Filter>
     </ClInclude>
     <ClInclude Include="src\EditorMetricsWindow.h">

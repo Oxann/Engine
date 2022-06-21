@@ -4,14 +4,22 @@
 
 #include <filesystem>
 #include <sstream>
+#include <d3dcompiler.h>
+#include <d3d11.h>
+#include <wrl.h>
 
 #include "Shader.h"
 #include "Log.h"
 #include "EngineAssert.h"
 #include "VertexBuffer.h"
+#include "ConstantBuffer.h"
 
 
 using namespace Microsoft::WRL;
+
+Shader::VertexShaderPerFrameBuffer Shader::VertexShaderPerFrameBuffer::buffer;
+Shader::VertexShaderPerObjectBuffer Shader::VertexShaderPerObjectBuffer::buffer;
+Shader::VertexShaderShadowBuffer Shader::VertexShaderShadowBuffer::buffer;
 
 Shader::Shader(const std::string& name,const std::filesystem::path& VS_Path, const std::filesystem::path& PS_Path)
 	:name(name),
@@ -40,13 +48,16 @@ Shader::Shader(const std::string& name,const std::filesystem::path& VS_Path, con
 
 	PS_Source = PS_tempSource.str();
 
-	//Reserving memory variants.
+	//Reserving memory for variants.
 	VS_Variants.reserve(VS_Macros.size() * (VS_Macros.size() - 1 ? VS_Macros.size() - 1 : 1));
 	PS_Variants.reserve(PS_Macros.size() * (PS_Macros.size() - 1 ? PS_Macros.size() - 1 : 1));
 
 	//Compiling default shaders without any macro definiton.
 	VS_Default = { CompileVS({}) };
-	PS_Default = { CompilePS({}) };
+
+	Microsoft::WRL::ComPtr<ID3DBlob> psBlob = CompilePS({});
+	PS_Default = { psBlob };
+	InitMaterialBufferAndTextures(psBlob);
 }
 
 const std::vector<std::string>& Shader::GetVertexShaderMacros() const
@@ -96,6 +107,11 @@ VertexShaderVariant* const Shader::GetDefaultVertexShaderVariant() const
 	return &VS_Default;
 }
 
+bool Shader::HasMacro(std::string_view macro) const
+{
+	return std::ranges::find(VS_Macros, macro) != VS_Macros.end();
+}
+
 PixelShaderVariant* const Shader::GetDefaultPixelShaderVariant() const
 {
 	return &PS_Default;
@@ -122,6 +138,18 @@ VS_ConstantBuffer<Shader::VertexShaderPerFrameBuffer>* const Shader::GetVertexSh
 																					true);
 
 	return &perFrameBuffer;
+}
+
+VS_ConstantBuffer<Shader::VertexShaderShadowBuffer>* const Shader::GetVertexShaderShadowBuffer()
+{
+	static VS_ConstantBuffer<Shader::VertexShaderShadowBuffer> shadowBuffer(&Shader::VertexShaderShadowBuffer::buffer,
+		1,
+		Shader::VertexShaderShadowBuffer::slot,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true);
+
+	return &shadowBuffer;
 }
 
 void Shader::ExtractMacrosFromSource(std::stringstream& source, std::vector<std::string>& macros)
@@ -214,4 +242,78 @@ Microsoft::WRL::ComPtr<ID3DBlob> Shader::CompilePS(const std::set<unsigned char>
 	ENGINEASSERT(errorMessages == nullptr, (char*)errorMessages->GetBufferPointer())
 
 	return blob;
+}
+
+bool Shader::HasMaterial() const
+{
+	return materialBuffer != nullptr;
+}
+
+unsigned int Shader::GetMaterialBufferSize() const
+{
+	return materialBuffer->GetSize();
+}
+
+const std::vector<Shader::MaterialBufferVariableDefinition>& Shader::GetFloat1Defs() const
+{
+	return float1s;
+}
+
+const std::vector<Shader::MaterialBufferVariableDefinition>& Shader::GetFloat2Defs() const
+{
+	return float2s;
+}
+
+const std::vector<Shader::MaterialBufferVariableDefinition>& Shader::GetFloat3Defs() const
+{
+	return float3s;
+}
+
+const std::vector<Shader::MaterialBufferVariableDefinition>& Shader::GetFloat4Defs() const
+{
+	return float4s;
+}
+
+void Shader::InitMaterialBufferAndTextures(Microsoft::WRL::ComPtr<ID3DBlob> pixelShaderBlob)
+{
+	//Reflection
+	ComPtr<ID3D11ShaderReflection> pixelShaderReflection;
+	CHECK_DX_ERROR(D3DReflect(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), IID_ID3D11ShaderReflection, &pixelShaderReflection));
+	
+	ID3D11ShaderReflectionConstantBuffer* materialBufferReflection = pixelShaderReflection->GetConstantBufferByName(materialBufferName.c_str());
+	D3D11_SHADER_BUFFER_DESC materialBufferDesc;
+	HRESULT hasMaterial = materialBufferReflection->GetDesc(&materialBufferDesc);
+
+	if (hasMaterial == E_FAIL)
+		return;
+
+	//Allocating the actual buffer.
+	materialBuffer = new PS_ConstantBuffer<unsigned char>(nullptr, materialBufferDesc.Size, materialBufferSlot, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE, false);
+
+	for (int i = 0; i < materialBufferDesc.Variables; i++)
+	{
+		ID3D11ShaderReflectionVariable* variable = materialBufferReflection->GetVariableByIndex(i);
+
+		D3D11_SHADER_VARIABLE_DESC variableDesc;
+		variable->GetDesc(&variableDesc);
+
+		D3D11_SHADER_TYPE_DESC typeDesc;
+		variable->GetType()->GetDesc(&typeDesc);
+
+		switch (typeDesc.Type)
+		{
+		case D3D_SVT_FLOAT:
+			if (variableDesc.Size == 4)
+				float1s.emplace_back(variableDesc.Name, variableDesc.StartOffset);
+			else if (variableDesc.Size == 8)
+				float2s.emplace_back(variableDesc.Name, variableDesc.StartOffset);
+			else if (variableDesc.Size == 12)
+				float3s.emplace_back(variableDesc.Name, variableDesc.StartOffset);
+			else if (variableDesc.Size == 16)
+				float4s.emplace_back(variableDesc.Name, variableDesc.StartOffset);
+			break;
+		default:
+			break;
+		}
+	}
 }

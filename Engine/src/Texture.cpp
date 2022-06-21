@@ -80,7 +80,7 @@ bool Texture::HasAlpha() const
 	return nChannels == 4;
 }
 
-void Texture::BindPipeline(Type slot) const
+void Texture::BindPipeline(unsigned int slot) const
 {
 	GetDeviceContext()->PSSetShaderResources(slot, 1u, pSRV.GetAddressOf());
 	GetDeviceContext()->PSSetSamplers(slot, 1u, sampler.GetAddressOf());
@@ -105,8 +105,7 @@ Texture::FilterMode Texture::GetFilterMode() const
 
 void Texture::SetAnisotropy(unsigned int value)
 {
-	std::clamp(value, 1u, 16u);
-	anisotropy = value;
+	anisotropy = std::clamp(value, 1u, 16u);
 
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	sampler->GetDesc(&samplerDesc);

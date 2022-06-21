@@ -4,7 +4,6 @@
 #include "Texture.h"
 #include "Model.h"
 #include "Shader.h"
-#include "Unlit_Material.h"
 #include "Engine.h"
 
 using namespace std::filesystem;
@@ -17,6 +16,7 @@ void Resources::Init()
 	auto time1 = std::chrono::steady_clock::now();
 
 	LoadShaders();
+	InitDefaultMaterials();
 
 	std::vector<path> texturesToLoad;
 	std::vector<path> modelsToLoad;
@@ -51,15 +51,6 @@ void Resources::Init()
 
 	auto time2 = std::chrono::steady_clock::now();
 	ENGINE_LOG(ENGINE_INFO, std::to_string(std::chrono::duration<float>(time2 - time1).count()))
-
-	//Some default resources
-#ifdef EDITOR
-	Material* wireframe = Materials.insert({ "$Default\\wireframeMaterial", std::make_unique<Unlit_Material>("$Default\\wireframeMaterial") }).first->second.get();
-	static_cast<Unlit_Material*>(wireframe)->SetColor({ 0.0f, 0.6f, 0.0f, 1.0f });
-
-	Material* outline  = Materials.insert({ "$Default\\outlineMaterial", std::make_unique<Unlit_Material>("$Default\\outlineMaterial") }).first->second.get();
-	static_cast<Unlit_Material*>(outline)->SetColor({ 1.0f, 0.0f, 0.0f, 1.0f });
-#endif
 
 	ENGINE_LOG(ENGINE_INFO, "Resources successfully loaded.");
 }
@@ -112,6 +103,25 @@ void Resources::LoadTextures(const std::vector<path>& texturePaths)
 
 	auto texturesLoadEnd = std::chrono::steady_clock::now();
 	ENGINE_LOG(ENGINE_INFO, "Textures loaded in " + std::to_string(std::chrono::duration<float>(texturesLoadEnd - texturesLoadBegin).count()) + " seconds.")
+}
+
+void Resources::InitDefaultMaterials()
+{
+	Shader::GetVertexShaderPerFrameBuffer();
+	Shader::GetVertexShaderPerObjectBuffer();
+
+	Shader* unlitShader = FindShader("Unlit");
+	Shader* litShader = FindShader("Lit");
+
+	Material* wireframe = Materials.insert({ "$Default\\Wireframe", std::make_unique<Material>("Wireframe", unlitShader) }).first->second.get();
+	wireframe->SetFloat4("color", { 0.0f, 0.6f, 0.0f, 1.0f });
+
+	auto x = wireframe->GetFloat4("color");
+
+	Material* outline = Materials.insert({ "$Default\\Outline", std::make_unique<Material>("Outline", unlitShader) }).first->second.get();
+	outline->SetFloat4("color", { 1.0f, 0.0f, 0.0f, 1.0f });
+
+	Material* lit = Materials.insert({ "$Default\\Lit", std::make_unique<Material>("Lit", litShader) }).first->second.get();
 }
 
 Texture* Resources::FindTexture(const std::string& file)

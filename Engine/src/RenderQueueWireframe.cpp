@@ -58,7 +58,7 @@ void RenderQueueWireframe::Render()
 
 	for (const auto& renderItem : queue)
 	{
-		static Material* wireframeMaterial = Resources::FindMaterial("$Default\\wireframeMaterial");
+		static Material* wireframeMaterial = Resources::FindMaterial("$Default\\Wireframe");
 		renderItem.renderer->Render(renderItem.subMeshIndex, wireframeMaterial);
 
 		//Counting rendered vertices.

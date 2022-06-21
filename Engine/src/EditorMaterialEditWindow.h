@@ -1,7 +1,5 @@
 #pragma once
 #include "Editor.h"
-#include "Phong_Material.h"
-#include "Unlit_Material.h"
 #include "EditorTextureEditWindow.h"
 
 #include <typeindex>
@@ -15,9 +13,7 @@ public:
 		isActive = false;
 		editorRSW = Editor::GetWindow<EditorResourceSelectionWindow>();
 		editorTEW = Editor::GetWindow<EditorTextureEditWindow>();
-		
-		materialEdits.insert({typeid(Phong_Material),&EditorMaterialEditWindow::EditPhong});
-		materialEdits.insert({typeid(Unlit_Material),&EditorMaterialEditWindow::EditUnlit});
+		name = "Material";
 	}
 
 	void Update() override
@@ -42,7 +38,108 @@ public:
 			ImGui::EndCombo();
 		}
 
-		(this->*(this->materialEdit))(material);
+		char materialVarDefLabel[4] = {0};
+		materialVarDefLabel[0] = '#';
+		materialVarDefLabel[1] = '#';
+		materialVarDefLabel[2] = 1;
+
+		for (const auto& float1Def : material->shaderView.shader->GetFloat1Defs())
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text(float1Def.name.c_str());
+			ImGui::SameLine();
+
+			float currenValue = material->GetFloat(float1Def.name);
+			if (ImGui::DragFloat(materialVarDefLabel, &currenValue, 0.001f))
+			{
+				material->SetFloat(float1Def.name, currenValue);
+			}
+
+			materialVarDefLabel[2]++;
+		}
+
+		for (const auto& float2Def : material->shaderView.shader->GetFloat2Defs())
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text(float2Def.name.c_str());
+			ImGui::SameLine();
+
+			DirectX::XMFLOAT2 currenValue = material->GetFloat2(float2Def.name);
+			if (ImGui::DragFloat2(materialVarDefLabel, reinterpret_cast<float*>(&currenValue), 0.001f))
+			{
+				material->SetFloat2(float2Def.name, currenValue);
+			}
+
+			materialVarDefLabel[2]++;
+		}
+	
+		for (const auto& float3Def : material->shaderView.shader->GetFloat3Defs())
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text(float3Def.name.c_str());
+			ImGui::SameLine();
+
+			DirectX::XMFLOAT3 currenValue = material->GetFloat3(float3Def.name);
+			if (ImGui::DragFloat3(materialVarDefLabel, reinterpret_cast<float*>(&currenValue), 0.001f))
+			{
+				material->SetFloat3(float3Def.name, currenValue);
+			}
+
+			materialVarDefLabel[2]++;
+		}
+	
+		for (const auto& float4Def : material->shaderView.shader->GetFloat4Defs())
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text(float4Def.name.c_str());
+			ImGui::SameLine();
+
+			DirectX::XMFLOAT4 currenValue = material->GetFloat4(float4Def.name);
+			if (ImGui::ColorEdit4(materialVarDefLabel, reinterpret_cast<float*>(&currenValue)))
+			{
+				material->SetFloat4(float4Def.name, currenValue);
+			}
+
+			materialVarDefLabel[2]++;
+		}
+
+		for (const auto& texture2DDef : material->shaderView.GetActivePixelShader().GetTexture2Ds())
+		{
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text(texture2DDef.name.c_str());
+			ImGui::SameLine();
+
+			Texture* texture = material->GetTexture(texture2DDef.name);
+			
+			if (ImGui::RadioButton(materialVarDefLabel, true))
+			{
+				editorRSW->PopUp(EditorResourceSelectionWindow::Type::Texture,
+					texture,
+					[this, texture2DDef](ResourceBase* newResource) {
+						material->SetTexture(texture2DDef.name, static_cast<Texture*>(newResource));
+					});
+
+				if (texture)
+					editorTEW->PopUp(texture);
+			}
+
+			if (texture)
+			{
+				ImGui::SameLine();
+				ImGui::Text(texture->GetFileName().c_str());
+				ImGui::AlignTextToFramePadding();
+			}
+			else
+			{
+				ImGui::SameLine();
+				ImGui::Text("NONE");
+				ImGui::AlignTextToFramePadding();
+			}
+
+			materialVarDefLabel[2]++;
+		}
+
+		ShowMacros();
 	}
 
 	void PopUp(Material* material)
@@ -50,7 +147,6 @@ public:
 		isActive = true;
 		name = material->GetFileName() + "###MaterialEdit";
 		this->material = material;
-		materialEdit = materialEdits[typeid(*material)];
 
 		switch (material->mode)
 		{
@@ -66,124 +162,31 @@ public:
 	}
 
 private:
-	void EditPhong(Material* material)
+	void ShowMacros()
 	{
-		Phong_Material* phongMaterial = static_cast<Phong_Material*>(material);
-
-		//Diffuse color edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Diffuse Color ");
-		ImGui::SameLine();
-		ImGui::ColorEdit4("##diffusecolor", reinterpret_cast<float*>(&phongMaterial->diffuseColor));
-
-		//Specular color edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Specular Color ");
-		ImGui::SameLine();
-		ImGui::ColorEdit4("##specularColor", reinterpret_cast<float*>(&phongMaterial->specularColor));
-
-		//Shininess edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Shininess ");
-		ImGui::SameLine();
-		ImGui::SliderFloat("##shiniess", &phongMaterial->Shininess, 0.0f, 1.0f);
-
-		//Shininess strength edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Shininess Strength");
-		ImGui::SameLine();
-		ImGui::SliderFloat("##shiniessStrength", &phongMaterial->ShininessStrength, 0.0f, 1.0f);
-
-		//Diffuse map edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Diffuse Map -> %s", phongMaterial->diffuseMap ? phongMaterial->diffuseMap->GetFileName().c_str() : "No Texture.");
-		ImGui::SameLine();
-		if (ImGui::RadioButton("##diffuseMap", true))
+		if (ImGui::CollapsingHeader("SHADER MACROS"))
 		{
-			editorRSW->PopUp(EditorResourceSelectionWindow::Type::Texture,
-				phongMaterial->diffuseMap,
-				[phongMaterial](const ResourceBase* newResource) {
-					phongMaterial->SetDiffuseMap(static_cast<const Texture*>(newResource));
-				});
-			
-			if(phongMaterial->diffuseMap)
-				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->diffuseMap));
-		}
+			const auto& macros = material->shaderView.shader->GetPixelShaderMacros();
+			for (int i = 0; i < macros.size(); i++)
+			{
+				bool isMacroActive = material->shaderView.PS_ActiveMacros.find(i) != material->shaderView.PS_ActiveMacros.end();
 
-		//Specular map edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Specular Map -> %s", phongMaterial->specularMap ? phongMaterial->specularMap->GetFileName().c_str() : "No texture.");
-		ImGui::SameLine();
-		if (ImGui::RadioButton("##specularMap", true))
-		{
-			editorRSW->PopUp(EditorResourceSelectionWindow::Type::Texture,
-				phongMaterial->specularMap,
-				[phongMaterial](const ResourceBase* newResource) {
-					phongMaterial->SetSpecularMap(static_cast<const Texture*>(newResource));
-				});
-			
-			if(phongMaterial->specularMap)
-				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->specularMap));
+				if (ImGui::RadioButton(macros[i].c_str(), isMacroActive))
+				{
+					if (isMacroActive)
+						material->DeactivateMacro(macros[i]);
+					else
+						material->ActivateMacro(macros[i]);
+				}
+			}
 		}
-
-		//Normal map edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Normal Map -> %s", phongMaterial->normalMap ? phongMaterial->normalMap->GetFileName().c_str() : "No texture.");
-		ImGui::SameLine();
-		if (ImGui::RadioButton("##normalMap", true))
-		{
-			editorRSW->PopUp(EditorResourceSelectionWindow::Type::Texture,
-				phongMaterial->normalMap,
-				[phongMaterial](const ResourceBase* newResource) {
-					phongMaterial->SetNormalMap(static_cast<const Texture*>(newResource));
-				});
-			
-			if(phongMaterial->normalMap)
-				editorTEW->PopUp(const_cast<Texture*>(phongMaterial->normalMap));
-		}
-
-		//Shadows
-		bool receiveShadows = phongMaterial->receiveShadows;
-		ImGui::AlignTextToFramePadding();
-		if(ImGui::Checkbox("Receive Shadows##receiveShadows", &receiveShadows))
-			phongMaterial->SetReceiveShadows(receiveShadows);
 	}
 
-	void EditUnlit(Material* material)
-	{
-		Unlit_Material* unlitMaterial = static_cast<Unlit_Material*>(material);
-
-		//Diffuse color edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Color ");
-		ImGui::SameLine();
-		ImGui::ColorEdit4("##color", reinterpret_cast<float*>(&unlitMaterial->color));
-
-
-		//Texture edit
-		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Texture -> %s", unlitMaterial->texture ? unlitMaterial->texture->GetFileName().c_str() : "No Texture.");
-		ImGui::SameLine();
-		if (ImGui::RadioButton("##texture", true))
-		{
-			editorRSW->PopUp(EditorResourceSelectionWindow::Type::Texture,
-				unlitMaterial->texture,
-				[unlitMaterial](const ResourceBase* newResource) {
-					unlitMaterial->SetTexture(static_cast<const Texture*>(newResource));
-				});
-
-			if(unlitMaterial->texture)
-				editorTEW->PopUp(const_cast<Texture*>(unlitMaterial->texture));
-		}
-	}
 private:
 
 	Material* material;
 	EditorResourceSelectionWindow* editorRSW;
 	EditorTextureEditWindow* editorTEW;
 	std::string opacityName;
-
-	std::unordered_map <std::type_index, void(EditorMaterialEditWindow::*)(Material*)> materialEdits;
-	void(EditorMaterialEditWindow::* materialEdit)(Material*) = nullptr;
 };
 

@@ -23,6 +23,8 @@ private:
 	void Update();
 	void UpdateShadowMaps();
 	void UpdateVertexShaderPerFrameBuffer();
+	void UpdateDirectionalLights();
+	void UpdatePointLights();
 public:
 	unsigned long long meshCount;
 	unsigned long long vertexCount;
@@ -45,4 +47,54 @@ private:
 
 	//Skybox
 	Skybox* skybox = nullptr;
+
+private:
+	struct DirectionalLights_TO_GPU
+	{
+		inline static unsigned int slot = 1u;
+		inline static unsigned int maxCount = 4u;
+
+		alignas(16) unsigned int Count;
+		
+		struct PerLightInfo
+		{
+			float depthBias;
+			DirectX::XMFLOAT3 light; //color * intensity
+			alignas(16) DirectX::XMFLOAT3 direction;
+		};
+		PerLightInfo lights[4];
+	} directionalLights_TO_GPU;
+
+	PS_ConstantBuffer<DirectionalLights_TO_GPU> directionalLightsBuffer = {
+		nullptr,
+		1u,
+		1u,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true
+	};
+
+
+	struct PointLights_TO_GPU
+	{
+		unsigned int Count;
+		float Constant;
+		float Linear;
+		float Quadratic;
+		struct PerLightInfo
+		{
+			alignas(16) DirectX::XMFLOAT3 light; //color * intensity
+			alignas(16) DirectX::XMFLOAT3 position;
+		};
+		PerLightInfo lights[4];
+	} pointLights_TO_GPU;
+
+	PS_ConstantBuffer<PointLights_TO_GPU> pointLightsBuffer = {
+		&pointLights_TO_GPU,
+		1u,
+		2u,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true
+	};
 };

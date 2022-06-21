@@ -29,7 +29,7 @@ void RendererManager::Update()
 
 	//Creating frustum.
 	DirectX::BoundingFrustum::CreateFromMatrix(frustum,Graphics::GetProjectionMatrix());
-
+	
 	for (const auto& renderer : renderers)
 	{
 		renderer->Update();
@@ -42,8 +42,11 @@ void RendererManager::Update()
 	Graphics::pDeviceContext->OMSetRenderTargets(1u, Graphics::pView.GetAddressOf(), Graphics::pDepthStencil.Get());
 	Graphics::pDeviceContext->RSSetViewports(1, &Graphics::viewport);
 
+	UpdateDirectionalLights();
 	if (directionalLights.size() > 0)
 		directionalLights[0]->shadowMap.BindAsShaderResource();
+
+	UpdatePointLights();
 
 	//Render queues
 	renderQueueOpaque.Render();
@@ -74,17 +77,15 @@ void RendererManager::UpdateShadowMaps()
 	static ShaderView shadowMapShader(Resources::FindShader("ShadowCast"));
 	shadowMapShader.Bind();
 	Graphics::pDeviceContext->OMSetRenderTargets(0u, nullptr, nullptr);
-
+	
 	struct VS_CBUFFER_SLOT0
 	{
 		DirectX::XMMATRIX MVP = DirectX::XMMatrixIdentity();
 	};
 
 	static VS_CBUFFER_SLOT0 vs_cbuffer_slot0_data;
-	static VS_ConstantBuffer<VS_CBUFFER_SLOT0> vs_cbuffer_slot0(&vs_cbuffer_slot0_data,1,0,D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE);
+	static VS_ConstantBuffer<VS_CBUFFER_SLOT0> vs_cbuffer_slot0(&vs_cbuffer_slot0_data,1,0,D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
 	static DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixOrthographicLH(64.0f, 64.0f, -50.0f, 50.0f);
-
-	vs_cbuffer_slot0.BindPipeline();
 
 	for (int i = 0; i < directionalLights.size(); i++)
 	{
@@ -115,7 +116,55 @@ void RendererManager::UpdateShadowMaps()
 
 void RendererManager::UpdateVertexShaderPerFrameBuffer()
 {
-	Shader::VertexShaderPerFrameBuffer::buffer.view = Graphics::GetViewMatrix();
-	Shader::VertexShaderPerFrameBuffer::buffer.projection = Graphics::GetProjectionMatrix();
+	Shader::VertexShaderPerFrameBuffer::buffer.view = DirectX::XMMatrixTranspose(Graphics::GetViewMatrix());
+	Shader::VertexShaderPerFrameBuffer::buffer.projection = DirectX::XMMatrixTranspose(Graphics::GetProjectionMatrix());
 	Shader::GetVertexShaderPerFrameBuffer()->ChangeData(&Shader::VertexShaderPerFrameBuffer::buffer);
+}
+
+void RendererManager::UpdateDirectionalLights()
+{
+	directionalLights_TO_GPU.Count = directionalLights.size();
+
+	for (unsigned int i = 0; i < DirectionalLights_TO_GPU::maxCount && i < directionalLights_TO_GPU.Count; i++)
+	{
+		const DirectionalLight& currentLight = *directionalLights[i];
+		directionalLights_TO_GPU.lights[i].depthBias = currentLight.depthBias;
+
+		DirectX::XMMATRIX lightModelView = DirectX::XMMatrixMultiply(
+			DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion()), Graphics::GetViewMatrix());
+
+		DirectX::XMStoreFloat3(&directionalLights_TO_GPU.lights[i].direction, DirectX::XMVector3Normalize(lightModelView.r[2]));
+
+		directionalLights_TO_GPU.lights[i].light = { currentLight.color.x * currentLight.intensity,
+									currentLight.color.y * currentLight.intensity,
+									currentLight.color.z * currentLight.intensity };
+	}
+
+	directionalLightsBuffer.ChangeData(&directionalLights_TO_GPU);
+}
+
+void RendererManager::UpdatePointLights()
+{
+	pointLights_TO_GPU.Count = pointLights.size();
+	pointLights_TO_GPU.Constant = PointLight::constant;
+	pointLights_TO_GPU.Linear = PointLight::linear;
+	pointLights_TO_GPU.Quadratic = PointLight::quadratic;
+
+	for (unsigned int i = 0; i < PointLight::MaxCount && i < pointLights_TO_GPU.Count; i++)
+	{
+		const PointLight& currentLight = *pointLights[i];
+		DirectX::XMFLOAT3 worldPos = currentLight.GetEntity()->GetTransform()->GetWorldPosition();
+
+		//Light calculations in view space
+		DirectX::XMVECTOR pos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&worldPos), Graphics::GetViewMatrix());
+		DirectX::XMStoreFloat3(&pointLights_TO_GPU.lights[i].position, pos);
+
+		pointLights_TO_GPU.lights[i].light = {
+			currentLight.color.x * currentLight.intensity,
+			currentLight.color.y * currentLight.intensity,
+			currentLight.color.z * currentLight.intensity
+		};
+	}
+
+	pointLightsBuffer.ChangeData(&pointLights_TO_GPU);
 }

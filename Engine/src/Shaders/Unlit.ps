@@ -24,7 +24,6 @@ float4 main() : SV_TARGET
 {
 #ifdef COLORTEXTURE
     return colorTexture.Sample(colorTextureSampler, texCoord) * color;
-#else
-    return color;
 #endif
+    return color;
 }

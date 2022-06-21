@@ -4,7 +4,6 @@
 #include "Entity.h"
 #include "EngineException.h"
 #include "Resources.h"
-#include "Phong_Material.h"
 #include "Renderer.h"
 
 #include <filesystem>
@@ -200,50 +199,57 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 
 			if (isMaterialAlreadyExist == materials.end())
 			{	
-				std::unique_ptr<Phong_Material> newMaterial = std::make_unique<Phong_Material>(mat->GetName().C_Str());
+				static Shader* litShader = Resources::FindShader("Lit");
+				std::unique_ptr<Material> newMaterial = std::make_unique<Material>(mat->GetName().C_Str(), litShader);
 				
 				////////// DIFFUSE //////////
 				aiColor4D diffuseColor;
 				if(mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn::aiReturn_SUCCESS)
-					newMaterial->SetDiffuseColor({ diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a });
+					newMaterial->SetFloat4("matDiffuseColor", {diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a});
 
 				//if the material has diffuse map we set it
 				if (mat->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE))
 				{
+					newMaterial->ActivateMacro("DIFFUSETEXTURE");
+
 					aiString temp;
 					mat->GetTexture(aiTextureType::aiTextureType_DIFFUSE, 0u, &temp);
-					newMaterial->SetDiffuseMap(GetTextureInParentFolder(temp.C_Str()));
+					newMaterial->SetTexture("diffuseTexture", GetTextureInParentFolder(temp.C_Str()));
 				}
 				/////////////////////////////
 
 				////////// SPECULAR //////////
 				aiColor4D specularColor;
 				if(mat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor) == aiReturn::aiReturn_SUCCESS)
-					newMaterial->SetSpecularColor({ specularColor.r, specularColor.g, specularColor.b, specularColor.a });
+					newMaterial->SetFloat4("matSpecularColor", {specularColor.r, specularColor.g, specularColor.b, specularColor.a});
 
 				float shininess;
 				if(mat->Get(AI_MATKEY_SHININESS, shininess) == aiReturn::aiReturn_SUCCESS)
-					newMaterial->SetShininess(std::log2f(shininess) / 13.0f);
+					newMaterial->SetFloat("matShininess", std::log2f(shininess) / 13.0f);
 
 				float shininessStrength;				
 				if(mat->Get(AI_MATKEY_SHININESS_STRENGTH, shininessStrength) == aiReturn::aiReturn_SUCCESS)
-					newMaterial->SetShininessStrength(shininessStrength);
+					newMaterial->SetFloat("matShininessStrength", shininessStrength);
 
 				//if the material has speculer map we set it
 				if (mat->GetTextureCount(aiTextureType::aiTextureType_SPECULAR))
 				{
+					newMaterial->ActivateMacro("SPECULARTEXTURE");
+
 					aiString temp;
 					mat->GetTexture(aiTextureType::aiTextureType_SPECULAR, 0u, &temp);
-					newMaterial->SetSpecularMap(GetTextureInParentFolder(temp.C_Str()));
+					newMaterial->SetTexture("specularTexture", GetTextureInParentFolder(temp.C_Str()));
 				}
 				//////////////////////////////
 
 				//Normal map
 				if (mat->GetTextureCount(aiTextureType::aiTextureType_NORMALS))
 				{
+					newMaterial->ActivateMacro("NORMALTEXTURE");
+
 					aiString temp;
 					mat->GetTexture(aiTextureType::aiTextureType_NORMALS, 0u, &temp);
-					newMaterial->SetNormalMap(GetTextureInParentFolder(temp.C_Str()));
+					newMaterial->SetTexture("normalTexture", GetTextureInParentFolder(temp.C_Str()));
 				}
 
 				const auto& addNewMaterial = materials.insert({ mat->GetName().C_Str(),std::move(newMaterial) });

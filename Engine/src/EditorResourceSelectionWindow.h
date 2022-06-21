@@ -24,12 +24,6 @@ public:
 		switch (type)
 		{
 		case EditorResourceSelectionWindow::Type::Texture:
-			if (ImGui::Selectable("null###nullTexture",!currentResource))
-			{
-				onResourceChange(nullptr);
-				currentResource = nullptr;
-			}
-				
 			for (const auto& texture : Resources::Textures)
 			{
 				bool isSelected = texture.second.get() == currentResource;
@@ -73,7 +67,7 @@ public:
 		}
 	}
 
-	void PopUp(Type type,const ResourceBase* currentResource, std::function<void(const ResourceBase*)> onResourceChange)
+	void PopUp(Type type,ResourceBase* currentResource, std::function<void(ResourceBase*)> onResourceChange)
 	{
 		isActive = true;
 
@@ -98,6 +92,6 @@ public:
 	}
 private:
 	Type type;
-	const ResourceBase* currentResource;
-	std::function<void(const ResourceBase*)> onResourceChange;
+	ResourceBase* currentResource;
+	std::function<void(ResourceBase*)> onResourceChange;
 };

@@ -11,9 +11,11 @@ public:
 		:size(size),
 		slot(slot)
 	{
-		ENGINEASSERT(slot >= 0, "Constant buffer slot cannt be less than 0.");
+		ENGINEASSERT(slot >= 0, "Constant buffer slot cannot be less than 0.");
 		ENGINEASSERT(size >= 1, "Constant Buffer size cannot be less than 1.");
-		ENGINEASSERT(data != nullptr, "Constant Buffer Data cannot be null pointer.");
+
+		if(usage == D3D11_USAGE::D3D11_USAGE_IMMUTABLE)
+			ENGINEASSERT(data != nullptr, "Immutable buffer's initial data cannot be null.");
 
 		D3D11_BUFFER_DESC cbdesc;
 		cbdesc.ByteWidth = sizeof(DataType) * size;
@@ -22,9 +24,17 @@ public:
 		cbdesc.CPUAccessFlags = cpuAccess;
 		cbdesc.MiscFlags = 0u;
 		cbdesc.StructureByteStride = sizeof(DataType);
-		D3D11_SUBRESOURCE_DATA cbdata;
-		cbdata.pSysMem = data;
-		CHECK_DX_ERROR(GetDevice()->CreateBuffer(&cbdesc, &cbdata, &buffer));
+
+		if (data == nullptr)
+		{
+			CHECK_DX_ERROR(GetDevice()->CreateBuffer(&cbdesc, NULL, &buffer));
+		}
+		else
+		{
+			D3D11_SUBRESOURCE_DATA constantBufferData;
+			constantBufferData.pSysMem = data;
+			CHECK_DX_ERROR(GetDevice()->CreateBuffer(&cbdesc, &constantBufferData, &buffer));
+		}
 	}
 
 	void ChangeData(const DataType* data)
@@ -36,6 +46,9 @@ public:
 	}
 
 	void BindPipeline() const = 0;
+
+	unsigned int GetSize() { return size; }
+
 protected:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
 	UINT size;

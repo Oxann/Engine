@@ -6,13 +6,18 @@
 class ShaderView
 {
 	friend class Material;
+
+#ifdef EDITOR
+	friend class EditorMaterialEditWindow;
+#endif
+
 public:
 	ShaderView(const Shader* shader);
 
-	bool ActivateMacro_VS(const std::string& macro);
-	bool ActivateMacro_PS(const std::string& macro);
-	bool DeactivateMacro_VS(const std::string& macro);
-	bool DeactivateMacro_PS(const std::string& macro);
+	bool ActivateMacro_VS(std::string_view macro);
+	bool ActivateMacro_PS(std::string_view macro);
+	bool DeactivateMacro_VS(std::string_view macro);
+	bool DeactivateMacro_PS(std::string_view macro);
  
 	void Bind() const;
 

@@ -5,6 +5,8 @@
 // SHADOW
 // VARIANTS END
 
+#include "TransformBuffers.hlsli"
+
 struct OUT
 {
     float3 ViewSpacePosition : VIEWSPACEPOSITION;
@@ -41,22 +43,12 @@ struct IN
 #endif   
 };
 
-cbuffer Transform : register(b0)
-{
-    matrix modelView;
-    matrix normalMatrix;
-    matrix MVP;
-#ifdef SHADOW
-    matrix lightSpaceMatrix;
-#endif
-};
-
 
 OUT main( IN in_ )
 {
     OUT Out;
     
-    Out.Position = mul(float4(in_.position, 1.0f), MVP);
+    Out.Position = mul(float4(in_.position, 1.0f), modelViewProjection);
     Out.ViewSpacePosition = mul(float4(in_.position, 1.0f), modelView).xyz;
     Out.ViewSpaceNormal = normalize(mul(in_.normal, (float3x3) normalMatrix));
 
@@ -69,7 +61,7 @@ OUT main( IN in_ )
     Out.Bitangent = normalize(mul(in_.Bitangent, (float3x3)normalMatrix));
 #endif
 
-#ifdef SHADOW    
+#ifdef SHADOW
     Out.lightSpacePosition = mul(float4(in_.position, 1.0f), lightSpaceMatrix);
 #endif
     return Out;
