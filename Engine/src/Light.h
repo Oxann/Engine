@@ -1,7 +1,8 @@
 #pragma once
-#include "ConstantBuffer.h"
 #include "Component.h"
 #include "ShadowMap.h"
+#include <DirectXMath.h>
+#include <utility>
 
 class DirectionalLight final : public Component
 {
@@ -10,6 +11,9 @@ class DirectionalLight final : public Component
 public:
 	void Start() override;
 	DirectionalLight* Clone() override;
+	void SetShadowResolution(int width, int height);
+	int GetShadowResolutionWidth() const;
+	int GetShadowResolutionHeight() const;
 public:
 	DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
 	float intensity = 1.0f;
@@ -17,8 +21,9 @@ public:
 	bool shadows = false;
 public:
 	static constexpr unsigned int MaxCount = 4u;
+	inline static std::pair<int,int> defaultShadowMapResolution = std::make_pair<int,int>(4096,4096);
 private:
-	ShadowMap shadowMap;
+	ShadowMap shadowMap = { defaultShadowMapResolution.first, defaultShadowMapResolution.second, ShadowMap::ShadowType::Soft };
 };
 
 class PointLight final : public Component

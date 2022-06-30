@@ -212,6 +212,29 @@ private:
 			ImGui::Text("Depth Bias: ");
 			ImGui::SameLine();
 			ImGui::DragFloat("##depthBias", &displayedDirectionalLight->depthBias, 0.001f, 0.0f, 1.0f);
+
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Shadow Map Resolution: ");
+			ImGui::SameLine();
+
+			std::string currentWidth = std::to_string(displayedDirectionalLight->GetShadowResolutionWidth());
+			if (ImGui::BeginCombo("##ShadowMapRes", currentWidth.c_str()))
+			{
+				if (ImGui::Selectable("256", displayedDirectionalLight->GetShadowResolutionWidth() == 256))
+					displayedDirectionalLight->SetShadowResolution(256, 256);
+
+				if (ImGui::Selectable("512", displayedDirectionalLight->GetShadowResolutionWidth() == 512))
+					displayedDirectionalLight->SetShadowResolution(512, 512);
+
+				if (ImGui::Selectable("1024", displayedDirectionalLight->GetShadowResolutionWidth() == 1024))
+					displayedDirectionalLight->SetShadowResolution(1024, 1024);
+
+				if (ImGui::Selectable("2048", displayedDirectionalLight->GetShadowResolutionWidth() == 2048))
+					displayedDirectionalLight->SetShadowResolution(2048, 2048);
+
+				if (ImGui::Selectable("4096", displayedDirectionalLight->GetShadowResolutionWidth() == 4096))
+					displayedDirectionalLight->SetShadowResolution(4096, 4096);
+			}
 		}
 	}
 

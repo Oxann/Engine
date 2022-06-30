@@ -11,6 +11,21 @@ DirectionalLight* DirectionalLight::Clone()
 	return new DirectionalLight(*this);
 }
 
+void DirectionalLight::SetShadowResolution(int width, int height)
+{
+	shadowMap.SetResolution(width, height);
+}
+
+int DirectionalLight::GetShadowResolutionWidth() const
+{
+	return shadowMap.GetWidth();
+}
+
+int DirectionalLight::GetShadowResolutionHeight() const
+{
+	return shadowMap.GetHeight();
+}
+
 void PointLight::Start()
 {
 	Scene::GetActiveScene()->rendererManager.pointLights.push_back(this);
