@@ -26,6 +26,16 @@ int DirectionalLight::GetShadowResolutionHeight() const
 	return shadowMap.GetHeight();
 }
 
+void DirectionalLight::SetShadowType(ShadowMap::ShadowType type)
+{
+	shadowMap.SetShadowType(type);
+}
+
+ShadowMap::ShadowType DirectionalLight::GetShadowType() const
+{
+	return shadowMap.GetShadowType();
+}
+
 void PointLight::Start()
 {
 	Scene::GetActiveScene()->rendererManager.pointLights.push_back(this);

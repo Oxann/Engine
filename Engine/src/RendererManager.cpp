@@ -3,6 +3,8 @@
 #include "Graphics.h"
 #include "MainWindow.h"
 #include "Entity.h"
+#include <DirectXMath.h>
+#include "EngineAssert.h"
 
 RendererManager::RendererManager()
 	: meshCount(0),
@@ -85,20 +87,46 @@ void RendererManager::UpdateShadowMaps()
 
 	static VS_CBUFFER_SLOT0 vs_cbuffer_slot0_data;
 	static VS_ConstantBuffer<VS_CBUFFER_SLOT0> vs_cbuffer_slot0(&vs_cbuffer_slot0_data,1,0,D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
-	static DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixOrthographicLH(64.0f, 64.0f, -50.0f, 50.0f);
 
 	for (int i = 0; i < directionalLights.size(); i++)
 	{
 		directionalLights[i]->shadowMap.BindAsDepthBuffer();
+		
 		DirectX::XMMATRIX lightViewMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationQuaternion(directionalLights[i]->GetTransform()->GetWorldQuaternion()));
+		
+#ifdef EDITOR
+		DirectX::XMMATRIX viewToLightSpace = Editor::EditorCamera::rotationMatrix * DirectX::XMMatrixTranslationFromVector(Editor::EditorCamera::position) * lightViewMatrix;
+#else
+		DirectX::XMMATRIX viewToLightSpace = activeCamera->GetTransform()->GetWorldMatrix()* lightViewMatrix;
+#endif
+		DirectX::XMFLOAT3 cascadeCenterInViewSpace;
+		DirectX::XMVECTOR _cascadeCenterInViewSpace = DirectX::XMVectorSet(0.0f, 0.0f, directionalLights[i]->shadowDistance * 0.5f, 1.0f);
+		_cascadeCenterInViewSpace = DirectX::XMVector4Transform(_cascadeCenterInViewSpace, viewToLightSpace);
+		DirectX::XMStoreFloat3(&cascadeCenterInViewSpace, _cascadeCenterInViewSpace);
+
+		DirectX::XMFLOAT3 min = {	cascadeCenterInViewSpace.x - directionalLights[i]->shadowDistance * 0.5f, 
+									cascadeCenterInViewSpace.y - directionalLights[i]->shadowDistance * 0.5f, 
+									cascadeCenterInViewSpace.z - directionalLights[i]->shadowDistance * 0.5f };
+		
+		DirectX::XMFLOAT3 max = {	cascadeCenterInViewSpace.x + directionalLights[i]->shadowDistance * 0.5f, 
+									cascadeCenterInViewSpace.y + directionalLights[i]->shadowDistance * 0.5f, 
+									cascadeCenterInViewSpace.z + directionalLights[i]->shadowDistance * 0.5f };
+
+		float step = directionalLights[i]->shadowDistance / directionalLights[i]->GetShadowResolutionWidth();
+		min.x = step * std::floor(min.x / step);
+		max.x = step * std::floor(max.x / step);
+		min.y = step * std::floor(min.y / step);
+		max.y = step * std::floor(max.y / step);
+
+		DirectX::XMMATRIX proj = DirectX::XMMatrixOrthographicOffCenterLH(min.x, max.x, min.y, max.y, min.z, max.z);
 		
 		for (int j = 0; j < renderers.size(); j++)
 		{
 			Renderer* currentRenderer = renderers[j];
-
+			
 			if (currentRenderer->castShadows)
 			{
-				currentRenderer->lightSpaceMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranspose(currentRenderer->GetWorldMatrix()) * lightViewMatrix * projectionMatrix);
+				currentRenderer->lightSpaceMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranspose(currentRenderer->GetWorldMatrix()) * lightViewMatrix * proj);
 				vs_cbuffer_slot0_data.MVP = currentRenderer->lightSpaceMatrix;
 				vs_cbuffer_slot0.ChangeData(&vs_cbuffer_slot0_data);
 
@@ -138,6 +166,8 @@ void RendererManager::UpdateDirectionalLights()
 		directionalLights_TO_GPU.lights[i].light = { currentLight.color.x * currentLight.intensity,
 									currentLight.color.y * currentLight.intensity,
 									currentLight.color.z * currentLight.intensity };
+	
+		directionalLights_TO_GPU.lights->shadowType = (int)currentLight.GetShadowType();
 	}
 
 	directionalLightsBuffer.ChangeData(&directionalLights_TO_GPU);

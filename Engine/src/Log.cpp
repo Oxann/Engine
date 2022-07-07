@@ -38,7 +38,6 @@ Log::Log()
 			THROW_ENGINE_EXCEPTION(fileName + " could not be opened.",false);
 		}
 
-		#ifndef NDEBUG
 		//Console
 		AllocConsole();
 		EnableMenuItem(GetSystemMenu(GetConsoleWindow(), FALSE), SC_CLOSE, MF_DISABLED);
@@ -46,7 +45,6 @@ Log::Log()
 		freopen("CONIN$", "r", stdin);
 		freopen("CONOUT$", "w", stdout);
 		freopen("CONOUT$", "w", stderr);
-		#endif
 
 		logThread = std::make_unique<std::thread>(_Write);
 		if(logThread->joinable())
@@ -94,9 +92,7 @@ void Log::_Write()
 		formattedMsg << msg.msg << "\n";
 
 		//Console output
-		#ifndef NDEBUG
 		std::cout << formattedMsg.str();
-		#endif
 		//File output
 		out << formattedMsg.rdbuf();
 

@@ -20,5 +20,9 @@ OUT main(IN In)
 {
 	OUT Out;
     Out.position = mul(float4(In.position, 1.0f), MVP);
+	
+	if(Out.position.z < 0.0f)
+		Out.position.z = 0.0f;
+
 	return Out;
 }

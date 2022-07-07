@@ -8,7 +8,7 @@ ShadowMap::ShadowMap(int width, int height, ShadowType shadowType)
 {
 	D3D11_RASTERIZER_DESC rasterizerDesc;
 	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
+	rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
 	rasterizerDesc.FrontCounterClockwise = FALSE;
 	rasterizerDesc.DepthBias = 1000;
 	rasterizerDesc.DepthBiasClamp = 0.0f;
@@ -48,8 +48,8 @@ void ShadowMap::BindAsDepthBuffer() const
 
 void ShadowMap::BindAsShaderResource() const
 {
-	Graphics::pDeviceContext->PSSetShaderResources(shaderResourceSlot, 1, shaderResource.GetAddressOf());
-	Graphics::pDeviceContext->PSSetSamplers(shaderResourceSlot, 1, sampler.GetAddressOf());
+	Graphics::pDeviceContext->PSSetShaderResources(textureSlot, 1, shaderResource.GetAddressOf());
+	Graphics::pDeviceContext->PSSetSamplers(shadowType == ShadowType::Hard ? hardShadowsSamplerSlot : softShadowsSamplerSlot, 1, sampler.GetAddressOf());
 }
 
 void ShadowMap::SetResolution(int width, int height)
@@ -85,11 +85,11 @@ void ShadowMap::SetShadowType(ShadowType shadowType)
 		samplerDesc.MinLOD = 0.0f;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		samplerDesc.MaxAnisotropy = 0;
-		samplerDesc.BorderColor[0] = 0.0f;
-		samplerDesc.BorderColor[1] = 0.0f;
-		samplerDesc.BorderColor[2] = 0.0f;
-		samplerDesc.BorderColor[3] = 0.0f;
-		samplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+		samplerDesc.BorderColor[0] = 1.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 1.0f;
+		samplerDesc.BorderColor[3] = 1.0f;
+		samplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
 	}
 	else
 	{
@@ -101,15 +101,20 @@ void ShadowMap::SetShadowType(ShadowType shadowType)
 		samplerDesc.MinLOD = 0.0f;
 		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 		samplerDesc.MaxAnisotropy = 0;
-		samplerDesc.BorderColor[0] = 0.0f;
-		samplerDesc.BorderColor[1] = 0.0f;
-		samplerDesc.BorderColor[2] = 0.0f;
-		samplerDesc.BorderColor[3] = 0.0f;
+		samplerDesc.BorderColor[0] = 1.0f;
+		samplerDesc.BorderColor[1] = 1.0f;
+		samplerDesc.BorderColor[2] = 1.0f;
+		samplerDesc.BorderColor[3] = 1.0f;
 		samplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
 	}
 
 	sampler.Reset();
 	CHECK_DX_ERROR(Graphics::pDevice->CreateSamplerState(&samplerDesc, sampler.GetAddressOf()));
+}
+
+ShadowMap::ShadowType ShadowMap::GetShadowType() const
+{
+	return shadowType;
 }
 
 void ShadowMap::CreateTextureAndViews(int width, int height)

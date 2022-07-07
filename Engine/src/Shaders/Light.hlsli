@@ -2,6 +2,8 @@
 #define MAX_POINT_LIGHT_COUNT 4
 #define MINLIGHT 0.000001f
 
+#define HASSOFTSHADOWS(light) light.shadowType == 1
+
 cbuffer AmbientLight : register(b0)
 {
     // w is intensity
@@ -17,7 +19,7 @@ cbuffer DirectionalLights : register(b1)
         float depthBias;
         float3 ligth; //color * intensity
         float3 direction;
-        float padding;
+        int shadowType; // 0 is hard, 1 is soft
     } directionalLights[MAX_DIRECTIONAL_LIGHT_COUNT];
 };
 
@@ -33,3 +35,7 @@ cbuffer PointLights : register(b2)
         float3 position;
     } pointLights[MAX_POINT_LIGHT_COUNT];
 }
+
+Texture2D shadowMap : register(t3);
+SamplerState hardShadowsSampler : register(s3);
+SamplerComparisonState softShadowsSampler : register(s4);

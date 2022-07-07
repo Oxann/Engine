@@ -45,9 +45,6 @@ SamplerState specularTextureSampler : register(s1);
 Texture2D normalTexture : register(t2);
 SamplerState normalTextureSampler : register(s2);
 
-Texture2D shadowMap : register(t3);
-SamplerComparisonState shadowMapSampler : register(s3);
-
 
 #ifdef SHADOW
 float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float3 diffuseColor, float3 specularColor, float shininess, float3 lightSpacePosition)
@@ -67,8 +64,20 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
         float2 shadowMapCoord;
         shadowMapCoord.x = lightSpacePosition.x;
         shadowMapCoord.y = -lightSpacePosition.y;
+
         shadowMapCoord = shadowMapCoord * 0.5f + 0.5f;
-        float lit = shadowMap.SampleCmpLevelZero(shadowMapSampler, shadowMapCoord, lightSpacePosition.z);
+
+        float shadow = 1.0f; // 0 is full shadow
+        if(HASSOFTSHADOWS(directionalLights[0]) && lightSpacePosition.z < 1.0f)
+        {
+            shadow = shadowMap.SampleCmpLevelZero(softShadowsSampler, shadowMapCoord, lightSpacePosition.z);
+        }
+        else
+        {
+            float lightDist = shadowMap.Sample(hardShadowsSampler, shadowMapCoord).r;
+            if(lightDist < lightSpacePosition.z)
+                shadow = 0.0f;
+        }
 #endif              
         float diffuse = max(dot(-directionalLights[i].direction, normal), 0.0f);
         if (diffuse < MINLIGHT)
@@ -81,8 +90,8 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
         totalSpecular += specular * directionalLights[i].ligth.rgb;
 
 #ifdef SHADOW
-        totalDiffuse *= lit;
-        totalSpecular *= lit;
+        totalDiffuse *= shadow;
+        totalSpecular *= shadow;
 #endif
     }
             

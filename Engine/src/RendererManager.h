@@ -33,8 +33,8 @@ public:
 	Camera* activeCamera = nullptr;
 private:	
 	std::vector<Renderer*> renderers;
-	std::vector<const DirectionalLight*> directionalLights;
-	std::vector<const PointLight*> pointLights;
+	std::vector<DirectionalLight*> directionalLights;
+	std::vector<PointLight*> pointLights;
 
 	//Render Queues
 	RenderQueueOpaque renderQueueOpaque;
@@ -61,6 +61,7 @@ private:
 			float depthBias;
 			DirectX::XMFLOAT3 light; //color * intensity
 			alignas(16) DirectX::XMFLOAT3 direction;
+			int shadowType;
 		};
 		PerLightInfo lights[4];
 	} directionalLights_TO_GPU;

@@ -4,11 +4,12 @@
 
 class ShadowMap
 {
+	friend class RendererManager;
 public:
 	enum class ShadowType
 	{
-		Soft,
-		Hard
+		Hard = 0,
+		Soft = 1
 	};
 
 public:
@@ -19,6 +20,7 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 	void SetShadowType(ShadowType shadowType);
+	ShadowType GetShadowType() const;
 
 private:
 	void CreateTextureAndViews(int width, int height);
@@ -31,5 +33,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
 	ShadowType shadowType;
-	static constexpr int shaderResourceSlot = 3;
+	static constexpr int textureSlot = 3;
+	static constexpr int hardShadowsSamplerSlot = 3;
+	static constexpr int softShadowsSamplerSlot = 4;
 };
