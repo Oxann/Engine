@@ -17,6 +17,7 @@ void Resources::Init()
 
 	LoadShaders();
 	InitDefaultMaterials();
+	InitDefaultTextures();
 
 	std::vector<path> texturesToLoad;
 	std::vector<path> modelsToLoad;
@@ -122,6 +123,29 @@ void Resources::InitDefaultMaterials()
 	outline->SetFloat4("color", { 1.0f, 0.0f, 0.0f, 1.0f });
 
 	Material* lit = Materials.insert({ "$Default\\Lit", std::make_unique<Material>("Lit", litShader) }).first->second.get();
+	lit->SetFloat4("matDiffuseColor", { 1.0f,1.0f,1.0f,1.0f });
+	lit->SetFloat4("matSpecularColor", { 1.0f,1.0f,1.0f,1.0f });
+	lit->SetFloat("matShininess", 0.5f);
+	lit->SetFloat("matShininessStrength", 1.0f);
+}
+
+void Resources::InitDefaultTextures()
+{
+	unsigned char whiteTextureData[16] = { 
+		255u,255u,255u,255u,
+		255u,255u,255u,255u,
+		255u,255u,255u,255u,
+		255u,255u,255u,255u
+	};
+	Textures.emplace(std::piecewise_construct, std::forward_as_tuple("$Default\\White"), std::forward_as_tuple(std::make_unique<Texture>(2, 2, whiteTextureData, Texture::FilterMode::POINT, D3D11_USAGE::D3D11_USAGE_IMMUTABLE)));
+
+	unsigned char blackTextureData[16] = { 
+		0u, 0u, 0u, 255u, 
+		0u, 0u, 0u, 255u,
+		0u, 0u, 0u, 255u,
+		0u, 0u, 0u, 255u
+	};
+	Textures.emplace(std::piecewise_construct, std::forward_as_tuple("$Default\\Black"), std::forward_as_tuple(std::make_unique<Texture>(2, 2, blackTextureData, Texture::FilterMode::POINT, D3D11_USAGE::D3D11_USAGE_IMMUTABLE)));
 }
 
 Texture* Resources::FindTexture(const std::string& file)

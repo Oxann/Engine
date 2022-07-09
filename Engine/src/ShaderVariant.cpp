@@ -165,20 +165,25 @@ void PixelShaderVariant::InitTextureLayout(Microsoft::WRL::ComPtr<ID3DBlob> pixe
 	{
 		D3D11_SHADER_INPUT_BIND_DESC resourceDesc;
 		pixelShaderReflection->GetResourceBindingDesc(i, &resourceDesc);
-		switch (resourceDesc.Type)
+
+		//Slots that are higher than 7 are reserved.
+		if (resourceDesc.BindPoint < 8)
 		{
-		case D3D_SHADER_INPUT_TYPE::D3D_SIT_TEXTURE:
-			switch (resourceDesc.Dimension)
+			switch (resourceDesc.Type)
 			{
-			case D3D_SRV_DIMENSION::D3D_SRV_DIMENSION_TEXTURE2D:
-				texture2Ds.emplace_back(resourceDesc.Name, resourceDesc.BindPoint);
+			case D3D_SHADER_INPUT_TYPE::D3D_SIT_TEXTURE:
+				switch (resourceDesc.Dimension)
+				{
+				case D3D_SRV_DIMENSION::D3D_SRV_DIMENSION_TEXTURE2D:
+					texture2Ds.emplace_back(resourceDesc.Name, resourceDesc.BindPoint);
+					break;
+				default:
+					break;
+				}
 				break;
 			default:
 				break;
 			}
-			break;
-		default:
-			break;
 		}
 	}
 }

@@ -35,6 +35,38 @@ ShadowMap::ShadowMap(int width, int height, ShadowType shadowType)
 
 	CreateTextureAndViews(width,height);
 	SetShadowType(shadowType);
+
+	D3D11_SAMPLER_DESC softSamplerDesc = {};
+	softSamplerDesc.Filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	softSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	softSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	softSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	softSamplerDesc.MipLODBias = 0.0f;
+	softSamplerDesc.MinLOD = 0.0f;
+	softSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	softSamplerDesc.MaxAnisotropy = 0;
+	softSamplerDesc.BorderColor[0] = 1.0f;
+	softSamplerDesc.BorderColor[1] = 1.0f;
+	softSamplerDesc.BorderColor[2] = 1.0f;
+	softSamplerDesc.BorderColor[3] = 1.0f;
+	softSamplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateSamplerState(&softSamplerDesc, softShadowSampler.GetAddressOf()));
+
+	D3D11_SAMPLER_DESC hardSamplerDesc = {};
+	hardSamplerDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+	hardSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+	hardSamplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+	hardSamplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+	hardSamplerDesc.MipLODBias = 0.0f;
+	hardSamplerDesc.MinLOD = 0.0f;
+	hardSamplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	hardSamplerDesc.MaxAnisotropy = 0;
+	hardSamplerDesc.BorderColor[0] = 1.0f;
+	hardSamplerDesc.BorderColor[1] = 1.0f;
+	hardSamplerDesc.BorderColor[2] = 1.0f;
+	hardSamplerDesc.BorderColor[3] = 1.0f;
+	hardSamplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateSamplerState(&hardSamplerDesc, hardShadowSampler.GetAddressOf()));
 }
 
 void ShadowMap::BindAsDepthBuffer() const
@@ -49,7 +81,8 @@ void ShadowMap::BindAsDepthBuffer() const
 void ShadowMap::BindAsShaderResource() const
 {
 	Graphics::pDeviceContext->PSSetShaderResources(textureSlot, 1, shaderResource.GetAddressOf());
-	Graphics::pDeviceContext->PSSetSamplers(shadowType == ShadowType::Hard ? hardShadowsSamplerSlot : softShadowsSamplerSlot, 1, sampler.GetAddressOf());
+	Graphics::pDeviceContext->PSSetSamplers(softShadowsSamplerSlot, 1, softShadowSampler.GetAddressOf());
+	Graphics::pDeviceContext->PSSetSamplers(hardShadowsSamplerSlot, 1, hardShadowSampler.GetAddressOf());
 }
 
 void ShadowMap::SetResolution(int width, int height)
@@ -73,43 +106,6 @@ int ShadowMap::GetHeight() const
 void ShadowMap::SetShadowType(ShadowType shadowType)
 {
 	this->shadowType = shadowType;
-	D3D11_SAMPLER_DESC samplerDesc = {};
-
-	if (shadowType == ShadowType::Soft)
-	{
-		samplerDesc.Filter = D3D11_FILTER::D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-		samplerDesc.MipLODBias = 0.0f;
-		samplerDesc.MinLOD = 0.0f;
-		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-		samplerDesc.MaxAnisotropy = 0;
-		samplerDesc.BorderColor[0] = 1.0f;
-		samplerDesc.BorderColor[1] = 1.0f;
-		samplerDesc.BorderColor[2] = 1.0f;
-		samplerDesc.BorderColor[3] = 1.0f;
-		samplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
-	}
-	else
-	{
-		samplerDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
-		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
-		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
-		samplerDesc.MipLODBias = 0.0f;
-		samplerDesc.MinLOD = 0.0f;
-		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-		samplerDesc.MaxAnisotropy = 0;
-		samplerDesc.BorderColor[0] = 1.0f;
-		samplerDesc.BorderColor[1] = 1.0f;
-		samplerDesc.BorderColor[2] = 1.0f;
-		samplerDesc.BorderColor[3] = 1.0f;
-		samplerDesc.ComparisonFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-	}
-
-	sampler.Reset();
-	CHECK_DX_ERROR(Graphics::pDevice->CreateSamplerState(&samplerDesc, sampler.GetAddressOf()));
 }
 
 ShadowMap::ShadowType ShadowMap::GetShadowType() const

@@ -1,5 +1,6 @@
 #include "Material.h"
 #include "Renderer.h"
+#include "Graphics.h"
 #include <algorithm>
 
 Material::Material(const std::string& name, const Shader* shader)
@@ -183,8 +184,15 @@ void Material::Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const
 	//Binding textures (also binds sampler)
 	const auto& texture2DDefs = shaderView.GetActivePixelShader().GetTexture2Ds();
 	for (const auto& texture2DDef : texture2DDefs)
+	{
 		if(texture2Ds[texture2DDef.slot])
 			texture2Ds[texture2DDef.slot]->BindPipeline(texture2DDef.slot);
+		else
+		{
+			static Texture* whiteTexture = Resources::FindTexture("$Default\\White");
+			whiteTexture->BindPipeline(texture2DDef.slot);
+		}
+	}
 
 	if (shaderView.GetActiveVertexShader().HasShadows())
 	{

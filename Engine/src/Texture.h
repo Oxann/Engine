@@ -19,6 +19,7 @@ public:
 	};
 public:
 	Texture(const std::filesystem::path& file);
+	Texture(int width, int height, unsigned char* initialData, FilterMode filterMode, D3D11_USAGE usage);
 
 	bool HasAlpha() const;
 
@@ -38,10 +39,14 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetResourceView() const;
 
-public:
-	const int width = 0;
-	const int height = 0;
-	const int nChannels = 0;
+	int GetWidth() const;
+	int GetHeight() const;
+	int GetChannels() const;
+
+private:
+	int width = 0;
+	int height = 0;
+	int nChannels = 0;
 	
 private:
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler = nullptr;

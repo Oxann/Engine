@@ -14,7 +14,7 @@ public:
 	{
 		//Width and height
 		ImGui::AlignTextToFramePadding();
-		ImGui::Text("Width: %d    height: %d", texture->width, texture->height);
+		ImGui::Text("Width: %d    height: %d", texture->GetWidth(), texture->GetHeight());
 
 		//Filter mode selection
 		ImGui::AlignTextToFramePadding();
@@ -63,7 +63,7 @@ public:
 			if(ImGui::IsItemDeactivatedAfterEdit())
 				texture->SetAnisotropy(anisotropy);
 		}		
-		const float textureRatio = (float)texture->width / texture->height;
+		const float textureRatio = (float)texture->GetWidth() / texture->GetHeight();
 		ImGui::Image((void*)(texture->GetResourceView().Get()), ImVec2(textureRatio * 300.0f, 300));
 	}
 

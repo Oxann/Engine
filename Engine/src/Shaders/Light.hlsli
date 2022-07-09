@@ -36,6 +36,6 @@ cbuffer PointLights : register(b2)
     } pointLights[MAX_POINT_LIGHT_COUNT];
 }
 
-Texture2D shadowMap : register(t3);
-SamplerState hardShadowsSampler : register(s3);
-SamplerComparisonState softShadowsSampler : register(s4);
+Texture2D shadowMap : register(t9);
+SamplerState hardShadowsSampler : register(s9);
+SamplerComparisonState softShadowsSampler : register(s10);

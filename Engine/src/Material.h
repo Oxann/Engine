@@ -53,5 +53,5 @@ protected:
 	static constexpr unsigned int PS_MaterialSlot = 3u;
 	std::vector<unsigned char> materialBuffer;
 
-	std::array<Texture*,16> texture2Ds;
+	std::array<Texture*,8> texture2Ds;
 };

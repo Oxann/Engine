@@ -65,7 +65,7 @@ OUT main( IN in_ )
     Out.lightSpacePosition = mul(float4(in_.position, 1.0f), lightSpaceMatrix);
 
     if(Out.lightSpacePosition.z > 1.0f)
-        Out.lightSpacePosition.z = 1.0f;
+        Out.lightSpacePosition.z = 0.99999f;
 #endif
     return Out;
 }

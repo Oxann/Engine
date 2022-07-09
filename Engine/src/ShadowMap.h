@@ -30,10 +30,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthMap;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResource;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> sampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> softShadowSampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> hardShadowSampler;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
 	ShadowType shadowType;
-	static constexpr int textureSlot = 3;
-	static constexpr int hardShadowsSamplerSlot = 3;
-	static constexpr int softShadowsSamplerSlot = 4;
+	static constexpr int textureSlot = 9;
+	static constexpr int hardShadowsSamplerSlot = 9;
+	static constexpr int softShadowsSamplerSlot = 10;
 };

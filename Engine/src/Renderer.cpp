@@ -74,7 +74,10 @@ void Renderer::Update()
 		
 		//If merged AABB is not inside the frustum we can return here.
 		if (Scene::GetActiveScene()->rendererManager.frustum.Contains(viewSpaceAABB) == DirectX::ContainmentType::DISJOINT)
+		{
+			TransposeMatrices();
 			return;
+		}
 	}
 
 	//Passing to render queues

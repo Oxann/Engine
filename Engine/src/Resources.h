@@ -30,6 +30,7 @@ private:
 	static void LoadShaders();
 	static void LoadTextures(const std::vector<std::filesystem::path>& texturePaths);
 	static void InitDefaultMaterials();
+	static void InitDefaultTextures();
 
 private:
 	static inline std::unordered_map<std::string, std::unique_ptr<Texture>> Textures;
