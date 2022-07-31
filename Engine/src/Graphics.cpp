@@ -21,7 +21,7 @@ void Graphics::Init(HWND hWnd)
 	swapChainDesc.BufferDesc.Height = MainWindow::GetDisplayResolution().height;
 	swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
 	swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	swapChainDesc.SampleDesc.Count = 1;
@@ -100,7 +100,7 @@ void Graphics::Init(HWND hWnd)
 	//Initializing projection matrix
 
 	//Ambient Lighting
-	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.1f);
+	ambientLight = DirectX::XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
 	ambientLightBuffer = new PS_ConstantBuffer<DirectX::XMVECTOR>(&ambientLight, 1u, 0u, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
 
 	ENGINE_LOG(ENGINE_INFO, "Graphics Ready!");

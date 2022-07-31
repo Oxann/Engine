@@ -9,9 +9,13 @@
 
 using namespace Microsoft::WRL;
 
-Texture::Texture(const std::filesystem::path& file)
+Texture::Texture(const std::filesystem::path& file, FilterMode filterMode, int anisotropy, ColorSpace colorSpace)
 	:ResourceBase(file)
 {
+	ENGINEASSERT(anisotropy >= 1 && anisotropy <= 16, "Anisotropy must be between 1 and 16")
+	this->anisotropy = anisotropy;
+	this->filterMode = filterMode;
+
 	unsigned char* img_data = stbi_load(file.string().c_str() , &width, &height, &nChannels, 4);
 	
 	if (img_data)
@@ -21,7 +25,7 @@ Texture::Texture(const std::filesystem::path& file)
 		textureDesc.Height = height;
 		textureDesc.MipLevels = 0u;
 		textureDesc.ArraySize = 1u;
-		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		textureDesc.Format = (DXGI_FORMAT)colorSpace;
 		textureDesc.SampleDesc.Count = 1u;
 		textureDesc.SampleDesc.Quality = 0u;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -52,10 +56,8 @@ Texture::Texture(const std::filesystem::path& file)
 		Graphics::immediateContextMutex.unlock();
 
 		//Sampler
-		filterMode = FilterMode::ANISOTROPIC;
-
 		D3D11_SAMPLER_DESC samplerDesc = {};
-		samplerDesc.Filter = (D3D11_FILTER)FilterMode::ANISOTROPIC;
+		samplerDesc.Filter = (D3D11_FILTER)filterMode;
 		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -176,6 +178,14 @@ unsigned int Texture::GetAnisotropy() const
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> Texture::GetResourceView() const
 {
 	return pSRV;
+}
+
+Texture::ColorSpace Texture::GetColorSpace() const
+{
+	D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+	pSRV->GetDesc(&desc);
+
+	return (ColorSpace)desc.Format;
 }
 
 int Texture::GetWidth() const

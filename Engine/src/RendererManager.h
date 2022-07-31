@@ -25,6 +25,7 @@ private:
 	void UpdateVertexShaderPerFrameBuffer();
 	void UpdateDirectionalLights();
 	void UpdatePointLights();
+	void Tonemap();
 public:
 	unsigned long long meshCount;
 	unsigned long long vertexCount;
@@ -47,6 +48,11 @@ private:
 
 	//Skybox
 	Skybox* skybox = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> postProcessInputTexture;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> postProcessSampler;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> postProcessRasterizerState;
+	Microsoft::WRL::ComPtr<ID3D11BlendState> postProcessBlendState;
 
 private:
 	struct DirectionalLights_TO_GPU
@@ -84,7 +90,8 @@ private:
 		float Quadratic;
 		struct PerLightInfo
 		{
-			alignas(16) DirectX::XMFLOAT3 light; //color * intensity
+			float range;
+			DirectX::XMFLOAT3 light; //color * intensity
 			alignas(16) DirectX::XMFLOAT3 position;
 		};
 		PerLightInfo lights[4];

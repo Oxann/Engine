@@ -1,0 +1,127 @@
+// VARIANTS BEGIN
+// DIFFUSETEXTURE
+// NORMALTEXTURE
+// ROUGHNESSTEXTURE
+// METALNESSTEXTURE
+// AMBIENTOCCLUSIONTEXTURE
+// SHADOW
+// VARIANTS END
+
+#include "Light.hlsli"
+
+struct PSInput
+{
+    float3 viewSpacePosition : VIEWSPACEPOSITION;
+    float3 normal : VIEWSPACENORMAL;
+    
+#if defined(DIFFUSETEXTURE) || defined(ROUGHNESSTEXTURE) || defined(METALNESSTEXTURE) || defined(NORMALTEXTURE) || defined(AMBIENTOCCLUSIONTEXTURE)
+    float2 texCoord : TEXCOORD;
+#endif 
+    
+#ifdef NORMALTEXTURE
+    float3 tangent : TANGENT;
+    float3 bitangent : BITANGENT;
+#endif
+
+#ifdef SHADOW
+    float4 lightSpacePosition : LIGHTSPACEPOSITION;
+#endif
+};
+
+//Material 
+cbuffer Material : register(b3)
+{
+    float4 diffuseColor;
+    float metalness;
+    float smoothness;
+}
+
+//Textures
+Texture2D diffuseTexture : register(t0);
+SamplerState diffuseTextureSampler : register(s0);
+
+Texture2D metalnessTexture : register(t1);
+SamplerState metalnessTextureSampler : register(s1);
+
+Texture2D roughnessTexture : register(t2);
+SamplerState roughnessTextureSampler : register(s2);
+
+Texture2D ambientOcclusionTexture : register(t3);
+SamplerState ambientOcclusionTextureSampler : register(s3);
+
+Texture2D normalTexture : register(t4);
+SamplerState normalTextureSampler : register(s4);
+
+
+float4 main(PSInput input) : SV_Target
+{
+    Surface surface;
+    surface.diffuseColor = diffuseColor;
+
+#ifdef DIFFUSETEXTURE
+    surface.diffuseColor *= diffuseTexture.Sample(diffuseTextureSampler, input.texCoord); 
+#endif
+
+#ifdef METALNESSTEXTURE
+    surface.metalness = metalnessTexture.Sample(metalnessTextureSampler, input.texCoord).r;
+#else
+    surface.metalness = saturate(metalness);
+#endif
+  
+#ifdef ROUGHNESSTEXTURE
+    surface.roughness = roughnessTexture.Sample(roughnessTextureSampler, input.texCoord).r;
+#else
+    surface.roughness = saturate(1.0f - smoothness);
+#endif
+
+#ifdef NORMALTEXTURE
+    const float3 normal = normalize(mul(normalTexture.Sample(normalTextureSampler, input.texCoord).rgb * 2.0f - 1.0f,
+                 float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal))));
+#else
+    const float3 normal = normalize(input.normal);
+#endif
+
+    const float3 viewDirection = normalize(-input.viewSpacePosition);
+
+    float3 finalColor = {0.0f, 0.0f, 0.0f};
+    [unroll]
+    for(unsigned int i = 0; i < DirectionalLightCount; i++)
+    {
+    #ifdef SHADOW
+        float2 shadowMapCoord;
+        shadowMapCoord.x = input.lightSpacePosition.x;
+        shadowMapCoord.y = -input.lightSpacePosition.y;
+
+        shadowMapCoord = shadowMapCoord * 0.5f + 0.5f;
+
+        float shadow = 1.0f; // 0 is full shadow
+        if(HASSOFTSHADOWS(directionalLights[i]) && input.lightSpacePosition.z < 1.0f)
+        {
+            shadow = shadowMap.SampleCmpLevelZero(softShadowsSampler, shadowMapCoord, input.lightSpacePosition.z);
+        }
+        else
+        {
+            float lightDist = shadowMap.Sample(hardShadowsSampler, shadowMapCoord).r;
+            if(lightDist < input.lightSpacePosition.z)
+                shadow = 0.0f;
+        }
+        finalColor += CalculateDirectionalLight(directionalLights[i], surface, viewDirection, normal) * shadow;
+    #else
+        finalColor += CalculateDirectionalLight(directionalLights[i], surface, viewDirection, normal);
+    #endif  
+    }
+
+    for(unsigned int j = 0; j < PointLightCount; j++)
+    {
+        finalColor += CalculatePointLight(pointLights[j], surface, viewDirection, normal, input.viewSpacePosition);
+    }
+
+#ifdef AMBIENTOCCLUSIONTEXTURE
+    float3 ambientFactor = ambientLight.xyz * ambientLight.w * surface.diffuseColor.xyz * ambientOcclusionTexture.Sample(ambientOcclusionTextureSampler, input.texCoord).r;
+#else
+    float3 ambientFactor = ambientLight.xyz * ambientLight.w * surface.diffuseColor.xyz;
+#endif
+
+    finalColor += ambientFactor;
+    return float4(finalColor, surface.diffuseColor.w);
+}

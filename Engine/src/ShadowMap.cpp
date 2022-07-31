@@ -71,6 +71,9 @@ ShadowMap::ShadowMap(int width, int height, ShadowType shadowType)
 
 void ShadowMap::BindAsDepthBuffer() const
 {
+	static ComPtr<ID3D11ShaderResourceView> unbind = nullptr;
+	Graphics::pDeviceContext->PSSetShaderResources(textureSlot, 1, unbind.GetAddressOf());
+
 	Graphics::pDeviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 	Graphics::pDeviceContext->ClearDepthStencilView(depthMap.Get(), D3D11_CLEAR_FLAG::D3D11_CLEAR_DEPTH, 1.0f, 0);
 	Graphics::pDeviceContext->OMSetRenderTargets(0, nullptr, depthMap.Get());

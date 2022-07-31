@@ -199,13 +199,13 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 
 			if (isMaterialAlreadyExist == materials.end())
 			{	
-				static Shader* litShader = Resources::FindShader("Lit");
+				static Shader* litShader = Resources::FindShader("LitPBR");
 				std::unique_ptr<Material> newMaterial = std::make_unique<Material>(mat->GetName().C_Str(), litShader);
-				
+
 				////////// DIFFUSE //////////
 				aiColor4D diffuseColor;
 				if(mat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == aiReturn::aiReturn_SUCCESS)
-					newMaterial->SetFloat4("matDiffuseColor", {diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a});
+					newMaterial->SetFloat4("diffuseColor", {diffuseColor.r, diffuseColor.g, diffuseColor.b, diffuseColor.a});
 
 				//if the material has diffuse map we set it
 				if (mat->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE))
@@ -218,7 +218,54 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 				}
 				/////////////////////////////
 
-				////////// SPECULAR //////////
+				////////// METALNESS //////////
+				float metalness;
+				
+				if (mat->Get(AI_MATKEY_METALLIC_FACTOR, metalness) == aiReturn::aiReturn_SUCCESS)
+					newMaterial->SetFloat("metalness", metalness);
+				else
+					newMaterial->SetFloat("metalness", 0.0f);
+				
+				if (mat->GetTextureCount(aiTextureType::aiTextureType_METALNESS))
+				{
+					newMaterial->ActivateMacro("METALNESSTEXTURE");
+
+					aiString temp;
+					mat->GetTexture(aiTextureType::aiTextureType_METALNESS, 0u, &temp);
+					newMaterial->SetTexture("metalnessTexture", GetTextureInParentFolder(temp.C_Str()));
+				}
+				/////////////////////////////
+
+				////////// SMOOTHNESS //////////
+				float roughness;
+
+				if (mat->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == aiReturn::aiReturn_SUCCESS)
+					newMaterial->SetFloat("smoothness", 1.0f - roughness);
+				else 
+					newMaterial->SetFloat("smoothness", 0.5f);
+
+				if (mat->GetTextureCount(aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS))
+				{
+					newMaterial->ActivateMacro("ROUGHNESSTEXTURE");
+
+					aiString temp;
+					mat->GetTexture(aiTextureType::aiTextureType_DIFFUSE_ROUGHNESS, 0u, &temp);
+					newMaterial->SetTexture("roughnessTexture", GetTextureInParentFolder(temp.C_Str()));
+				}
+				/////////////////////////////
+
+				////////// AMBIENT OCCLUSION //////////
+				if (mat->GetTextureCount(aiTextureType::aiTextureType_AMBIENT_OCCLUSION))
+				{
+					newMaterial->ActivateMacro("AMBIENTOCCLUSIONTEXTURE");
+
+					aiString temp;
+					mat->GetTexture(aiTextureType::aiTextureType_AMBIENT_OCCLUSION, 0u, &temp);
+					newMaterial->SetTexture("ambientOcclusionTexture", GetTextureInParentFolder(temp.C_Str()));
+				}
+				/////////////////////////////
+
+				/*////////// SPECULAR //////////
 				aiColor4D specularColor;
 				if(mat->Get(AI_MATKEY_COLOR_SPECULAR, specularColor) == aiReturn::aiReturn_SUCCESS)
 					newMaterial->SetFloat4("matSpecularColor", {specularColor.r, specularColor.g, specularColor.b, specularColor.a});
@@ -240,7 +287,7 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 					mat->GetTexture(aiTextureType::aiTextureType_SPECULAR, 0u, &temp);
 					newMaterial->SetTexture("specularTexture", GetTextureInParentFolder(temp.C_Str()));
 				}
-				//////////////////////////////
+				//////////////////////////////*/
 
 				//Normal map
 				if (mat->GetTextureCount(aiTextureType::aiTextureType_NORMALS))
@@ -277,11 +324,6 @@ Texture* Model::GetTextureInParentFolder(std::filesystem::path textureName) cons
 			Texture* texture = Resources::FindTexture(file.path().string());
 			if (texture)
 				return texture;
-			else
-			{
-				auto newTexture = Resources::Textures.insert({ file.path().string(),std::make_unique<Texture>(file.path()) });
-				return static_cast<Texture*>(newTexture.first->second.get());
-			}
 		}
 	}
 

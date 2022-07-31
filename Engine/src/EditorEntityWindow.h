@@ -275,6 +275,11 @@ private:
 			ImGui::SameLine();
 			ImGui::DragFloat("##pointLightIntensity", &displayedPointLight->intensity, 0.05f, 0.0f, 1000.0f);
 
+			ImGui::AlignTextToFramePadding();
+			ImGui::Text("Range: ");
+			ImGui::SameLine();
+			ImGui::DragFloat("##pointLightRange", &displayedPointLight->range, 0.05f, 0.0f, 1000.0f);
+
 			//Color
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Color: ");

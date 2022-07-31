@@ -5,6 +5,7 @@
 #include "Model.h"
 #include "Shader.h"
 #include "Engine.h"
+#include "TextureSerializer.h"
 
 using namespace std::filesystem;
 
@@ -91,8 +92,12 @@ void Resources::LoadTextures(const std::vector<path>& texturePaths)
 	for (int i = 0; i < texturePaths.size(); i++)
 	{
 		textureLoadHandles.push_back(Engine::threadPool.AddTask<void>([&texturePath = texturePaths[i], &textureLoadMutex]{
-			auto newTexture = std::make_unique<Texture>(texturePath);
 
+			TextureSerializer::Data serializedData;
+			TextureSerializer::Deserialize(texturePath, &serializedData);
+
+			auto newTexture = std::make_unique<Texture>(texturePath, serializedData.filterMode, serializedData.anisotropy, serializedData.isSRGB ? Texture::ColorSpace::sRGB : Texture::ColorSpace::RGB);
+			
 			textureLoadMutex.lock();
 			Textures.emplace(std::piecewise_construct, std::forward_as_tuple(texturePath.string()), std::forward_as_tuple(std::move(newTexture)));
 			textureLoadMutex.unlock();

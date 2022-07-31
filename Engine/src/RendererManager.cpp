@@ -5,6 +5,7 @@
 #include "Entity.h"
 #include <DirectXMath.h>
 #include "EngineAssert.h"
+#include <wrl.h>
 
 RendererManager::RendererManager()
 	: meshCount(0),
@@ -15,6 +16,61 @@ RendererManager::RendererManager()
 	  renderQueueWireframe(this),
 	  renderQueueOutline(this)
 {
+	using namespace Microsoft::WRL;
+
+	ComPtr<ID3D11Texture2D> finalOutput;
+	D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = MainWindow::GetDisplayResolution().width;
+	desc.Height = MainWindow::GetDisplayResolution().height;
+	desc.MipLevels = 1u;
+	desc.ArraySize = 1u;
+	desc.Format = DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT;
+	desc.SampleDesc.Count = 1u;
+	desc.SampleDesc.Quality = 0u;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = 0;
+	desc.MiscFlags = 0;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateTexture2D(&desc, NULL, &finalOutput));
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+	srvDesc.Format = DXGI_FORMAT::DXGI_FORMAT_R16G16B16A16_FLOAT;
+	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Texture2D.MipLevels = -1;
+	srvDesc.Texture2D.MostDetailedMip = 0;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateShaderResourceView(finalOutput.Get(), &srvDesc, &postProcessInputTexture));
+
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER::D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MinLOD = 0.0f;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+	samplerDesc.MaxAnisotropy = 0;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateSamplerState(&samplerDesc, &postProcessSampler));
+
+	D3D11_RASTERIZER_DESC rasterizerStateDesc;
+	ZeroMemory(&rasterizerStateDesc, sizeof(D3D11_RASTERIZER_DESC));
+	rasterizerStateDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rasterizerStateDesc.CullMode = D3D11_CULL_BACK;
+	rasterizerStateDesc.FrontCounterClockwise = FALSE;
+	rasterizerStateDesc.DepthClipEnable = FALSE;
+	Graphics::pDevice->CreateRasterizerState(&rasterizerStateDesc, &postProcessRasterizerState);
+
+	D3D11_BLEND_DESC blendStateDesc;
+	blendStateDesc.AlphaToCoverageEnable = FALSE;
+	blendStateDesc.IndependentBlendEnable = FALSE;
+	blendStateDesc.RenderTarget[0].BlendEnable = FALSE;
+	blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+	blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+	blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+	blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+	blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateBlendState(&blendStateDesc, &postProcessBlendState));
 }
 
 void RendererManager::Update()
@@ -45,8 +101,10 @@ void RendererManager::Update()
 	Graphics::pDeviceContext->RSSetViewports(1, &Graphics::viewport);
 
 	UpdateDirectionalLights();
-	if (directionalLights.size() > 0)
+
+	if(directionalLights.size() > 0)
 		directionalLights[0]->shadowMap.BindAsShaderResource();
+
 
 	UpdatePointLights();
 
@@ -56,6 +114,8 @@ void RendererManager::Update()
 
 	if (skybox)
 		skybox->Draw();
+
+	Tonemap();
 
 #ifdef EDITOR
 	renderQueueWireframe.Render();
@@ -176,9 +236,6 @@ void RendererManager::UpdateDirectionalLights()
 void RendererManager::UpdatePointLights()
 {
 	pointLights_TO_GPU.Count = pointLights.size();
-	pointLights_TO_GPU.Constant = PointLight::constant;
-	pointLights_TO_GPU.Linear = PointLight::linear;
-	pointLights_TO_GPU.Quadratic = PointLight::quadratic;
 
 	for (unsigned int i = 0; i < PointLight::MaxCount && i < pointLights_TO_GPU.Count; i++)
 	{
@@ -194,7 +251,40 @@ void RendererManager::UpdatePointLights()
 			currentLight.color.y * currentLight.intensity,
 			currentLight.color.z * currentLight.intensity
 		};
+
+		pointLights_TO_GPU.lights[i].range = currentLight.range;
 	}
 
 	pointLightsBuffer.ChangeData(&pointLights_TO_GPU);
+}
+
+void RendererManager::Tonemap()
+{
+	using namespace Microsoft::WRL;
+	ComPtr<ID3D11Resource> texture;
+	postProcessInputTexture->GetResource(&texture);
+
+	ComPtr<ID3D11Resource> frameBuffer;
+	Graphics::pSwapChain->GetBuffer(0, __uuidof(ID3D11Resource), &frameBuffer);
+
+	Graphics::pDeviceContext->CopyResource(texture.Get(), frameBuffer.Get());
+
+	static Shader* gamma = Resources::FindShader("Tonemap");
+	gamma->GetDefaultPixelShaderVariant()->Bind();
+	gamma->GetDefaultVertexShaderVariant()->Bind();
+
+	Graphics::pDeviceContext->PSSetShaderResources(0, 1, postProcessInputTexture.GetAddressOf());
+	Graphics::pDeviceContext->PSSetSamplers(0, 1, postProcessSampler.GetAddressOf());
+	Graphics::pDeviceContext->RSSetState(postProcessRasterizerState.Get());
+	Graphics::pDeviceContext->OMSetBlendState(postProcessBlendState.Get(), NULL, 0xffffffff);
+
+	static const IndexBuffer* quadIndexBuffer = Mesh::Quad->GetSubMeshes()[0].GetIndexBuffer();
+	static const VertexBuffer* quadPositions = Mesh::Quad->GetSubMeshes()[0].GetVertexElement(VertexBuffer::ElementType::Position3D);
+	static const VertexBuffer* quadTexCoords = Mesh::Quad->GetSubMeshes()[0].GetVertexElement(VertexBuffer::ElementType::TexCoord);
+
+	quadIndexBuffer->BindPipeline();
+	quadPositions->BindPipeline();
+	quadTexCoords->BindPipeline();
+
+	Graphics::pDeviceContext->DrawIndexed(6, 0, 0);
 }

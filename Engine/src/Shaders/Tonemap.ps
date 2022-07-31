@@ -1,0 +1,21 @@
+// VARIANTS BEGIN
+// VARIANTS END
+
+#include "Tonemap.hlsli"
+
+struct IN 
+{
+	float2 texCoord : TEXCOORD;
+};
+
+Texture2D frameBuffer : register(t0);
+SamplerState frameBufferSampler : register(s0);
+
+float4 main(IN In) : SV_TARGET
+{
+	float3 final = abs(frameBuffer.SampleLevel(frameBufferSampler, In.texCoord,0)).xyz;
+
+    final = ACESFilm(final);
+
+	return float4(LinearToSRGB(final),1.0f);
+}

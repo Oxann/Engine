@@ -40,10 +40,6 @@ public:
 public:
 	DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
 	float intensity = 1.0f;
-	float range = 5.0f;
-public:
-	inline static float constant = 1.0f;
-	inline static float linear = 0.14f;
-	inline static float quadratic = 0.07f;
+	float range = 50.0f;
 	inline static constexpr unsigned int MaxCount = 4u;
 };

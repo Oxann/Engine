@@ -40,13 +40,7 @@ public:
 	static void Init(HWND hWnd);
 
 	static const Resolution& GetResolution();
-
-	//Projection
 	static float GetAspectRatio();
-	
-	//Height is in camera space from top to bottom. (NOT HALF!!!)
-	//If the projection type is perspective then height is vertical FOV angle.
-
 	static void SetAmbientColor(DirectX::XMFLOAT3 color);
 	static void SetAmbientIntensity(float intensity);
 	static DirectX::XMFLOAT3 GetAmbientColor();
@@ -67,7 +61,7 @@ public:
 	inline static D3D11_VIEWPORT viewport;
 	
 	inline static float clearColor[4] = {0.22f, 0.22f, 0.22f, 1.0f};
-	inline static bool isVSyncEnabled = false;
+	inline static bool isVSyncEnabled = true;
 
 	inline static std::mutex immediateContextMutex;
 

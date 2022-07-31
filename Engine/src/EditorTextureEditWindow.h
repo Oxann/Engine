@@ -16,6 +16,9 @@ public:
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Width: %d    height: %d", texture->GetWidth(), texture->GetHeight());
 
+		ImGui::AlignTextToFramePadding();
+		ImGui::Text("Color Space: %s", texture->GetColorSpace() == Texture::ColorSpace::RGB ? "RGB" : "sRGB");
+
 		//Filter mode selection
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text("Filter Mode:");

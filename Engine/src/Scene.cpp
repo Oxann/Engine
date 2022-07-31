@@ -14,12 +14,50 @@ void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
 
-	Entity* e2 = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("sponza.obj"));
-	e2->GetTransform()->SetLocalScale({ 0.01f,0.01f ,0.01f });
+	Scene::GetScene(1)->NewEntity(Entity::FindPrefab("spaceship.fbx"))->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
 
-	Entity* light = Scene::GetScene(1)->NewEntity("Light");
-	light->AddComponent<DirectionalLight>();
-	light->GetTransform()->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	for (int i = 0; i <= 10; i++)
+	{
+		for (int j = 0; j <= 10; j++)
+		{
+			Renderer* renderer = Scene::GetScene(1)->NewEntity("cube")->AddRenderer(nullptr);
+			renderer->GetTransform()->SetLocalPosition(i, 0.0f, -j);
+			renderer->SetMesh(Mesh::Sphere);
+
+			static auto shader = Resources::FindShader("LitPBR");
+			Material* pbr = new Material("pbr", shader);
+			pbr->SetFloat4("diffuseColor", { 1.0f,0.0f,0.0f,1.0f });
+			pbr->SetFloat("metalness", i * 0.1f);
+			pbr->SetFloat("smoothness", j * 0.1f);
+			renderer->SetMaterial(pbr, 0);
+		}
+	}
+
+	/*Entity* light = Scene::GetScene(1)->NewEntity("Light");
+	light->AddComponent<PointLight>();
+	light->GetTransform()->SetLocalPosition({ 3.0f, 5.0f, -3.0f });
+
+	Entity* light2 = Scene::GetScene(1)->NewEntity("Light");
+	light2->AddComponent<PointLight>();
+	light2->GetTransform()->SetLocalPosition({ 6.0f, 5.0f, -3.0f });
+
+
+	Entity* light3 = Scene::GetScene(1)->NewEntity("Light");
+	light3->AddComponent<PointLight>();
+	light3->GetTransform()->SetLocalPosition({ 3.0f, 5.0f, -6.0f });*/
+
+
+	Entity* light4 = Scene::GetScene(1)->NewEntity("Light");
+	light4->AddComponent<PointLight>();
+	light4->GetTransform()->SetLocalPosition({ 6.0f, 5.0f, -6.0f });
+
+
+	//Entity* light2 = Scene::GetScene(1)->NewEntity("Light2");
+	//light2->AddComponent<DirectionalLight>();
+	//light2->GetTransform()->SetLocalRotation(90.0f, 0.0f, 0.0f);
+
+	/*Entity* light3 = Scene::GetScene(1)->NewEntity("Light2");
+	light3->AddComponent<PointLight>();*/
 
 	Scene::LoadScene(1);
 };

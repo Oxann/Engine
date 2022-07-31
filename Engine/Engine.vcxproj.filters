@@ -8,10 +8,10 @@
       <Filter>Shaders\Unlit</Filter>
     </FxCompile>
     <FxCompile Include="src\Shaders\Lit.ps">
-      <Filter>Shaders\Phong</Filter>
+      <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="src\Shaders\Lit.vs">
-      <Filter>Shaders\Phong</Filter>
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +118,7 @@
     </ClCompile>
     <ClCompile Include="src\ThreadPool.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\TextureSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -273,13 +274,19 @@
     <ClInclude Include="src\Skybox.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="thirdparty\FastNoiseLite.h">
-      <Filter>thirdparty</Filter>
-    </ClInclude>
     <ClInclude Include="src\ShadowMap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\ThreadPool.h" />
+    <ClInclude Include="thirdparty\json.hpp">
+      <Filter>thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TextureSerializer.h">
+      <Filter>Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EditorLightingSettingsWindow.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -287,9 +294,6 @@
     </None>
     <None Include="thirdparty\assimp\Release\assimp-vc142-mt.dll">
       <Filter>thirdparty\assimp</Filter>
-    </None>
-    <None Include="src\Shaders\Light.hlsli">
-      <Filter>Shaders\Phong</Filter>
     </None>
     <None Include="src\Shaders\Skybox.vs">
       <Filter>Shaders\Skybox</Filter>
@@ -304,6 +308,24 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\Shaders\TransformBuffers.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Tonemap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Tonemap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\LitPBR.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\LitPBR.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Light.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Tonemap.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
@@ -350,9 +372,6 @@
     <Filter Include="Graphics\Render Queue">
       <UniqueIdentifier>{280460ca-b3b3-424b-a6d6-ce7f4754130b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders\Phong">
-      <UniqueIdentifier>{965110d6-226e-4102-b048-f93a2009e887}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Graphics\Shader System">
       <UniqueIdentifier>{a282c12a-8244-4c0c-8762-2b4e5827b9d5}</UniqueIdentifier>
     </Filter>
@@ -364,6 +383,9 @@
     </Filter>
     <Filter Include="Graphics\D3D">
       <UniqueIdentifier>{c12efcb2-b998-4067-bfa9-78b4c5b04607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Serialization">
+      <UniqueIdentifier>{3a2ce23e-3f9a-4da0-bad8-ce30d3365d59}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

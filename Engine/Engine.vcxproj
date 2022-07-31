@@ -234,7 +234,7 @@
       <AllowIsolation>false</AllowIsolation>
       <IgnoreEmbeddedIDL>true</IgnoreEmbeddedIDL>
       <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\assimp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -337,7 +337,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -373,6 +373,7 @@
     <ClCompile Include="src\ShadowMap.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\TextureSerializer.cpp" />
     <ClCompile Include="src\ThreadPool.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
@@ -385,6 +386,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\EditorLightingSettingsWindow.h" />
     <ClInclude Include="src\RenderQueueOutline.h" />
     <ClInclude Include="src\RenderQueueWireframe.h" />
     <ClInclude Include="src\RendererManager.h" />
@@ -424,8 +426,8 @@
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\TextureSerializer.h" />
     <ClInclude Include="src\ThreadPool.h" />
-    <ClInclude Include="thirdparty\FastNoiseLite.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h" />
     <ClInclude Include="thirdparty\imgui\imgui.h" />
     <ClInclude Include="thirdparty\imgui\imgui_impl_dx11.h" />
@@ -434,6 +436,7 @@
     <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="thirdparty\json.hpp" />
     <ClInclude Include="thirdparty\stb_image.h" />
     <ClInclude Include="src\Time.h" />
     <ClInclude Include="src\Transform.h" />
@@ -454,6 +457,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <None Include="src\Shaders\Tonemap.vs" />
+    <None Include="src\Shaders\Tonemap.ps" />
     <None Include="src\Shaders\Light.hlsli">
       <FileType>Document</FileType>
     </None>
@@ -484,10 +489,13 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
     </FxCompile>
+    <None Include="src\Shaders\LitPBR.ps" />
+    <None Include="src\Shaders\LitPBR.vs" />
     <None Include="src\Shaders\ShadowCast.ps" />
     <None Include="src\Shaders\ShadowCast.vs" />
     <None Include="src\Shaders\Skybox.vs" />
     <None Include="src\Shaders\Skybox.ps" />
+    <None Include="src\Shaders\Tonemap.hlsli" />
     <None Include="src\Shaders\TransformBuffers.hlsli" />
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll" />
     <None Include="thirdparty\assimp\Release\assimp-vc142-mt.dll" />

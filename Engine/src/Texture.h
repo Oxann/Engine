@@ -17,8 +17,15 @@ public:
 		TRILINEAR = D3D11_FILTER_MIN_MAG_MIP_LINEAR,
 		ANISOTROPIC = D3D11_FILTER_ANISOTROPIC
 	};
+
+	enum ColorSpace
+	{
+		sRGB = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM_SRGB,
+		RGB = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM
+	};
+
 public:
-	Texture(const std::filesystem::path& file);
+	Texture(const std::filesystem::path& file, FilterMode filterMode, int anisotropy, ColorSpace colorSpace);
 	Texture(int width, int height, unsigned char* initialData, FilterMode filterMode, D3D11_USAGE usage);
 
 	bool HasAlpha() const;
@@ -38,6 +45,8 @@ public:
 	unsigned int GetAnisotropy() const;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetResourceView() const;
+
+	ColorSpace GetColorSpace() const;
 
 	int GetWidth() const;
 	int GetHeight() const;

@@ -86,8 +86,8 @@ float3 CalculateDirectionalLights(float3 normal, float3 viewSpacePosition, float
         float3 halfwayVec = normalize(-directionalLights[i].direction + viewVec);
         float specular = pow(max(dot(halfwayVec, normal), 0.0f), shininess);
         
-        totalDiffuse += diffuse * directionalLights[i].ligth.rgb;
-        totalSpecular += specular * directionalLights[i].ligth.rgb;
+        totalDiffuse += diffuse * directionalLights[i].light.rgb;
+        totalSpecular += specular * directionalLights[i].light.rgb;
 
 #ifdef SHADOW
         totalDiffuse *= shadow;
@@ -150,12 +150,13 @@ float4 main(IN in_) : SV_Target
     
 
     //Lighting   
-    float3 phong = AmbientLight.rgb * AmbientLight.a * diffuseColor.rgb +
+    float3 phong = ambientLight.rgb * ambientLight.a * diffuseColor.rgb +
 #ifdef SHADOW
                CalculateDirectionalLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess, in_.lightSpacePosition.xyz) +
 #else
                CalculateDirectionalLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess) +
 #endif
                CalculatePointLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess);
-    return saturate(float4(phong, diffuseColor.a));
+
+    return float4(phong, diffuseColor.a);
 }
