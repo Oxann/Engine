@@ -117,7 +117,7 @@ void Resources::InitDefaultMaterials()
 	Shader::GetVertexShaderPerObjectBuffer();
 
 	Shader* unlitShader = FindShader("Unlit");
-	Shader* litShader = FindShader("Lit");
+	Shader* litShader = FindShader("LitPBR");
 
 	Material* wireframe = Materials.insert({ "$Default\\Wireframe", std::make_unique<Material>("Wireframe", unlitShader) }).first->second.get();
 	wireframe->SetFloat4("color", { 0.0f, 0.6f, 0.0f, 1.0f });
@@ -127,11 +127,10 @@ void Resources::InitDefaultMaterials()
 	Material* outline = Materials.insert({ "$Default\\Outline", std::make_unique<Material>("Outline", unlitShader) }).first->second.get();
 	outline->SetFloat4("color", { 1.0f, 0.0f, 0.0f, 1.0f });
 
-	Material* lit = Materials.insert({ "$Default\\Lit", std::make_unique<Material>("Lit", litShader) }).first->second.get();
-	lit->SetFloat4("matDiffuseColor", { 1.0f,1.0f,1.0f,1.0f });
-	lit->SetFloat4("matSpecularColor", { 1.0f,1.0f,1.0f,1.0f });
-	lit->SetFloat("matShininess", 0.5f);
-	lit->SetFloat("matShininessStrength", 1.0f);
+	Material* lit = Materials.insert({ "$Default\\LitPBR", std::make_unique<Material>("LitPBR", litShader) }).first->second.get();
+	lit->SetFloat4("diffuseColor", { 1.0f,1.0f,1.0f,1.0f });
+	lit->SetFloat("metalness", 0.5f);
+	lit->SetFloat("smoothness", 0.5f);
 }
 
 void Resources::InitDefaultTextures()

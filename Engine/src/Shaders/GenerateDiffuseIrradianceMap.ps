@@ -1,0 +1,42 @@
+// VARIANTS BEGIN
+// VARIANTS END
+
+#define PI 3.14159265359f
+
+TextureCube cubemap : register(t0);
+SamplerState cubemapSampler : register(s0);
+
+
+float4 main(float3 localPosition : LOCALPOSITION) : SV_TARGET
+{
+    float3 normal = normalize(localPosition);
+    
+    float3 irradiance = 0.0f;
+
+    float3 right = normalize(cross(float3(0.0f,1.0f,0.0f), normal));
+    float3 up = normalize(cross(normal, right));
+    
+    const float step = 0.01f;
+
+    float sampleCount = 0.0f;
+
+    for(float phi = 0.0f; phi < 2.0f * PI; phi += step)
+    {
+        for(float theta = 0.0f; theta < 0.5f * PI; theta += step)
+        {
+            const float tangentSpaceZ = cos(theta);
+            const float tangentSpaceXY = sin(theta);
+            const float tangentSpaceX = tangentSpaceXY * cos(phi);
+            const float tangentSpaceY = tangentSpaceXY * sin(phi);
+            const float3 sampleVec = normalize(tangentSpaceX * right + tangentSpaceY * up + tangentSpaceZ * normal);
+            
+            irradiance += cubemap.SampleLevel(cubemapSampler, sampleVec, 0).xyz * cos(theta) * sin(theta);
+            
+            sampleCount += 1.0f;
+        }
+    }
+
+    irradiance = PI * irradiance / sampleCount;
+
+    return float4(irradiance, 1.0f);
+}

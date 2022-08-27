@@ -348,6 +348,7 @@
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
+    <ClCompile Include="src\EnvironmentMap.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\D3DBase.cpp" />
     <ClCompile Include="src\EngineException.cpp" />
@@ -387,6 +388,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\EditorLightingSettingsWindow.h" />
+    <ClInclude Include="src\EnvironmentMap.h" />
     <ClInclude Include="src\RenderQueueOutline.h" />
     <ClInclude Include="src\RenderQueueWireframe.h" />
     <ClInclude Include="src\RendererManager.h" />
@@ -457,6 +459,15 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release-Editor|x64'">true</ExcludedFromBuild>
     </FxCompile>
+    <None Include="src\Shaders\GenerateCubemap.ps" />
+    <None Include="src\Shaders\GenerateCubemap.vs" />
+    <None Include="src\Shaders\GenerateDiffuseIrradianceMap.ps" />
+    <None Include="src\Shaders\GenerateDiffuseIrradianceMap.vs" />
+    <None Include="src\Shaders\GenerateSpecularIrradianceMap.ps" />
+    <None Include="src\Shaders\GenerateSpecularIrradianceMap.vs" />
+    <None Include="src\Shaders\IntegrateBRDF.ps" />
+    <None Include="src\Shaders\IntegrateBRDF.vs" />
+    <None Include="src\Shaders\PSBuffers.hlsli" />
     <None Include="src\Shaders\Tonemap.vs" />
     <None Include="src\Shaders\Tonemap.ps" />
     <None Include="src\Shaders\Light.hlsli">

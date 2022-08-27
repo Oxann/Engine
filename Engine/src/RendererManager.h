@@ -23,6 +23,7 @@ private:
 	void Update();
 	void UpdateShadowMaps();
 	void UpdateVertexShaderPerFrameBuffer();
+	void UpdatePixelShaderPerFrameBuffer();
 	void UpdateDirectionalLights();
 	void UpdatePointLights();
 	void Tonemap();

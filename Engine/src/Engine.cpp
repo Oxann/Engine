@@ -10,6 +10,7 @@
 #include "EngineAssert.h"
 #include "EngineException.h"
 #include "Time.h"
+#include "EnvironmentMap.h"
 
 
 void Engine::Init(std::wstring mainWindowName, unsigned int mainWindowWidth, unsigned int mainWindowHeight)
@@ -20,6 +21,7 @@ void Engine::Init(std::wstring mainWindowName, unsigned int mainWindowWidth, uns
 
 	Graphics::Init(MainWindow::GetHWND());
 
+
 #ifdef EDITOR
 	Editor::Init(MainWindow::GetHWND(), Graphics::pDeviceContext.Get(), Graphics::pDevice.Get());
 #endif
@@ -27,6 +29,8 @@ void Engine::Init(std::wstring mainWindowName, unsigned int mainWindowWidth, uns
 	Mesh::Init();
 
 	Resources::Init();
+
+    EnvironmentMap::GenerateBRDFLUT();
 
 	Scene::Init();
 

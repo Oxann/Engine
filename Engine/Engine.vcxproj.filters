@@ -119,6 +119,9 @@
     <ClCompile Include="src\ThreadPool.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\TextureSerializer.cpp" />
+    <ClCompile Include="src\EnvironmentMap.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -287,6 +290,9 @@
     <ClInclude Include="src\EditorLightingSettingsWindow.h">
       <Filter>Editor</Filter>
     </ClInclude>
+    <ClInclude Include="src\EnvironmentMap.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -326,6 +332,33 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\Shaders\Tonemap.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\GenerateCubemap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\GenerateCubemap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\GenerateDiffuseIrradianceMap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\GenerateDiffuseIrradianceMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\GenerateSpecularIrradianceMap.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\GenerateSpecularIrradianceMap.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\IntegrateBRDF.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\IntegrateBRDF.ps">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\PSBuffers.hlsli">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

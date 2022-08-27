@@ -8,19 +8,20 @@
 // VARIANTS END
 
 #include "Light.hlsli"
+#include "PSBuffers.hlsli"
 
 struct PSInput
 {
-    float3 viewSpacePosition : VIEWSPACEPOSITION;
-    float3 normal : VIEWSPACENORMAL;
+    float3 WorldSpacePosition : WORLDSPACEPOSITION;
+    float3 WorldSpaceNormal : WORLDSPACENORMAL;
     
 #if defined(DIFFUSETEXTURE) || defined(ROUGHNESSTEXTURE) || defined(METALNESSTEXTURE) || defined(NORMALTEXTURE) || defined(AMBIENTOCCLUSIONTEXTURE)
     float2 texCoord : TEXCOORD;
 #endif 
     
 #ifdef NORMALTEXTURE
-    float3 tangent : TANGENT;
-    float3 bitangent : BITANGENT;
+    float3 WorldSpaceTangent : WORLDSPACETANGENT;
+    float3 WorldSpaceBitangent : WORLDSPACEBITANGENT;
 #endif
 
 #ifdef SHADOW
@@ -76,12 +77,12 @@ float4 main(PSInput input) : SV_Target
 
 #ifdef NORMALTEXTURE
     const float3 normal = normalize(mul(normalTexture.Sample(normalTextureSampler, input.texCoord).rgb * 2.0f - 1.0f,
-                 float3x3(normalize(input.tangent), normalize(input.bitangent), normalize(input.normal))));
+                 float3x3(normalize(input.WorldSpaceTangent), normalize(input.WorldSpaceBitangent), normalize(input.WorldSpaceNormal))));
 #else
-    const float3 normal = normalize(input.normal);
+    const float3 normal = normalize(input.WorldSpaceNormal);
 #endif
 
-    const float3 viewDirection = normalize(-input.viewSpacePosition);
+    const float3 viewDirection = normalize(cameraPosition - input.WorldSpacePosition);
 
     float3 finalColor = {0.0f, 0.0f, 0.0f};
     [unroll]
@@ -113,15 +114,16 @@ float4 main(PSInput input) : SV_Target
 
     for(unsigned int j = 0; j < PointLightCount; j++)
     {
-        finalColor += CalculatePointLight(pointLights[j], surface, viewDirection, normal, input.viewSpacePosition);
+        finalColor += CalculatePointLight(pointLights[j], surface, viewDirection, normal, input.WorldSpacePosition);
     }
 
 #ifdef AMBIENTOCCLUSIONTEXTURE
-    float3 ambientFactor = ambientLight.xyz * ambientLight.w * surface.diffuseColor.xyz * ambientOcclusionTexture.Sample(ambientOcclusionTextureSampler, input.texCoord).r;
+    float3 ao = ambientOcclusionTexture.Sample(ambientOcclusionTextureSampler, input.texCoord).r;
 #else
-    float3 ambientFactor = ambientLight.xyz * ambientLight.w * surface.diffuseColor.xyz;
+    float3 ao = 1.0f;
 #endif
+    
+    finalColor +=  CalculateEnvironment(surface, viewDirection, normal) * ao;
 
-    finalColor += ambientFactor;
     return float4(finalColor, surface.diffuseColor.w);
 }

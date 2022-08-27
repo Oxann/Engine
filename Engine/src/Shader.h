@@ -49,6 +49,7 @@ public:
 
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
+		DirectX::XMMATRIX viewProjection;
 
 		static constexpr int slot = 11;
 		static VertexShaderPerFrameBuffer buffer;
@@ -64,6 +65,17 @@ public:
 		static constexpr int slot = 12;
 		static VertexShaderShadowBuffer buffer;
 		inline static const std::string bufferName = "ShadowBuffer";
+	};
+
+	struct PixelShaderPerFrameBuffer
+	{
+		PixelShaderPerFrameBuffer() = default;
+
+		alignas(16) DirectX::XMVECTOR cameraPosition;
+
+		static constexpr int slot = 10;
+		static PixelShaderPerFrameBuffer buffer;
+		inline static const std::string bufferName = "PerFrameBuffer";
 	};
 
 	struct MaterialBufferVariableDefinition
@@ -102,6 +114,7 @@ public:
 	static VS_ConstantBuffer<VertexShaderPerObjectBuffer>* const GetVertexShaderPerObjectBuffer();
 	static VS_ConstantBuffer<VertexShaderPerFrameBuffer>* const GetVertexShaderPerFrameBuffer();
 	static VS_ConstantBuffer<VertexShaderShadowBuffer>* const GetVertexShaderShadowBuffer();
+	static PS_ConstantBuffer<PixelShaderPerFrameBuffer>* const GetPixelShaderPerFrameBuffer();
 
 	bool HasMaterial() const;
 	unsigned int GetMaterialBufferSize() const;

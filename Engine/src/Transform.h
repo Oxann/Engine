@@ -48,8 +48,12 @@ public:
 	DirectX::XMVECTOR GetForward() const;
 
 	static const DirectX::XMVECTOR& GetWorldUp();
+	static const DirectX::XMVECTOR& GetWorldDown();
 	static const DirectX::XMVECTOR& GetWorldRight();
+	static const DirectX::XMVECTOR& GetWorldLeft();
 	static const DirectX::XMVECTOR& GetWorldForward();
+	static const DirectX::XMVECTOR& GetWorldBack();
+	static const DirectX::XMVECTOR& GetWorldOrigin();
 
 	//Relative to it's parent.
 	DirectX::XMMATRIX GetLocalMatrix() const;

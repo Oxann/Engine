@@ -1,7 +1,10 @@
 // VARIANTS BEGIN
 // VARIANTS END
 
-#include "TransformBuffers.hlsli"
+cbuffer Transform : register(b0)
+{
+	matrix viewProjection;
+};
 
 struct IN
 {
@@ -10,7 +13,7 @@ struct IN
 
 struct OUT
 {
-	float3 texCoord : TEXCOORD;
+	float3 localPosition : LOCALPOSITION;
 	float4 position : SV_POSITION;
 };
 
@@ -18,8 +21,8 @@ OUT main( IN in_)
 {
 	OUT Out;
 	
-	Out.texCoord = in_.position;
-	Out.position = mul(float4(in_.position, 0.0f), viewProjectionMatrix);
+	Out.localPosition = in_.position;
+	Out.position = mul(float4(in_.position, 0.0f), viewProjection);
 	Out.position.z = Out.position.w;
 
 	return Out;

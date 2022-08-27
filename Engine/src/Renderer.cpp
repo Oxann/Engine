@@ -20,7 +20,7 @@ Renderer* Renderer::Clone()
 
 void Renderer::SetMesh(Mesh* mesh)
 {
-	static Material* defaultLitMaterial = Resources::FindMaterial("$Default\\Lit");
+	static Material* defaultLitMaterial = Resources::FindMaterial("$Default\\LitPBR");
 
 	this->mesh = mesh;
 	materials.resize(0u);
@@ -187,7 +187,7 @@ const DirectX::XMMATRIX& Renderer::GetNormalMatrix()
 	if (!isNormalMatrixUpdated)
 	{
 		//Matrices need to be converted to column order before passing them to shaders.
-		normalMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, GetWorldViewMatrix()));
+		normalMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, GetWorldMatrix()));
 		isNormalMatrixUpdated = true;
 	}
 

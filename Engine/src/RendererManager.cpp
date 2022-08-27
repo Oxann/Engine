@@ -6,6 +6,7 @@
 #include <DirectXMath.h>
 #include "EngineAssert.h"
 #include <wrl.h>
+#include "Scene.h"
 
 RendererManager::RendererManager()
 	: meshCount(0),
@@ -84,6 +85,7 @@ void RendererManager::Update()
 
 	//Updating per frame constant buffer
 	UpdateVertexShaderPerFrameBuffer();
+	UpdatePixelShaderPerFrameBuffer();
 
 	//Creating frustum.
 	DirectX::BoundingFrustum::CreateFromMatrix(frustum,Graphics::GetProjectionMatrix());
@@ -112,8 +114,10 @@ void RendererManager::Update()
 	renderQueueOpaque.Render();
 	renderQueueTransparent.Render();
 
+
 	if (skybox)
 		skybox->Draw();
+
 
 	Tonemap();
 
@@ -206,7 +210,19 @@ void RendererManager::UpdateVertexShaderPerFrameBuffer()
 {
 	Shader::VertexShaderPerFrameBuffer::buffer.view = DirectX::XMMatrixTranspose(Graphics::GetViewMatrix());
 	Shader::VertexShaderPerFrameBuffer::buffer.projection = DirectX::XMMatrixTranspose(Graphics::GetProjectionMatrix());
+	Shader::VertexShaderPerFrameBuffer::buffer.viewProjection = DirectX::XMMatrixTranspose(Graphics::GetViewMatrix() * Graphics::GetProjectionMatrix());
 	Shader::GetVertexShaderPerFrameBuffer()->ChangeData(&Shader::VertexShaderPerFrameBuffer::buffer);
+}
+
+void RendererManager::UpdatePixelShaderPerFrameBuffer()
+{
+#ifdef EDITOR
+	Shader::PixelShaderPerFrameBuffer::buffer.cameraPosition = Editor::EditorCamera::position;
+#else
+	DirectX::XMFLOAT3 activeCameraPosition = activeCamera->GetTransform()->GetWorldPosition();
+	Shader::PixelShaderPerFrameBuffer::buffer.cameraPosition = DirectX::XMLoadFloat3(&activeCameraPosition);
+#endif
+	Shader::GetPixelShaderPerFrameBuffer()->ChangeData(&Shader::PixelShaderPerFrameBuffer::buffer);
 }
 
 void RendererManager::UpdateDirectionalLights()
@@ -218,10 +234,9 @@ void RendererManager::UpdateDirectionalLights()
 		const DirectionalLight& currentLight = *directionalLights[i];
 		directionalLights_TO_GPU.lights[i].depthBias = currentLight.depthBias;
 
-		DirectX::XMMATRIX lightModelView = DirectX::XMMatrixMultiply(
-			DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion()), Graphics::GetViewMatrix());
+		DirectX::XMMATRIX lightWorld = DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion());
 
-		DirectX::XMStoreFloat3(&directionalLights_TO_GPU.lights[i].direction, DirectX::XMVector3Normalize(lightModelView.r[2]));
+		DirectX::XMStoreFloat3(&directionalLights_TO_GPU.lights[i].direction, DirectX::XMVector3Normalize(lightWorld.r[2]));
 
 		directionalLights_TO_GPU.lights[i].light = { currentLight.color.x * currentLight.intensity,
 									currentLight.color.y * currentLight.intensity,
@@ -242,8 +257,8 @@ void RendererManager::UpdatePointLights()
 		const PointLight& currentLight = *pointLights[i];
 		DirectX::XMFLOAT3 worldPos = currentLight.GetEntity()->GetTransform()->GetWorldPosition();
 
-		//Light calculations in view space
-		DirectX::XMVECTOR pos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&worldPos), Graphics::GetViewMatrix());
+		//Light calculations in world space
+		DirectX::XMVECTOR pos = DirectX::XMLoadFloat3(&worldPos);
 		DirectX::XMStoreFloat3(&pointLights_TO_GPU.lights[i].position, pos);
 
 		pointLights_TO_GPU.lights[i].light = {

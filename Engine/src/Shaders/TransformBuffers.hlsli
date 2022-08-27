@@ -10,6 +10,7 @@ cbuffer PerObjectBuffer : register(b10)
 cbuffer PerFrameBuffer : register(b11)
 {
     matrix viewMatrix;
+    matrix projectionMatrix;
     matrix viewProjectionMatrix;
 }
 

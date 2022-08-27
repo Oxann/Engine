@@ -6,6 +6,7 @@
 #include "Light.h"
 #include "Graphics.h"
 #include "Editor.h"
+#include "EnvironmentMap.h"
 
 #include <set>
 
@@ -33,31 +34,15 @@ void Scene::Init()
 		}
 	}
 
-	/*Entity* light = Scene::GetScene(1)->NewEntity("Light");
-	light->AddComponent<PointLight>();
-	light->GetTransform()->SetLocalPosition({ 3.0f, 5.0f, -3.0f });
+	Entity* light5 = Scene::GetScene(1)->NewEntity("Light2");
+	light5->AddComponent<DirectionalLight>();
+	light5->GetTransform()->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	
+	Skybox* skybox = new Skybox(std::string_view("Resources\\newport.hdr"));
+	EnvironmentMap* env = new EnvironmentMap(skybox->GetTexture());
+	env->Bind();
 
-	Entity* light2 = Scene::GetScene(1)->NewEntity("Light");
-	light2->AddComponent<PointLight>();
-	light2->GetTransform()->SetLocalPosition({ 6.0f, 5.0f, -3.0f });
-
-
-	Entity* light3 = Scene::GetScene(1)->NewEntity("Light");
-	light3->AddComponent<PointLight>();
-	light3->GetTransform()->SetLocalPosition({ 3.0f, 5.0f, -6.0f });*/
-
-
-	Entity* light4 = Scene::GetScene(1)->NewEntity("Light");
-	light4->AddComponent<PointLight>();
-	light4->GetTransform()->SetLocalPosition({ 6.0f, 5.0f, -6.0f });
-
-
-	//Entity* light2 = Scene::GetScene(1)->NewEntity("Light2");
-	//light2->AddComponent<DirectionalLight>();
-	//light2->GetTransform()->SetLocalRotation(90.0f, 0.0f, 0.0f);
-
-	/*Entity* light3 = Scene::GetScene(1)->NewEntity("Light2");
-	light3->AddComponent<PointLight>();*/
+	Scene::GetScene(1)->rendererManager.skybox = skybox;
 
 	Scene::LoadScene(1);
 };

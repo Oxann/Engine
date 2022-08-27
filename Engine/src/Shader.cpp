@@ -20,6 +20,7 @@ using namespace Microsoft::WRL;
 Shader::VertexShaderPerFrameBuffer Shader::VertexShaderPerFrameBuffer::buffer;
 Shader::VertexShaderPerObjectBuffer Shader::VertexShaderPerObjectBuffer::buffer;
 Shader::VertexShaderShadowBuffer Shader::VertexShaderShadowBuffer::buffer;
+Shader::PixelShaderPerFrameBuffer Shader::PixelShaderPerFrameBuffer::buffer;
 
 Shader::Shader(const std::string& name,const std::filesystem::path& VS_Path, const std::filesystem::path& PS_Path)
 	:name(name),
@@ -316,4 +317,16 @@ void Shader::InitMaterialBufferAndTextures(Microsoft::WRL::ComPtr<ID3DBlob> pixe
 			break;
 		}
 	}
+}
+
+PS_ConstantBuffer<Shader::PixelShaderPerFrameBuffer>* const Shader::GetPixelShaderPerFrameBuffer()
+{
+	static PS_ConstantBuffer<Shader::PixelShaderPerFrameBuffer> perFrameBuffer(&Shader::PixelShaderPerFrameBuffer::buffer,
+		1,
+		Shader::PixelShaderPerFrameBuffer::slot,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true);
+
+	return &perFrameBuffer;
 }

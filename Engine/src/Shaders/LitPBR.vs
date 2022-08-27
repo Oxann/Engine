@@ -11,16 +11,16 @@
 
 struct OUT
 {
-    float3 ViewSpacePosition : VIEWSPACEPOSITION;
-    float3 ViewSpaceNormal : VIEWSPACENORMAL;
+    float3 WorldSpacePosition : WORLDSPACEPOSITION;
+    float3 WorldSpaceNormal : WORLDSPACENORMAL;
 
 #if defined(DIFFUSETEXTURE) || defined(ROUGHNESSTEXTURE) || defined(METALNESSTEXTURE) || defined(NORMALTEXTURE) || defined(AMBIENTOCCLUSIONTEXTURE)
     float2 TexCoord : TEXCOORD;
 #endif
     
 #if defined(NORMALTEXTURE)
-    float3 Tangent : TANGENT;
-    float3 Bitangent : BITANGENT;
+    float3 WorldSpaceTangent : WORLDSPACETANGENT;
+    float3 WorldSpaceBitangent : WORLDSPACEBITANGENT;
 #endif    
 
 #ifdef SHADOW
@@ -40,8 +40,8 @@ struct IN
 #endif 
     
 #ifdef NORMALTEXTURE
-    float3 Tangent : TANGENT;
-    float3 Bitangent : BITANGENT;
+    float3 WorldSpaceTangent : WORLDSPACETANGENT;
+    float3 WorldSpaceBitangent : WORLDSPACEBITANGENT;
 #endif   
 };
 
@@ -51,16 +51,16 @@ OUT main( IN in_ )
     OUT Out;
     
     Out.Position = mul(float4(in_.position, 1.0f), modelViewProjection);
-    Out.ViewSpacePosition = mul(float4(in_.position, 1.0f), modelView).xyz;
-    Out.ViewSpaceNormal = normalize(mul(in_.normal, (float3x3) normalMatrix));
+    Out.WorldSpacePosition = mul(float4(in_.position, 1.0f), model).xyz;
+    Out.WorldSpaceNormal = normalize(mul(in_.normal, (float3x3) normalMatrix));
 
 #if defined(DIFFUSETEXTURE) || defined(ROUGHNESSTEXTURE) || defined(METALNESSTEXTURE) || defined(NORMALTEXTURE) || defined(AMBIENTOCCLUSIONTEXTURE)
     Out.TexCoord = in_.TexCoord;
 #endif 
     
 #ifdef NORMALTEXTURE
-    Out.Tangent = normalize(mul(in_.Tangent, (float3x3)normalMatrix));
-    Out.Bitangent = normalize(mul(in_.Bitangent, (float3x3)normalMatrix));
+    Out.WorldSpaceTangent = normalize(mul(in_.WorldSpaceTangent, (float3x3)normalMatrix));
+    Out.WorldSpaceBitangent = normalize(mul(in_.WorldSpaceBitangent, (float3x3)normalMatrix));
 #endif
 
 #ifdef SHADOW

@@ -300,14 +300,38 @@ const DirectX::XMVECTOR& Transform::GetWorldUp()
 	return WorldUp;
 }
 
+const DirectX::XMVECTOR& Transform::GetWorldDown()
+{
+	static DirectX::XMVECTOR WorldUp = DirectX::XMVectorSet(0.0f, -1.0f, 0.0f, 1.0f);
+	return WorldUp;
+}
+
 const DirectX::XMVECTOR& Transform::GetWorldRight()
 {
 	static DirectX::XMVECTOR WorldRight = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
 	return WorldRight;
 }
 
+const DirectX::XMVECTOR& Transform::GetWorldLeft()
+{
+	static DirectX::XMVECTOR WorldUp = DirectX::XMVectorSet(-1.0f, 0.0f, 0.0f, 1.0f);
+	return WorldUp;
+}
+
 const DirectX::XMVECTOR& Transform::GetWorldForward()
 {
 	static DirectX::XMVECTOR WorldForward = DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f);
 	return WorldForward;
+}
+
+const DirectX::XMVECTOR& Transform::GetWorldBack()
+{
+	static DirectX::XMVECTOR WorldUp = DirectX::XMVectorSet(0.0f, 0.0f, -1.0f, 1.0f);
+	return WorldUp;
+}
+
+const DirectX::XMVECTOR& Transform::GetWorldOrigin()
+{
+	static DirectX::XMVECTOR WorldUp = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	return WorldUp;
 }
