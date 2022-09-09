@@ -7,6 +7,21 @@
 #include "EngineAssert.h"
 #include <wrl.h>
 #include "Scene.h"
+#include "Skybox.h"
+#include "EnvironmentMap.h"
+
+void RendererManager::SetSkybox(Skybox* skybox)
+{
+	this->skybox = skybox;
+}
+
+void RendererManager::SetEnvironmentMap(EnvironmentMap* environmentMap)
+{
+	environmentMapSettings.isActive = environmentMap != nullptr;
+	environmentMapSettingsBuffer.ChangeData(&environmentMapSettings);
+	this->environmentMap = environmentMap;
+	environmentMap->Bind();
+}
 
 RendererManager::RendererManager()
 	: meshCount(0),
@@ -86,6 +101,7 @@ void RendererManager::Update()
 	//Updating per frame constant buffer
 	UpdateVertexShaderPerFrameBuffer();
 	UpdatePixelShaderPerFrameBuffer();
+	environmentMapSettingsBuffer.BindPipeline();
 
 	//Creating frustum.
 	DirectX::BoundingFrustum::CreateFromMatrix(frustum,Graphics::GetProjectionMatrix());
@@ -232,7 +248,6 @@ void RendererManager::UpdateDirectionalLights()
 	for (unsigned int i = 0; i < DirectionalLights_TO_GPU::maxCount && i < directionalLights_TO_GPU.Count; i++)
 	{
 		const DirectionalLight& currentLight = *directionalLights[i];
-		directionalLights_TO_GPU.lights[i].depthBias = currentLight.depthBias;
 
 		DirectX::XMMATRIX lightWorld = DirectX::XMMatrixRotationQuaternion(currentLight.GetEntity()->GetTransform()->GetWorldQuaternion());
 

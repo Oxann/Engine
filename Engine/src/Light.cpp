@@ -36,6 +36,16 @@ ShadowMap::ShadowType DirectionalLight::GetShadowType() const
 	return shadowMap.GetShadowType();
 }
 
+void DirectionalLight::SetBias(float bias)
+{
+	shadowMap.SetBias(bias);
+}
+
+float DirectionalLight::GetBias()
+{
+	return shadowMap.GetBias();
+}
+
 void PointLight::Start()
 {
 	Scene::GetActiveScene()->rendererManager.pointLights.push_back(this);

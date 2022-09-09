@@ -150,7 +150,7 @@ float4 main(IN in_) : SV_Target
     
 
     //Lighting   
-    float3 phong = ambientLight.rgb * ambientLight.a * diffuseColor.rgb +
+    float3 phong = diffuseColor.rgb +
 #ifdef SHADOW
                CalculateDirectionalLights(in_.normal, in_.viewSpacePosition, diffuseColor.rgb, specularColor.rgb, shininess, in_.lightSpacePosition.xyz) +
 #else

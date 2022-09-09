@@ -6,18 +6,7 @@ using namespace Microsoft::WRL;
 
 ShadowMap::ShadowMap(int width, int height, ShadowType shadowType)
 {
-	D3D11_RASTERIZER_DESC rasterizerDesc;
-	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
-	rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
-	rasterizerDesc.FrontCounterClockwise = FALSE;
-	rasterizerDesc.DepthBias = 1000;
-	rasterizerDesc.DepthBiasClamp = 0.0f;
-	rasterizerDesc.SlopeScaledDepthBias = 1.0f;
-	rasterizerDesc.DepthClipEnable = TRUE;
-	rasterizerDesc.ScissorEnable = FALSE;
-	rasterizerDesc.MultisampleEnable = FALSE;
-	rasterizerDesc.AntialiasedLineEnable = FALSE;
-	CHECK_DX_ERROR(Graphics::pDevice->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf()));
+	SetBias(1000.0f);
 
 	D3D11_DEPTH_STENCIL_DESC depthStencilStateDesc = {};
 	depthStencilStateDesc.DepthEnable = TRUE;
@@ -114,6 +103,29 @@ void ShadowMap::SetShadowType(ShadowType shadowType)
 ShadowMap::ShadowType ShadowMap::GetShadowType() const
 {
 	return shadowType;
+}
+
+void ShadowMap::SetBias(float bias)
+{
+	this->bias = bias;
+
+	D3D11_RASTERIZER_DESC rasterizerDesc;
+	rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+	rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+	rasterizerDesc.FrontCounterClockwise = FALSE;
+	rasterizerDesc.DepthBias = bias;
+	rasterizerDesc.DepthBiasClamp = 0.0f;
+	rasterizerDesc.SlopeScaledDepthBias = 1.0f;
+	rasterizerDesc.DepthClipEnable = TRUE;
+	rasterizerDesc.ScissorEnable = FALSE;
+	rasterizerDesc.MultisampleEnable = FALSE;
+	rasterizerDesc.AntialiasedLineEnable = FALSE;
+	CHECK_DX_ERROR(Graphics::pDevice->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf()));
+}
+
+float ShadowMap::GetBias() const
+{
+	return bias;
 }
 
 void ShadowMap::CreateTextureAndViews(int width, int height)

@@ -21,7 +21,8 @@ public:
 	int GetHeight() const;
 	void SetShadowType(ShadowType shadowType);
 	ShadowType GetShadowType() const;
-
+	void SetBias(float bias);
+	float GetBias() const;
 private:
 	void CreateTextureAndViews(int width, int height);
 
@@ -37,4 +38,5 @@ private:
 	static constexpr int textureSlot = 9;
 	static constexpr int hardShadowsSamplerSlot = 9;
 	static constexpr int softShadowsSamplerSlot = 10;
+	float bias;
 };

@@ -5,12 +5,6 @@
 
 #define HASSOFTSHADOWS(light) light.shadowType == 1
 
-cbuffer AmbientLight : register(b0)
-{
-    // w is intensity
-    float4 ambientLight;
-}
-
 cbuffer DirectionalLights : register(b1)
 {
     uint DirectionalLightCount;
@@ -36,6 +30,11 @@ cbuffer PointLights : register(b2)
         float3 light; //color * intensity
         float3 position;
     } pointLights[MAX_POINT_LIGHT_COUNT];
+}
+
+cbuffer EnviromentMapSettings : register(b0)
+{
+    int hasEnvironmentMap;
 }
 
 

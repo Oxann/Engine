@@ -5,9 +5,9 @@
 #include "RenderQueueWireframe.h"
 #include "RenderQueueOutline.h"
 #include "Camera.h"
-#include "Skybox.h"
 #include <vector>
-
+#include "Skybox.h"
+#include "EnvironmentMap.h"
 
 class RendererManager
 {
@@ -18,6 +18,9 @@ class RendererManager
 	friend class Entity;
 	friend PointLight;
 	friend DirectionalLight;
+public:
+	void SetSkybox(Skybox* skybox);
+	void SetEnvironmentMap(EnvironmentMap* environmentMap);
 private:
 	RendererManager();
 	void Update();
@@ -49,6 +52,8 @@ private:
 
 	//Skybox
 	Skybox* skybox = nullptr;
+
+	EnvironmentMap* environmentMap = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> postProcessInputTexture;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> postProcessSampler;
@@ -102,6 +107,20 @@ private:
 		&pointLights_TO_GPU,
 		1u,
 		2u,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true
+	};
+
+	struct EnvironmentMapSettings
+	{
+		alignas(16) bool isActive = false;
+	} environmentMapSettings;
+
+	PS_ConstantBuffer<EnvironmentMapSettings> environmentMapSettingsBuffer = {
+		&environmentMapSettings,
+		1u,
+		0u,
 		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
 		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
 		true

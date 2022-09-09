@@ -211,7 +211,12 @@ private:
 			ImGui::AlignTextToFramePadding();
 			ImGui::Text("Depth Bias: ");
 			ImGui::SameLine();
-			ImGui::DragFloat("##depthBias", &displayedDirectionalLight->depthBias, 0.001f, 0.0f, 1.0f);
+			
+			float bias = displayedDirectionalLight->GetBias();
+			if (ImGui::DragFloat("##depthBias", &bias, 1.0f))
+			{
+				displayedDirectionalLight->SetBias(bias);
+			}
 
 			if (ImGui::CollapsingHeader("Shadow Settings"))
 			{

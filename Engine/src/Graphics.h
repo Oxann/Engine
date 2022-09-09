@@ -61,7 +61,7 @@ public:
 	inline static D3D11_VIEWPORT viewport;
 	
 	inline static float clearColor[4] = {0.22f, 0.22f, 0.22f, 1.0f};
-	inline static bool isVSyncEnabled = true;
+	inline static bool isVSyncEnabled = false;
 
 	inline static std::mutex immediateContextMutex;
 

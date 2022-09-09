@@ -96,16 +96,20 @@ float4 main(PSInput input) : SV_Target
         shadowMapCoord = shadowMapCoord * 0.5f + 0.5f;
 
         float shadow = 1.0f; // 0 is full shadow
-        if(HASSOFTSHADOWS(directionalLights[i]) && input.lightSpacePosition.z < 1.0f)
+        if(input.lightSpacePosition.z < 1.0f)
         {
-            shadow = shadowMap.SampleCmpLevelZero(softShadowsSampler, shadowMapCoord, input.lightSpacePosition.z);
+            if(HASSOFTSHADOWS(directionalLights[i]))
+            {
+                shadow = shadowMap.SampleCmpLevelZero(softShadowsSampler, shadowMapCoord, input.lightSpacePosition.z);
+            }
+            else
+            {
+                float lightDist = shadowMap.Sample(hardShadowsSampler, shadowMapCoord).r;
+                if(lightDist < input.lightSpacePosition.z)
+                    shadow = 0.0f;
+            }
         }
-        else
-        {
-            float lightDist = shadowMap.Sample(hardShadowsSampler, shadowMapCoord).r;
-            if(lightDist < input.lightSpacePosition.z)
-                shadow = 0.0f;
-        }
+
         finalColor += CalculateDirectionalLight(directionalLights[i], surface, viewDirection, normal) * shadow;
     #else
         finalColor += CalculateDirectionalLight(directionalLights[i], surface, viewDirection, normal);
@@ -123,7 +127,8 @@ float4 main(PSInput input) : SV_Target
     float3 ao = 1.0f;
 #endif
     
-    finalColor +=  CalculateEnvironment(surface, viewDirection, normal) * ao;
+    if(hasEnvironmentMap)
+        finalColor +=  CalculateEnvironment(surface, viewDirection, normal) * ao;
 
     return float4(finalColor, surface.diffuseColor.w);
 }
