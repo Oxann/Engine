@@ -195,7 +195,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\bullet\Include;$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
@@ -203,15 +203,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AllowIsolation>false</AllowIsolation>
       <IgnoreEmbeddedIDL>true</IgnoreEmbeddedIDL>
-      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\assimp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\bullet\Debug;$(ProjectDir)\thirdparty\assimp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mtd.lib;BulletCollision_vs2010_x64_debug.lib;BulletDynamics_vs2010_x64_debug.lib;LinearMath_vs2010_x64_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
       <ObjectFileOutput>$(ProjectDir)Shaders\$(Configuration)\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Editor|x64'">
@@ -225,7 +225,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\bullet\Include;$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
@@ -233,15 +233,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AllowIsolation>false</AllowIsolation>
       <IgnoreEmbeddedIDL>true</IgnoreEmbeddedIDL>
-      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\assimp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\bullet\Debug;$(ProjectDir)\thirdparty\assimp\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mtd.lib;BulletCollision_vs2010_x64_debug.lib;BulletDynamics_vs2010_x64_debug.lib;LinearMath_vs2010_x64_debug.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
       <ObjectFileOutput>$(ProjectDir)Shaders\$(Configuration)\%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -299,7 +299,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\bullet\Include;$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
@@ -307,8 +307,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\bullet\Release;$(ProjectDir)\thirdparty\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;BulletCollision_vs2010_x64_release.lib;BulletDynamics_vs2010_x64_release.lib;LinearMath_vs2010_x64_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -328,7 +328,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <LanguageStandard>stdcpplatest</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\thirdparty\bullet\Include;$(ProjectDir)\thirdparty\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableModules>true</EnableModules>
     </ClCompile>
     <Link>
@@ -336,8 +336,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\thirdparty\bullet\Release;$(ProjectDir)\thirdparty\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc143-mt.lib;BulletCollision_vs2010_x64_release.lib;BulletDynamics_vs2010_x64_release.lib;LinearMath_vs2010_x64_release.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ShaderModel>5.0</ShaderModel>
@@ -345,7 +345,9 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\BoxCollider.cpp" />
     <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Collider.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\Engine.cpp" />
     <ClCompile Include="src\EnvironmentMap.cpp" />
@@ -360,6 +362,8 @@
     <ClCompile Include="src\MainWindow.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
+    <ClCompile Include="src\PhysicsWorld.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\RendererManager.cpp" />
     <ClCompile Include="src\RenderQueueOpaque.cpp" />
@@ -367,12 +371,14 @@
     <ClCompile Include="src\RenderQueueTransparent.cpp" />
     <ClCompile Include="src\RenderQueueWireframe.cpp" />
     <ClCompile Include="src\Resources.cpp" />
+    <ClCompile Include="src\Rigidbody.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShaderVariant.cpp" />
     <ClCompile Include="src\ShaderView.cpp" />
     <ClCompile Include="src\ShadowMap.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
+    <ClCompile Include="src\SphereCollider.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\TextureSerializer.cpp" />
     <ClCompile Include="src\ThreadPool.cpp" />
@@ -386,9 +392,13 @@
     <ClCompile Include="src\WinMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\BoxCollider.h" />
     <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Collider.h" />
     <ClInclude Include="src\EditorLightingSettingsWindow.h" />
     <ClInclude Include="src\EnvironmentMap.h" />
+    <ClInclude Include="src\Physics.h" />
+    <ClInclude Include="src\PhysicsWorld.h" />
     <ClInclude Include="src\RenderQueueOutline.h" />
     <ClInclude Include="src\RenderQueueWireframe.h" />
     <ClInclude Include="src\RendererManager.h" />
@@ -421,12 +431,14 @@
     <ClInclude Include="src\MainWindow.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\Renderer.h" />
+    <ClInclude Include="src\Rigidbody.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\ShaderVariant.h" />
     <ClInclude Include="src\ShaderView.h" />
     <ClInclude Include="src\ShadowMap.h" />
     <ClInclude Include="src\Skybox.h" />
+    <ClInclude Include="src\SphereCollider.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\TextureSerializer.h" />
     <ClInclude Include="src\ThreadPool.h" />

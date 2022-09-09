@@ -41,6 +41,9 @@ public:
 	const DirectX::XMVECTOR& GetLocalQuaternion() const;
 	
 	void SetLocalRotation(float x, float y, float z);
+	
+	//Expects a quaternion. 
+	void SetLocalRotation(float x, float y, float z, float w); 
 
 	//World Space (relative to it's parent)
 	DirectX::XMVECTOR GetUp() const;

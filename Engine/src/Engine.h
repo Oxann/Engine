@@ -15,7 +15,7 @@ public:
 private:
 	static void Update();
 private:
-	static void ShutDown();
+	static void Shutdown();
 public:
 	static inline ThreadPool threadPool;
 };

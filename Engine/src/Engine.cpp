@@ -11,6 +11,7 @@
 #include "EngineException.h"
 #include "Time.h"
 #include "EnvironmentMap.h"
+#include "Physics.h"
 
 
 void Engine::Init(std::wstring mainWindowName, unsigned int mainWindowWidth, unsigned int mainWindowHeight)
@@ -31,6 +32,8 @@ void Engine::Init(std::wstring mainWindowName, unsigned int mainWindowWidth, uns
 	Resources::Init();
 
     EnvironmentMap::GenerateBRDFLUT();
+
+    Physics::Init();
 
 	Scene::Init();
 
@@ -85,7 +88,7 @@ int Engine::Start()
 
     while (Log::MessageCount() > 0); // Waiting for all log messages to be pumped.
 
-    Engine::ShutDown();
+    Engine::Shutdown();
 
     return 0;
 }
@@ -105,11 +108,14 @@ void Engine::Update()
 	Editor::Update();
 #endif
 
+    Physics::Update();
+
 	//Render
 	Scene::ActiveScene->rendererManager.Update();
 }
 
-void Engine::ShutDown()
+void Engine::Shutdown()
 {
-    MainWindow::ShutDown();
+    Physics::ShutDown();
+    MainWindow::Shutdown();
 }

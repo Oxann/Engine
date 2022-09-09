@@ -37,7 +37,7 @@ void MainWindow::Init(std::wstring name, int clientWidth, int clientHeight)
 	ENGINE_LOG(ENGINE_INFO, "Main Window Ready!");
 }
 
-void MainWindow::ShutDown()
+void MainWindow::Shutdown()
 {
 	DestroyWindow(hWnd);
 	UnregisterClass(MainWindowClassName.c_str(), GetModuleHandle(nullptr));

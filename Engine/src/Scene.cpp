@@ -7,6 +7,9 @@
 #include "Graphics.h"
 #include "Editor.h"
 #include "EnvironmentMap.h"
+#include "BoxCollider.h"
+#include "Rigidbody.h"
+#include "SphereCollider.h"
 
 #include <set>
 
@@ -15,9 +18,36 @@ void Scene::Init()
 {
 	Scene::CreateNewScene(1, "first scene");
 
-	Scene::GetScene(1)->NewEntity(Entity::FindPrefab("spaceship.fbx"))->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
+	auto a = Scene::GetScene(1)->NewEntity(Entity::FindPrefab("character.fbx"));
+	a->GetTransform()->SetLocalScale(0.01f, 0.01f, 0.01f);
 
-	for (int i = 0; i <= 10; i++)
+	/*auto x = Scene::GetScene(1)->NewEntity("asd");
+	auto r = x->AddRenderer(nullptr);
+	r->SetMesh(Mesh::Cube);
+	r->GetTransform()->SetLocalPosition(0.0f, 0.5f, 0.0f);*/
+
+	Renderer* renderer = Scene::GetScene(1)->NewEntity("cube")->AddRenderer(nullptr);
+	renderer->GetTransform()->SetLocalScale(50.0f,1.0f,50.0f);
+	renderer->GetTransform()->SetLocalPosition(0.0f,-0.5f,0.0f);
+	renderer->SetMesh(Mesh::Cube);
+
+/* {
+		auto x = Scene::GetScene(1)->NewEntity("asd");
+		x->AddComponent<SphereCollider>()->SetRadius(1.0f);
+		auto r = x->AddRenderer(nullptr);
+		r->SetMesh(Mesh::Cube);
+		r->GetTransform()->SetLocalPosition({ 0.0f,15.0f,0.0f });
+	}
+
+	{
+		auto x = Scene::GetScene(1)->NewEntity("asd");
+		x->AddComponent<BoxCollider>()->SetSize(1.0f,1.0f,1.0f);
+		auto r = x->AddRenderer(nullptr);
+		r->SetMesh(Mesh::Cube);
+	}*/
+	
+	
+	/*for (int i = 0; i <= 10; i++)
 	{
 		for (int j = 0; j <= 10; j++)
 		{
@@ -32,17 +62,17 @@ void Scene::Init()
 			pbr->SetFloat("smoothness", j * 0.1f);
 			renderer->SetMaterial(pbr, 0);
 		}
-	}
+	}*/
 
 	Entity* light5 = Scene::GetScene(1)->NewEntity("Light2");
 	light5->AddComponent<DirectionalLight>();
-	light5->GetTransform()->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	light5->GetTransform()->SetLocalRotation(45.0f, 0.0f, 0.0f);
 	
-	Skybox* skybox = new Skybox(std::string_view("Resources\\newport.hdr"));
-	EnvironmentMap* env = new EnvironmentMap(skybox->GetTexture());
-	env->Bind();
+	//Skybox* skybox = new Skybox(std::string_view("Resources\\newport.hdr"));
+	//EnvironmentMap* env = new EnvironmentMap(skybox->GetTexture());
+	//Scene::GetScene(1)->rendererManager.SetSkybox(skybox);
+	//Scene::GetScene(1)->rendererManager.SetEnvironmentMap(env);
 
-	Scene::GetScene(1)->rendererManager.skybox = skybox;
 
 	Scene::LoadScene(1);
 };

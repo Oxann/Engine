@@ -94,7 +94,7 @@ void Log::_Write()
 		//Console output
 		std::cout << formattedMsg.str();
 		//File output
-		out << formattedMsg.rdbuf();
+		//out << formattedMsg.rdbuf();
 
 		log.logLock.lock();
 		Messages.pop();

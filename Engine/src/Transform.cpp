@@ -233,6 +233,13 @@ void Transform::SetLocalRotation(float x, float y, float z)
 	localQuaternion = DirectX::XMQuaternionRotationRollPitchYaw(DirectX::XMConvertToRadians(x), DirectX::XMConvertToRadians(y), DirectX::XMConvertToRadians(z));
 }
 
+void Transform::SetLocalRotation(float x, float y, float z, float w)
+{
+	isLocalMatrixUpdated = false;
+	DirectX::XMFLOAT4 newRotation = { x,y,z,w };
+	localQuaternion = DirectX::XMLoadFloat4(&newRotation);
+}
+
 DirectX::XMMATRIX Transform::GetLocalMatrix() const
 {
 	if (!isLocalMatrixUpdated)

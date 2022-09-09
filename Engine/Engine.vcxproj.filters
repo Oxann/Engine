@@ -122,6 +122,24 @@
     <ClCompile Include="src\EnvironmentMap.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="src\Physics.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rigidbody.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BoxCollider.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Collider.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SphereCollider.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsWorld.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -293,6 +311,24 @@
     <ClInclude Include="src\EnvironmentMap.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="src\Physics.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Rigidbody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsWorld.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\BoxCollider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Collider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SphereCollider.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -352,14 +388,14 @@
     <None Include="src\Shaders\GenerateSpecularIrradianceMap.vs">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\Shaders\IntegrateBRDF.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="src\Shaders\IntegrateBRDF.ps">
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\Shaders\PSBuffers.hlsli">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\IntegrateBRDF.vs">
+      <Filter>Serialization</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -419,6 +455,9 @@
     </Filter>
     <Filter Include="Serialization">
       <UniqueIdentifier>{3a2ce23e-3f9a-4da0-bad8-ce30d3365d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{6d026864-157b-44f2-a336-c274823f072d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

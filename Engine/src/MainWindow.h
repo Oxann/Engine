@@ -7,7 +7,7 @@ class MainWindow
 {
 public:
 	static void Init(std::wstring name, int clientWidth, int clientHeight);
-	static void ShutDown();
+	static void Shutdown();
 
 	static HWND GetHWND();
 	static Resolution GetDisplayResolution();
