@@ -70,7 +70,7 @@ public:
 		return nullptr;
 	}
 private:
-	static void MousePick(Entity* entity, float& minDistance, Entity** pickedEntity, const float viewSpaceX, const float viewSpaceY);
+	//static void MousePick(Entity* entity, float& minDistance, Entity** pickedEntity, const float viewSpaceX, const float viewSpaceY);
 public:
 	inline static bool isActive = true;
 	inline static ImGuiIO* imguiIO = nullptr;

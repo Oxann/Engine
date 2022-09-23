@@ -1,5 +1,6 @@
 #pragma once
 #include "Renderer.h"
+#include "SkinnedRenderer.h"
 #include "RenderQueueOpaque.h"
 #include "RenderQueueTransparent.h"
 #include "RenderQueueWireframe.h"
@@ -13,7 +14,9 @@ class RendererManager
 {
 	friend class Engine;
 	friend class Scene;
+	friend RendererBase;
 	friend Renderer;
+	friend SkinnedRenderer;
 	friend class EditorEntityWindow;
 	friend class Entity;
 	friend PointLight;
@@ -36,8 +39,11 @@ public:
 	unsigned long long triangleCount;
 
 	Camera* activeCamera = nullptr;
+	DirectX::BoundingFrustum frustum;
+
 private:	
 	std::vector<Renderer*> renderers;
+	std::vector<SkinnedRenderer*> skinnedRenderers;
 	std::vector<DirectionalLight*> directionalLights;
 	std::vector<PointLight*> pointLights;
 
@@ -46,9 +52,6 @@ private:
 	RenderQueueTransparent renderQueueTransparent;
 	RenderQueueWireframe renderQueueWireframe;
 	RenderQueueOutline renderQueueOutline;
-
-	//Frustum
-	DirectX::BoundingFrustum frustum;
 
 	//Skybox
 	Skybox* skybox = nullptr;

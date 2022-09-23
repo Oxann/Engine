@@ -14,7 +14,9 @@ public:
 		TexCoord,
 		Normal,
 		Tangent,
-		Bitangent
+		Bitangent,
+		BoneWeights,
+		BoneIDs
 	};
 public:
 	VertexBuffer(const void* data, unsigned int count,ElementType type)
@@ -47,6 +49,14 @@ public:
 		case VertexBuffer::ElementType::Bitangent:
 			slot = 4u;
 			stride = sizeof(float) * 3u;
+			break;
+		case VertexBuffer::ElementType::BoneIDs:
+			slot = 5u;
+			stride = sizeof(float) * 4u;
+			break;
+		case VertexBuffer::ElementType::BoneWeights:
+			slot = 6u;
+			stride = sizeof(unsigned int) * 4u;
 			break;
 		default:
 			ENGINEASSERT(false, "Vertex buffer type is not correct.");

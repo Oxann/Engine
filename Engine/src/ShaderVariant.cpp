@@ -100,6 +100,19 @@ void VertexShaderVariant::InitInputLayoutAndBuffers(Microsoft::WRL::ComPtr<ID3DB
 			temp_ilo.Format = DXGI_FORMAT_R32G32B32_FLOAT;
 			vertexElements.emplace_back(VertexBuffer::ElementType::Bitangent);
 		}
+		else if (semanticName == "BONEIDS")
+		{
+			temp_ilo.InputSlot = 5u;
+			temp_ilo.Format = DXGI_FORMAT_R32G32B32A32_SINT;
+			vertexElements.emplace_back(VertexBuffer::ElementType::BoneIDs);
+		}
+		else if (semanticName == "BONEWEIGHTS")
+		{
+			temp_ilo.InputSlot = 6u;
+			temp_ilo.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			vertexElements.emplace_back(VertexBuffer::ElementType::BoneWeights);
+		}
+
 		ilo.push_back(temp_ilo);
 	}
 	CHECK_DX_ERROR(Graphics::pDevice->CreateInputLayout(ilo.data(), (UINT)ilo.size(), blob->GetBufferPointer(), blob->GetBufferSize(), &inputLayout));

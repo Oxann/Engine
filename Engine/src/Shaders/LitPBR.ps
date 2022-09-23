@@ -5,6 +5,7 @@
 // METALNESSTEXTURE
 // AMBIENTOCCLUSIONTEXTURE
 // SHADOW
+// SKINNING
 // VARIANTS END
 
 #include "Light.hlsli"
@@ -96,6 +97,7 @@ float4 main(PSInput input) : SV_Target
         shadowMapCoord = shadowMapCoord * 0.5f + 0.5f;
 
         float shadow = 1.0f; // 0 is full shadow
+        #ifndef SKINNING
         if(input.lightSpacePosition.z < 1.0f)
         {
             if(HASSOFTSHADOWS(directionalLights[i]))
@@ -109,7 +111,7 @@ float4 main(PSInput input) : SV_Target
                     shadow = 0.0f;
             }
         }
-
+        #endif
         finalColor += CalculateDirectionalLight(directionalLights[i], surface, viewDirection, normal) * shadow;
     #else
         finalColor += CalculateDirectionalLight(directionalLights[i], surface, viewDirection, normal);

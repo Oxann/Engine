@@ -108,7 +108,12 @@ void RendererManager::Update()
 	
 	for (const auto& renderer : renderers)
 	{
-		renderer->Update();
+		renderer->PrepareForRendering();
+	}
+
+	for (const auto& skinnedRenderer : skinnedRenderers)
+	{
+		skinnedRenderer->PrepareForRendering();
 	}
 
 	UpdateShadowMaps();
@@ -156,18 +161,27 @@ void RendererManager::Update()
 
 void RendererManager::UpdateShadowMaps()
 {
+	//Non skinned version of the shadow cast shader and VS constant buffer.
 	static ShaderView shadowMapShader(Resources::FindShader("ShadowCast"));
-	shadowMapShader.Bind();
-	Graphics::pDeviceContext->OMSetRenderTargets(0u, nullptr, nullptr);
-	
 	struct VS_CBUFFER_SLOT0
 	{
 		DirectX::XMMATRIX MVP = DirectX::XMMatrixIdentity();
 	};
-
 	static VS_CBUFFER_SLOT0 vs_cbuffer_slot0_data;
-	static VS_ConstantBuffer<VS_CBUFFER_SLOT0> vs_cbuffer_slot0(&vs_cbuffer_slot0_data,1,0,D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,true);
+	static VS_ConstantBuffer<VS_CBUFFER_SLOT0> vs_cbuffer_slot0(&vs_cbuffer_slot0_data, 1, 0, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE, false);
 
+	//Skinned version of the shadow cast shader and VS constant buffer.
+	static ShaderView shadowMapSkinnedShader(Resources::FindShader("ShadowCastSkinned"));
+	struct VS_CBUFFER_SLOT0_SKINNED
+	{
+		DirectX::XMMATRIX MVP[80];
+	};
+	static VS_CBUFFER_SLOT0_SKINNED vs_cbuffer_slot0_skinned_data;
+	static VS_ConstantBuffer<VS_CBUFFER_SLOT0_SKINNED> vs_cbuffer_slot0_skinned(&vs_cbuffer_slot0_skinned_data, 1, 0, D3D11_USAGE::D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE, false);
+
+	//We don't need a render target so we set it null.
+	Graphics::pDeviceContext->OMSetRenderTargets(0u, nullptr, nullptr);
+	
 	for (int i = 0; i < directionalLights.size(); i++)
 	{
 		directionalLights[i]->shadowMap.BindAsDepthBuffer();
@@ -175,7 +189,7 @@ void RendererManager::UpdateShadowMaps()
 		DirectX::XMMATRIX lightViewMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixRotationQuaternion(directionalLights[i]->GetTransform()->GetWorldQuaternion()));
 		
 #ifdef EDITOR
-		DirectX::XMMATRIX viewToLightSpace = Editor::EditorCamera::rotationMatrix * DirectX::XMMatrixTranslationFromVector(Editor::EditorCamera::position) * lightViewMatrix;
+		DirectX::XMMATRIX viewToLightSpace = DirectX::XMMatrixTranslationFromVector(Editor::EditorCamera::position) * lightViewMatrix;
 #else
 		DirectX::XMMATRIX viewToLightSpace = activeCamera->GetTransform()->GetWorldMatrix()* lightViewMatrix;
 #endif
@@ -199,14 +213,18 @@ void RendererManager::UpdateShadowMaps()
 		max.y = step * std::floor(max.y / step);
 
 		DirectX::XMMATRIX proj = DirectX::XMMatrixOrthographicOffCenterLH(min.x, max.x, min.y, max.y, min.z, max.z);
-		
+		DirectX::XMMATRIX lightViewProj = lightViewMatrix * proj;
+
+
+		shadowMapShader.Bind();
+		vs_cbuffer_slot0.BindPipeline();
 		for (int j = 0; j < renderers.size(); j++)
 		{
 			Renderer* currentRenderer = renderers[j];
 			
 			if (currentRenderer->castShadows)
 			{
-				currentRenderer->lightSpaceMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranspose(currentRenderer->GetWorldMatrix()) * lightViewMatrix * proj);
+				currentRenderer->lightSpaceMatrix = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranspose(currentRenderer->GetWorldMatrix()) * lightViewProj);
 				vs_cbuffer_slot0_data.MVP = currentRenderer->lightSpaceMatrix;
 				vs_cbuffer_slot0.ChangeData(&vs_cbuffer_slot0_data);
 
@@ -216,6 +234,37 @@ void RendererManager::UpdateShadowMaps()
 					subMeshes[subMeshIndex].GetVertexElement(VertexBuffer::ElementType::Position3D)->BindPipeline();
 					subMeshes[subMeshIndex].GetIndexBuffer()->BindPipeline();
 					Graphics::pDeviceContext->DrawIndexed(subMeshes[subMeshIndex].GetIndexCount(), 0, 0);
+				}
+			}
+		}
+
+		shadowMapSkinnedShader.Bind();
+		vs_cbuffer_slot0_skinned.BindPipeline();
+		for (int j = 0; j < skinnedRenderers.size(); j++)
+		{
+			SkinnedRenderer* currentRenderer = skinnedRenderers[j];
+			const auto& bones = currentRenderer->bones;
+			const auto& bonesWorldMatrices = currentRenderer->boneWorldMatrices;
+
+			if (currentRenderer->castShadows)
+			{
+				for (int boneIndex = 0; boneIndex < bones.size(); boneIndex++)
+				{
+					vs_cbuffer_slot0_skinned_data.MVP[boneIndex] = DirectX::XMMatrixTranspose(DirectX::XMMatrixTranspose(bonesWorldMatrices[boneIndex]) * lightViewProj);
+				}
+				vs_cbuffer_slot0_skinned.ChangeData(&vs_cbuffer_slot0_skinned_data);
+
+				for (int meshIndex = 0; meshIndex < currentRenderer->meshes.size(); meshIndex++)
+				{
+					auto mesh = currentRenderer->meshes[meshIndex];
+					for (int submeshIndex = 0; submeshIndex < mesh->GetSubMeshCount(); submeshIndex++)
+					{
+						mesh->GetSubMeshes()[submeshIndex].GetVertexElement(VertexBuffer::ElementType::Position3D)->BindPipeline();
+						mesh->GetSubMeshes()[submeshIndex].GetVertexElement(VertexBuffer::ElementType::BoneIDs)->BindPipeline();
+						mesh->GetSubMeshes()[submeshIndex].GetVertexElement(VertexBuffer::ElementType::BoneWeights)->BindPipeline();
+						mesh->GetSubMeshes()[submeshIndex].GetIndexBuffer()->BindPipeline();
+						Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[submeshIndex].GetIndexCount(), 0, 0);
+					}
 				}
 			}
 		}
@@ -299,9 +348,9 @@ void RendererManager::Tonemap()
 
 	Graphics::pDeviceContext->CopyResource(texture.Get(), frameBuffer.Get());
 
-	static Shader* gamma = Resources::FindShader("Tonemap");
-	gamma->GetDefaultPixelShaderVariant()->Bind();
-	gamma->GetDefaultVertexShaderVariant()->Bind();
+	static Shader* tonemapShader = Resources::FindShader("Tonemap");
+	tonemapShader->GetDefaultPixelShaderVariant()->Bind();
+	tonemapShader->GetDefaultVertexShaderVariant()->Bind();
 
 	Graphics::pDeviceContext->PSSetShaderResources(0, 1, postProcessInputTexture.GetAddressOf());
 	Graphics::pDeviceContext->PSSetSamplers(0, 1, postProcessSampler.GetAddressOf());

@@ -2,7 +2,7 @@
 #include <d3d11.h>
 #include <wrl.h>
 
-class Renderer;
+class RendererBase;
 class RendererManager;
 
 class RenderQueueBase
@@ -10,10 +10,10 @@ class RenderQueueBase
 public:
 	struct RenderQueueBaseItem
 	{
-		RenderQueueBaseItem(Renderer* renderer, unsigned int subMeshIndex)
+		RenderQueueBaseItem(RendererBase* renderer, unsigned int subMeshIndex)
 			:renderer(renderer), subMeshIndex(subMeshIndex)
 		{}
-		Renderer* renderer;
+		RendererBase* renderer;
 		unsigned int subMeshIndex;
 	};
 public:

@@ -43,7 +43,9 @@ public:
 
 	unsigned int GetTextureCount() const;
 
- 	void Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const;
+	bool HasShadows() const;
+
+ 	void Bind(const Mesh::SubMesh* subMesh) const;
 
 public:
 	Mode mode = Mode::Opaque;

@@ -9,7 +9,7 @@ class RenderQueueOpaque : public RenderQueueBase
 {
 public:
 	RenderQueueOpaque(RendererManager* const rendererManager);
-	void Add(Renderer* renderer, unsigned int index);
+	void Add(RendererBase* renderer, unsigned int index);
 	void Render() override;
 private:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;

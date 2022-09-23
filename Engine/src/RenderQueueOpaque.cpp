@@ -44,7 +44,7 @@ RenderQueueOpaque::RenderQueueOpaque(RendererManager* const rendererManager)
 	Graphics::pDevice->CreateDepthStencilState(&depthStencilStateDesc, &depthStencilState);
 }
 
-void RenderQueueOpaque::Add(Renderer* renderer, unsigned int index)
+void RenderQueueOpaque::Add(RendererBase* renderer, unsigned int index)
 {
 	queue.emplace_back(renderer, index);
 }
@@ -63,9 +63,15 @@ void RenderQueueOpaque::Render()
 		renderItem.renderer->Render(renderItem.subMeshIndex);
 
 		//Counting rendered vertices.
-		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
-		rendererManager->vertexCount += subMesh.GetVertexCount();
-		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
+		
+		Renderer* renderer = dynamic_cast<Renderer*>(renderItem.renderer);
+
+		if (renderer)
+		{
+			const Mesh::SubMesh& subMesh = renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+			rendererManager->vertexCount += subMesh.GetVertexCount();
+			rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
+		}
 	}
 
 	queue.clear();

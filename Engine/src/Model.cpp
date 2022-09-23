@@ -5,6 +5,7 @@
 #include "EngineException.h"
 #include "Resources.h"
 #include "Renderer.h"
+#include "SkinnedRenderer.h"
 
 #include <filesystem>
 
@@ -17,6 +18,8 @@ Model::Model(const std::filesystem::path& file)
 
 	//Ignoring lights and cameras
 	importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent::aiComponent_CAMERAS | aiComponent::aiComponent_LIGHTS);
+	importer.SetPropertyInteger(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+	importer.SetPropertyFloat(AI_CONFIG_PP_FID_ANIM_ACCURACY, 0.0f);
 	
 	const unsigned int pFlags = aiProcess_FlipUVs |
 		aiProcess_MakeLeftHanded |
@@ -26,8 +29,10 @@ Model::Model(const std::filesystem::path& file)
 		aiProcess_RemoveComponent |
 		aiProcess_CalcTangentSpace |
 		aiProcess_GenSmoothNormals |
-		aiProcess_GenBoundingBoxes;
-	
+		aiProcess_GenBoundingBoxes |
+		aiProcess_PopulateArmatureData |
+		aiProcess_FindInvalidData;
+
 	auto scene = importer.ReadFile(file.string(), pFlags);
 	
 	if (scene == nullptr)
@@ -37,22 +42,57 @@ Model::Model(const std::filesystem::path& file)
 		THROW_ENGINE_EXCEPTION(msg.str(), true);
 	}
 
-	root = CloneNode(scene->mRootNode, scene);
-
 	//Prefab root
 	Entity* newPrefab = new Entity(file.filename().string());
+	Transform* newPrefabRootBone = nullptr;
+	SkinnedRenderer* skinnedRenderer = nullptr;
+	aiNode* rootBone = nullptr;
+
+	for (int i = 0; i < scene->mNumMeshes; i++)
+	{
+		if (scene->mMeshes[i]->HasBones())
+		{
+			skinnedRenderer = newPrefab->AddChild("SkinnedRenderer")->AddComponent<SkinnedRenderer>();
+			rootBone = scene->mMeshes[i]->mBones[0]->mNode;
+			break;
+		}
+	}
+
+	root = CloneNode(scene->mRootNode, scene, skinnedRenderer);
 	newPrefab->GetTransform()->SetLocalMatrix(root->localMatrix);
 
-	if (root->GetMesh() != nullptr)
+
+ 	if (root->GetMesh())
 	{
-		Renderer* renderer = newPrefab->AddRenderer(nullptr);
-		renderer->SetMesh(root->GetMesh());
-		for (int i = 0; i < root->materials.size(); i++)
-			renderer->SetMaterial(root->materials[i], i);
+		if (root->hasBones)
+		{
+			skinnedRenderer->AddMesh(root->GetMesh());
+			for (int i = 0; i < root->materials.size(); i++)
+			{
+				root->materials[i]->ActivateMacro("SKINNING");
+				skinnedRenderer->SetMaterial(root->materials[i], i);
+			}
+		}
+		else
+		{
+			Renderer* renderer = newPrefab->AddComponent<Renderer>();
+			renderer->SetMesh(root->GetMesh());
+			for (int i = 0; i < root->materials.size(); i++)
+				renderer->SetMaterial(root->materials[i], i);
+		}
 	}
 		
-	InitHierarchy(root.get(), scene->mRootNode, scene,newPrefab);
+	InitHierarchy(root.get(), scene->mRootNode, scene,newPrefab, skinnedRenderer, rootBone, &newPrefabRootBone);
 	
+	if (newPrefabRootBone)
+	{
+		skeleton = std::make_shared<Skeleton>(newPrefabRootBone);
+		skinnedRenderer->SetBones(newPrefabRootBone);
+		skinnedRenderer->skeleton = skeleton;
+	}
+
+	LoadAnimations(scene);
+
 	//Creating a new prefab from this model.
 	Entity::Prefabs.insert({ newPrefab->name,std::unique_ptr<Entity>(newPrefab) });
 }
@@ -86,6 +126,17 @@ const Material* Model::FindMaterial(const std::string& name) const
 	return result->second.get();
 }
 
+std::shared_ptr<Animation> Model::FindAnimation(std::string_view name) const
+{
+	for (const auto& animation : animations)
+	{
+		if (animation->name == name)
+			return animation;
+	}
+
+	return nullptr;
+}
+
 const std::unordered_map<std::string, std::unique_ptr<Mesh>>& Model::GetMeshes() const
 {
 	return meshes;
@@ -96,32 +147,49 @@ const std::unordered_map<std::string, std::unique_ptr<Material>>& Model::GetMate
 	return materials;
 }
 
-void Model::InitHierarchy(Node* node, aiNode* ai_node, const aiScene* scene,Entity* newPrefab)
+void Model::InitHierarchy(Node* node, aiNode* ai_node, const aiScene* scene,Entity* newPrefab, SkinnedRenderer* skinnedRenderer, aiNode* rootBone, Transform** prefabRootBone)
 {
+	if (ai_node == rootBone)
+		*prefabRootBone = newPrefab->GetTransform();
+
 	for (int i = 0; i < ai_node->mNumChildren; i++)
 	{
 		//Model
-		node->children.push_back(CloneNode(ai_node->mChildren[i],scene));
+		node->children.push_back(CloneNode(ai_node->mChildren[i],scene, skinnedRenderer));
 		Node* newChild = node->children.back().get();
 		newChild->parent = node;
-		
+
 		//Prefab
 		Entity* newPrefab_newChild = newPrefab->AddChild(newChild->name);
 		newPrefab_newChild->GetTransform()->SetLocalMatrix(newChild->localMatrix);
 		newPrefab_newChild->parent = newPrefab;
-		if (newChild->GetMesh() != nullptr)
+
+
+		if (newChild->GetMesh())
 		{
-			Renderer* renderer = newPrefab_newChild->AddRenderer(nullptr);
-			renderer->SetMesh(newChild->GetMesh());
-			for (int i = 0; i < newChild->materials.size(); i++)
-				renderer->SetMaterial(newChild->materials[i],i);
+			if (newChild->hasBones)
+			{
+				skinnedRenderer->AddMesh(newChild->GetMesh());
+				for (int i = 0; i < newChild->materials.size(); i++)
+				{
+					newChild->materials[i]->ActivateMacro("SKINNING");
+					skinnedRenderer->SetMaterial(newChild->materials[i], i);
+				}
+			}
+			else
+			{
+				Renderer* renderer = newPrefab_newChild->AddComponent<Renderer>();
+				renderer->SetMesh(newChild->GetMesh());
+				for (int i = 0; i < newChild->materials.size(); i++)
+					renderer->SetMaterial(newChild->materials[i], i);
+			}
 		}
 			
-		InitHierarchy(newChild, ai_node->mChildren[i], scene,newPrefab_newChild);
+		InitHierarchy(newChild, ai_node->mChildren[i], scene,newPrefab_newChild, skinnedRenderer, rootBone, prefabRootBone);
 	}
 }
 
-std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* scene)
+std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* scene, SkinnedRenderer* skinnedRenderer)
 {
 	//Initializing node
 	std::unique_ptr<Node> newNode = std::make_unique<Node>(
@@ -165,7 +233,94 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 				newSubMesh.positions.resize(mesh->mNumVertices);
 				std::copy(reinterpret_cast<DirectX::XMFLOAT3*>(mesh->mVertices), reinterpret_cast<DirectX::XMFLOAT3*>(mesh->mVertices) + mesh->mNumVertices, newSubMesh.positions.begin());
 			}
+
+			if (mesh->HasBones())
+			{
+				newNode->hasBones = true;
+
+				struct BoneIDs
+				{
+					int ids[4] = {-1, -1, -1, -1};
+				};
+
+				struct Weights
+				{
+					float weights[4] = {0.0f,0.0f,0.0f,0.0f};
+				};
+
+				std::vector<BoneIDs> boneIDs(mesh->mNumVertices);
+				std::vector<Weights> weights(mesh->mNumVertices);
 				
+				for (int currentBoneID = 0; currentBoneID < mesh->mNumBones; currentBoneID++)
+				{
+					auto currentBone = mesh->mBones[currentBoneID];
+
+					for (int j = 0; j < currentBone->mNumWeights; j++)
+					{
+						int currentVertexID = currentBone->mWeights[j].mVertexId;
+						float weight = currentBone->mWeights[j].mWeight;
+
+						bool doesCurrentVertexAlreadyHaveThisBone = false;
+
+						for (int m = 0; m < 4; m++)
+						{
+							if (currentBoneID == boneIDs[currentVertexID].ids[m])
+							{
+								doesCurrentVertexAlreadyHaveThisBone = true;
+								break;
+							}
+						}
+
+						if (!doesCurrentVertexAlreadyHaveThisBone)
+						{
+							int replacementIndex = -1;
+
+							for (int m = 0; m < 4; m++)
+							{
+								if (weight > weights[currentVertexID].weights[m])
+								{
+									replacementIndex = m;
+									break;
+								}
+							}
+
+							if (replacementIndex > -1)
+							{
+								for (int m = 2; m >= replacementIndex; m--)
+								{
+									boneIDs[currentVertexID].ids[m + 1] = boneIDs[currentVertexID].ids[m];
+									weights[currentVertexID].weights[m + 1] = weights[currentVertexID].weights[m];
+								}
+
+								boneIDs[currentVertexID].ids[replacementIndex] = currentBoneID;
+								weights[currentVertexID].weights[replacementIndex] = weight;
+							}
+						}
+					}
+				}
+
+				for (int i = 0; i < mesh->mNumVertices; i++)
+				{
+					float total = 0.0f;
+
+					if (boneIDs[i].ids[0] == -1)
+						int x = 5;
+
+					for (int j = 0; j < 4; j++)
+					{
+						total += weights[i].weights[j];
+					}
+
+					for (int j = 0; j < 4; j++)
+					{
+						weights[i].weights[j] /= total;
+					}
+				}
+
+				newSubMesh.AddNewVertexElement(boneIDs.data(), VertexBuffer::ElementType::BoneIDs);
+				newSubMesh.AddNewVertexElement(weights.data(), VertexBuffer::ElementType::BoneWeights);
+			}
+
 			if (mesh->HasNormals())
 				newSubMesh.AddNewVertexElement(mesh->mNormals, VertexBuffer::ElementType::Normal);
 
@@ -311,6 +466,46 @@ std::unique_ptr<Model::Node> Model::CloneNode(aiNode* ai_node, const aiScene* sc
 	}
 
 	return newNode;
+}
+
+void Model::LoadAnimations(const aiScene* scene)
+{
+	if (skeleton && scene->HasAnimations())
+	{
+		for (int i = 0; i < scene->mNumAnimations; i++)
+		{
+			auto animation = scene->mAnimations[i];
+			animations.emplace_back(std::make_shared<Animation>(skeleton, animation->mDuration / animation->mTicksPerSecond));
+			animations.back()->name = animation->mName.C_Str();
+
+			for (int j = 0; j < animation->mNumChannels; j++)
+			{
+				auto channel = animation->mChannels[j];
+				auto node = animations.back()->AddNewNodeFromSkeleton(channel->mNodeName.C_Str());
+				
+				if (node)
+				{
+					for (int k = 0; k < channel->mNumPositionKeys; k++)
+					{
+						auto position = channel->mPositionKeys[k];
+						node->positions.emplace_back(DirectX::XMVectorSet(position.mValue.x, position.mValue.y, position.mValue.z, 1.0f), position.mTime / animation->mTicksPerSecond);
+					}
+
+					for (int k = 0; k < channel->mNumRotationKeys; k++)
+					{
+						auto rotation = channel->mRotationKeys[k];
+						node->rotations.emplace_back(DirectX::XMVectorSet(rotation.mValue.x, rotation.mValue.y, rotation.mValue.z, rotation.mValue.w), rotation.mTime / animation->mTicksPerSecond);
+					}
+				
+					for (int k = 0; k < channel->mNumScalingKeys; k++)
+					{
+						auto scale = channel->mScalingKeys[k];
+						node->scales.emplace_back(DirectX::XMVectorSet(scale.mValue.x, scale.mValue.y, scale.mValue.z, 1.0f), scale.mTime / animation->mTicksPerSecond);
+					}
+				}
+			}
+		}
+	}
 }
 
 Texture* Model::GetTextureInParentFolder(std::filesystem::path textureName) const

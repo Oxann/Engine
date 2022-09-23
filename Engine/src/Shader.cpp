@@ -20,6 +20,7 @@ using namespace Microsoft::WRL;
 Shader::VertexShaderPerFrameBuffer Shader::VertexShaderPerFrameBuffer::buffer;
 Shader::VertexShaderPerObjectBuffer Shader::VertexShaderPerObjectBuffer::buffer;
 Shader::VertexShaderShadowBuffer Shader::VertexShaderShadowBuffer::buffer;
+Shader::VertexShaderBoneBuffer Shader::VertexShaderBoneBuffer::buffer;
 Shader::PixelShaderPerFrameBuffer Shader::PixelShaderPerFrameBuffer::buffer;
 
 Shader::Shader(const std::string& name,const std::filesystem::path& VS_Path, const std::filesystem::path& PS_Path)
@@ -151,6 +152,18 @@ VS_ConstantBuffer<Shader::VertexShaderShadowBuffer>* const Shader::GetVertexShad
 		true);
 
 	return &shadowBuffer;
+}
+
+VS_ConstantBuffer<Shader::VertexShaderBoneBuffer>* const Shader::GetVertexShaderBoneBuffer()
+{
+	static VS_ConstantBuffer<Shader::VertexShaderBoneBuffer> boneBuffer(&Shader::VertexShaderBoneBuffer::buffer,
+		1,
+		Shader::VertexShaderBoneBuffer::slot,
+		D3D11_USAGE::D3D11_USAGE_DYNAMIC,
+		D3D11_CPU_ACCESS_FLAG::D3D11_CPU_ACCESS_WRITE,
+		true);
+
+	return &boneBuffer;
 }
 
 void Shader::ExtractMacrosFromSource(std::stringstream& source, std::vector<std::string>& macros)

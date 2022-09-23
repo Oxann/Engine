@@ -45,7 +45,7 @@ public:
 		if (displayedEntity)
 		{
 			displayedTransform = displayedEntity->GetTransform();
-			displayedRenderer = displayedEntity->GetRenderer();
+			displayedRenderer = displayedEntity->GetComponent<RendererBase>();
 			displayedPointLight = displayedEntity->GetComponent<PointLight>();
 			displayedDirectionalLight = displayedEntity->GetComponent<DirectionalLight>();
 			strcpy_s(displayedName, displayedEntity->name.c_str());
@@ -147,16 +147,19 @@ private:
 		if (ImGui::CollapsingHeader("RENDERER"))
 		{
 			//Mesh selection
-			ImGui::AlignTextToFramePadding();
-			ImGui::Text("Mesh:");
-			ImGui::SameLine();
-			if (ImGui::RadioButton(displayedRenderer->GetMesh()->GetFileName().c_str(), true))
+			if (Renderer* renderer = dynamic_cast<Renderer*>(displayedRenderer))
 			{
-				editorRSW->PopUp(EditorResourceSelectionWindow::Type::Mesh,
-					displayedRenderer->mesh,
-					[this](ResourceBase* newResource) {
-						displayedRenderer->SetMesh(static_cast<Mesh*>(newResource));
-					});
+				ImGui::AlignTextToFramePadding();
+				ImGui::Text("Mesh:");
+				ImGui::SameLine();
+				if (ImGui::RadioButton(renderer->GetMesh()->GetFileName().c_str(), true))
+				{
+					editorRSW->PopUp(EditorResourceSelectionWindow::Type::Mesh,
+						renderer->mesh,
+						[renderer](ResourceBase* newResource) {
+							renderer->SetMesh(static_cast<Mesh*>(newResource));
+						});
+				}
 			}
 
 			ImGui::AlignTextToFramePadding();
@@ -185,11 +188,11 @@ private:
 		}
 
 		//Object outline
-		if (!Editor::isWireframeEnabled)
+		/*if (!Editor::isWireframeEnabled)
 		{
 			for (int i = 0; i < displayedRenderer->GetMesh()->GetSubMeshCount(); i++)
 				Scene::GetActiveScene()->rendererManager.renderQueueOutline.Add(displayedRenderer, i);
-		}
+		}*/
 	}
 
 	void DisplayDirectionalLight()
@@ -296,7 +299,7 @@ private:
 public:
 	Entity* displayedEntity = nullptr;
 	Transform* displayedTransform = nullptr;
-	Renderer* displayedRenderer = nullptr;
+	RendererBase* displayedRenderer = nullptr;
 	PointLight* displayedPointLight = nullptr;
 	DirectionalLight* displayedDirectionalLight = nullptr;
 	static inline char displayedName[128];

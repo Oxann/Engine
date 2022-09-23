@@ -42,7 +42,7 @@ RenderQueueWireframe::RenderQueueWireframe(RendererManager* const rendererManage
 	Graphics::pDevice->CreateDepthStencilState(&depthStencilStateDesc, &depthStencilState);
 }
 
-void RenderQueueWireframe::Add(Renderer* renderer, unsigned int index)
+void RenderQueueWireframe::Add(RendererBase* renderer, unsigned int index)
 {
 	queue.emplace_back(renderer, index);
 }
@@ -62,9 +62,9 @@ void RenderQueueWireframe::Render()
 		renderItem.renderer->Render(renderItem.subMeshIndex, wireframeMaterial);
 
 		//Counting rendered vertices.
-		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+		/*const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
 		rendererManager->vertexCount += subMesh.GetVertexCount();
-		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
+		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;*/
 	}
 
 	queue.clear();

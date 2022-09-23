@@ -105,7 +105,7 @@ void Editor::Update()
 
 	EditorCamera::Update();
 	
-	if (Input::GetKeyDown(VK_LBUTTON))
+	/*if (Input::GetKeyDown(VK_LBUTTON))
 	{
 		Entity* pickedEntity = nullptr;
 		float distance = std::numeric_limits<float>::max();
@@ -121,7 +121,7 @@ void Editor::Update()
 			MousePick(entity.get(), distance, &pickedEntity, viewSpaceX, viewSpaceY);
 		}
 		static_cast<EditorEntityWindow*>(windows[0].get())->PopUp(pickedEntity);
-	}
+	}*/
 }
 
 void Editor::Render()
@@ -143,7 +143,7 @@ bool Editor::WantCaptureMouse()
 	return imguiIO->WantCaptureMouse;
 }
 
-void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity, const float viewSpaceX, const float viewSpaceY)
+/*void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity, const float viewSpaceX, const float viewSpaceY)
 {
 	if (entity->Renderer_)
 	{
@@ -158,9 +158,9 @@ void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity
 
 		float distance = 0.0f;
 
-		if (entity->Renderer_->mesh->GetSubMeshCount() == 1 || entity->Renderer_->mesh->AABB.Intersects(rayOrigin, rayDirection, distance))
+		if (entity->Renderer_->GetMesh()->GetSubMeshCount() == 1 || entity->Renderer_->GetMesh()->AABB.Intersects(rayOrigin, rayDirection, distance))
 		{
-			for (const auto& subMesh : entity->Renderer_->mesh->GetSubMeshes())
+			for (const auto& subMesh : entity->Renderer_->GetMesh()->GetSubMeshes())
 			{
 				if (subMesh.AABB.Intersects(rayOrigin, rayDirection, distance))
 				{
@@ -186,7 +186,7 @@ void Editor::MousePick(Entity* entity, float& minDistance, Entity** pickedEntity
 
 	for (auto& child : entity->Children)
 		MousePick(child.get(), minDistance, pickedEntity, viewSpaceX, viewSpaceY);
-}
+}*/
 
 void Editor::EditorCamera::Update()
 {
@@ -254,14 +254,20 @@ void Editor::EditorCamera::Focus(const Entity* entity)
 {
 	if (entity->Renderer_)
 	{
-		DirectX::BoundingBox worldAABB;
-		entity->Renderer_->GetMesh()->AABB.Transform(worldAABB, entity->GetTransform()->GetWorldMatrix());
+		Renderer* renderer = dynamic_cast<Renderer*>(entity->Renderer_.get());
 
-		float distanceMultiplier = std::max({ worldAABB.Extents.x, worldAABB.Extents.y, worldAABB.Extents.z }) * 2.75f;
-		
-		position = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&worldAABB.Center), DirectX::XMVectorScale( rotationMatrix.r[2], -distanceMultiplier));
-	
-		UpdateMatrices();
+		if (renderer)
+		{
+			DirectX::BoundingBox worldAABB;
+			renderer->GetMesh()->AABB.Transform(worldAABB, entity->GetTransform()->GetWorldMatrix());
+
+			float distanceMultiplier = std::max({ worldAABB.Extents.x, worldAABB.Extents.y, worldAABB.Extents.z }) * 2.75f;
+
+			position = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(&worldAABB.Center), DirectX::XMVectorScale(rotationMatrix.r[2], -distanceMultiplier));
+
+			UpdateMatrices();
+		}
+
 	}
 }
 

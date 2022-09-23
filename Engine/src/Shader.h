@@ -24,6 +24,14 @@ class Shader
 {
 	friend class Material;
 public:
+	struct VertexShaderBoneBuffer
+	{
+		DirectX::XMMATRIX bones[80];
+		static constexpr int slot = 13;
+		inline static const std::string bufferName = "BoneBuffer";
+		static VertexShaderBoneBuffer buffer;
+	};
+
 	struct VertexShaderPerObjectBuffer
 	{
 		VertexShaderPerObjectBuffer() = default;
@@ -114,6 +122,7 @@ public:
 	static VS_ConstantBuffer<VertexShaderPerObjectBuffer>* const GetVertexShaderPerObjectBuffer();
 	static VS_ConstantBuffer<VertexShaderPerFrameBuffer>* const GetVertexShaderPerFrameBuffer();
 	static VS_ConstantBuffer<VertexShaderShadowBuffer>* const GetVertexShaderShadowBuffer();
+	static VS_ConstantBuffer<VertexShaderBoneBuffer>* const GetVertexShaderBoneBuffer();
 	static PS_ConstantBuffer<PixelShaderPerFrameBuffer>* const GetPixelShaderPerFrameBuffer();
 
 	bool HasMaterial() const;

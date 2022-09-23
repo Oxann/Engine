@@ -66,7 +66,7 @@ RenderQueueOutline::RenderQueueOutline(RendererManager* const rendererManager)
 	Graphics::pDevice->CreateDepthStencilState(&depthStencilStateDrawOutlineDesc, &depthStencilStateDrawOutline);
 }
 
-void RenderQueueOutline::Add(Renderer* renderer, unsigned int index)
+void RenderQueueOutline::Add(RendererBase* renderer, unsigned int index)
 {
 	queue.emplace_back(renderer, index);
 }
@@ -81,7 +81,7 @@ void RenderQueueOutline::Render()
 	//Counting rendered meshes.
 	rendererManager->meshCount += queue.size();
 
-	for (const auto& renderItem : queue)
+	/*for (const auto& renderItem : queue)
 	{
 		//Masking
 		Graphics::pDeviceContext->OMSetDepthStencilState(depthStencilStateMaskObject.Get(), 1u);
@@ -105,7 +105,7 @@ void RenderQueueOutline::Render()
 			rendererManager->vertexCount += subMesh.GetVertexCount();
 			rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
 		}
-	}
+	}*/
 
 	queue.clear();
 }

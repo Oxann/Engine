@@ -18,3 +18,8 @@ cbuffer ShadowBuffer : register(b12)
 {
     matrix lightSpaceMatrix;
 }
+
+cbuffer BoneBuffer : register(b13)
+{
+    matrix bones[80];
+}

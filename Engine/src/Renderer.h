@@ -6,17 +6,13 @@
 #include "Texture.h"
 #include "Resources.h"
 #include "Material.h"
-#include "Component.h"
+#include "RendererBase.h"
 
-class RendererManager;
 
-class Renderer final: public Component
+class Renderer final: public RendererBase
 {
-	friend RendererManager;
-	friend class Engine;
-	friend class Graphics;
-	friend class RenderQueueOutline;
 	friend Material;
+	friend RendererManager;
 
 #ifdef EDITOR
 	friend class EditorEntityWindow;
@@ -24,24 +20,23 @@ class Renderer final: public Component
 #endif
 
 public:
-	Renderer* Clone() override;
+	void Start() override;
+
+	//This functions are used by Render Queues. DON'T CALL FROM ELSEWEHERE.
+	//Binded material will be used.
+	virtual void Render(unsigned int subMeshIndex) override;
+
+	//Custom material needed.
+	virtual void Render(unsigned int subMeshIndex, const Material* material) override;
 
 	//If renderer already has a mesh this function also resets all materials to default.
 	void SetMesh(Mesh* mesh);
 
 	const Mesh* GetMesh() const;
 
-	//materialIndex = index of the sub mesh, first index is 0.
-	void SetMaterial(Material* material, unsigned int materialIndex);
-	
-	const std::vector<Material*>& GetMaterials() const;
 
-	//This functions are used by Render Queues. DON'T CALL FROM ELSEWEHERE.
-	//Binded material will be used.
-	void Render(unsigned int subMeshIndex);
 
-	//Custom material needed.
-	void Render(unsigned int subMeshIndex, const Material* material);
+	Renderer* Clone() override;
 
 	//COLUMN ORDER!!!
 	const DirectX::XMMATRIX& GetWorldMatrix();
@@ -55,12 +50,12 @@ public:
 	//COLUMN ORDER!!!
 	const DirectX::XMMATRIX& GetNormalMatrix();
 private:
-	void Start();
-	void Update() override;
+	void PrepareForRendering() override;
 	void UpdateMatrices();
 	void TransposeMatrices();
 	void SetLightSpaceMatrix(const DirectX::XMMATRIX lightSpaceMatrix);
 private:
+	Mesh* mesh = nullptr;
 
 	//All matrices are column order after renderer updated.
 	DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
@@ -69,13 +64,6 @@ private:
 	DirectX::XMMATRIX worldViewProjectionMatrix = DirectX::XMMatrixIdentity();
 	DirectX::XMMATRIX lightSpaceMatrix = DirectX::XMMatrixIdentity();
 
-	std::vector<Material*> materials;
-	Mesh* mesh = nullptr;
-	RendererManager* rendererManager;
-	
-	D3D_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-	bool castShadows = true;
 	bool isWorldMatrixUpdated = false;
 	bool isWorldViewMatrixUpdated = false;
 	bool isWorldViewProjectionMatrixUpdated = false;

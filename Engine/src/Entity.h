@@ -9,7 +9,7 @@
 
 #include "Component.h"
 #include "Transform.h"
-#include "Renderer.h"
+#include "RendererBase.h"
 
 class Scene;
 
@@ -34,9 +34,9 @@ private:
 public:
 	//DON'T DELETE ENTITY!!!
 	//USE DeletePrefab instead.
-	static Entity* FindPrefab(const std::string& name);
+	static Entity* FindPrefab(std::string_view name);
 
-	static Entity* NewPrefab(const std::string& name);
+	static Entity* NewPrefab(std::string_view name);
 
 	static Entity* NewPrefab(Entity* cloneFrom);
 public:
@@ -46,12 +46,19 @@ public:
 		static_assert(std::is_base_of<Component, ComponentType>::value,"All components must be derived from Component.");
 		static_assert(!std::is_same<Transform, ComponentType>::value, "Use GetTransform instead.");
 		
-		auto result = Components.find(typeid(ComponentType));
-		if (result == Components.end())
-			return nullptr;
+		if constexpr (std::is_base_of<RendererBase, ComponentType>::value)
+		{
+			return dynamic_cast<ComponentType*>(Renderer_.get());
+		}
 		else
 		{
-			return static_cast<ComponentType*>(result->second.get());
+			auto result = Components.find(typeid(ComponentType));
+			if (result == Components.end())
+				return nullptr;
+			else
+			{
+				return static_cast<ComponentType*>(result->second.get());
+			}
 		}
 	}
 	
@@ -62,15 +69,32 @@ public:
 		static_assert(std::is_base_of<Component, ComponentType>::value, "All components must be derived from Component.");
 		static_assert(!std::is_same<Transform, ComponentType>::value, "Transform can't be added.");
 
-		auto result = Components.insert({ typeid(ComponentType),std::make_unique<ComponentType>() });
-		if (result.second)
+		if constexpr (std::is_base_of<RendererBase, ComponentType>::value)
 		{
-			result.first->second->entity = this;
-			result.first->second->transform = Transform_.get();
-			return static_cast<ComponentType*>(result.first->second.get());
+			if (!Renderer_)
+			{
+				Renderer_ = std::make_unique<ComponentType>();
+
+				static_cast<Component*>(Renderer_.get())->entity = this;
+				static_cast<Component*>(Renderer_.get())->transform = this->Transform_.get();
+
+				return static_cast<ComponentType*>(Renderer_.get());
+			}
+			else
+				return nullptr;
 		}
 		else
-			return nullptr;
+		{
+			auto result = Components.insert({ typeid(ComponentType),std::make_unique<ComponentType>() });
+			if (result.second)
+			{
+				result.first->second->entity = this;
+				result.first->second->transform = Transform_.get();
+				return static_cast<ComponentType*>(result.first->second.get());
+			}
+			else
+				return nullptr;
+		}
 	}
 
 	//Clones the component from given entity.
@@ -80,30 +104,46 @@ public:
 	{
 		static_assert(std::is_base_of<Component, ComponentType>::value, "All components must be derived from Component.");
 		static_assert(std::is_same<Transform, ComponentType>::value, "Transform can't be added.");
+		
+		if constexpr (std::is_base_of<RendererBase, ComponentType>::value)
+		{
+			if (!Renderer_)
+			{
+				Renderer_.reset(cloneFrom->GetComponent<ComponentType>()->Clone());
 
-		std::type_index componentType = typeid(ComponentType);		
-		auto cloneComponent = cloneFrom->Components.find(componentType);
-
-		if(cloneComponent == cloneFrom->Components.end() || Components.find(componentType) != Components.end())
-			return nullptr;
+				static_cast<Component*>(Renderer_.get())->entity = this;
+				static_cast<Component*>(Renderer_.get())->transform = this->Transform_.get();
+			}
+			return static_cast<ComponentType*>(Renderer_.get());
+		}
 		else
 		{
-			auto result = Components.insert({ componentType, std::unique_ptr<Component>(cloneComponent.second.get()->Clone()) });
-			result.first->second->entity = this;
-			result.first->second->transform = Transform_.get();
-			return static_cast<ComponentType*>(result.first->second.get());
+			std::type_index componentType = typeid(ComponentType);
+			auto cloneComponent = cloneFrom->Components.find(componentType);
+
+			if (cloneComponent == cloneFrom->Components.end() || Components.find(componentType) != Components.end())
+				return nullptr;
+			else
+			{
+				auto result = Components.insert({ componentType, std::unique_ptr<Component>(cloneComponent.second.get()->Clone()) });
+				result.first->second->entity = this;
+				result.first->second->transform = Transform_.get();
+				return static_cast<ComponentType*>(result.first->second.get());
+			}
 		}
 	}
 
 	//Returns newly added child.
-	Entity* AddChild(std::string name);
+	Entity* AddChild(std::string_view name);
 
 	//Returns newly added child.
 	Entity* AddChild(Entity* entity);
 
-	Entity* GetChild(const std::string& name) const;
+	Entity* GetChild(std::string_view name) const;
 
 	Entity* GetChild(unsigned int index) const;
+
+	Entity* GetDescendant(std::string_view name);
 
 	Entity* GetParent() const;
 
@@ -115,10 +155,6 @@ public:
 	Entity* GetRoot() const;
 
 	Transform* GetTransform() const;
-
-	Renderer* GetRenderer() const;
-	Renderer* AddRenderer(Entity* cloneFrom);
-
 public:
 	std::string name;
 private:
@@ -126,7 +162,7 @@ private:
 	std::vector<std::unique_ptr<Entity>> Children;
 	std::unordered_map<std::type_index, std::unique_ptr<Component>> Components;
 	std::unique_ptr<Transform> Transform_;
-	std::unique_ptr<Renderer> Renderer_ = nullptr;
+	std::unique_ptr<RendererBase> Renderer_ = nullptr;
 private:
 	inline static std::unordered_map<std::string, std::unique_ptr<Entity>> Prefabs;
 };

@@ -23,7 +23,7 @@ Entity* Entity::Clone()
 	//Renderer
 	if (Renderer_)
 	{
-		newEntity->Renderer_ = std::unique_ptr<Renderer>(this->Renderer_->Clone());
+		newEntity->Renderer_ = std::unique_ptr<RendererBase>(this->Renderer_->Clone());
 		static_cast<Component*>(newEntity->Renderer_.get())->entity = newEntity;
 		static_cast<Component*>(newEntity->Renderer_.get())->transform = newEntity->Transform_.get();
 	}
@@ -69,9 +69,9 @@ void Entity::Update()
 	}
 }
 
-Entity* Entity::FindPrefab(const std::string& name)
+Entity* Entity::FindPrefab(std::string_view name)
 {
-	auto result = Prefabs.find(name);
+	auto result = Prefabs.find(name.data());
 	if (result == Prefabs.end())
 	{
 		std::stringstream msg;
@@ -82,9 +82,9 @@ Entity* Entity::FindPrefab(const std::string& name)
 }
 
 
-Entity* Entity::NewPrefab(const std::string& name)
+Entity* Entity::NewPrefab(std::string_view name)
 {
-	auto newPrefab = Prefabs.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(new Entity(name)));
+	auto newPrefab = Prefabs.emplace(std::piecewise_construct, std::forward_as_tuple(name), std::forward_as_tuple(new Entity(name.data())));
 	
 	if (newPrefab.second)
 		return newPrefab.first->second.get();
@@ -107,9 +107,9 @@ Entity* Entity::NewPrefab(Entity* cloneFrom)
 		return nullptr;
 }
 
-Entity* Entity::AddChild(std::string name)
+Entity* Entity::AddChild(std::string_view name)
 {
-	Children.push_back(std::make_unique<Entity>(name));
+	Children.push_back(std::make_unique<Entity>(name.data()));
 	Entity* newChild = Children.back().get();
 	newChild->parent = this;
 	return newChild;
@@ -124,18 +124,36 @@ Entity* Entity::AddChild(Entity* entity)
 	return Children.back().get();
 }
 
-Entity* Entity::GetChild(const std::string& name) const
+Entity* Entity::GetChild(std::string_view name) const
 {
 	for (const auto& child : Children)
 	{
 		if (name == child->name)
 			return child.get();
 	}
+	
+	return nullptr;
 }
 
 Entity* Entity::GetChild(unsigned int index) const
 {
 	return Children[index].get();
+}
+
+Entity* Entity::GetDescendant(std::string_view name)
+{
+	for (const auto& child : Children)
+	{
+		if (child->name == name)
+			return child.get();
+
+		Entity* descendant = child->GetDescendant(name);
+		
+		if (descendant)
+			return descendant;
+	}
+
+	return nullptr;
 }
 
 Entity* Entity::GetParent() const
@@ -171,24 +189,4 @@ Entity* Entity::GetRoot() const
 Transform* Entity::GetTransform() const
 {
 	return Transform_.get();
-}
-
-Renderer* Entity::GetRenderer() const
-{
-	return Renderer_.get();
-}
-
-Renderer* Entity::AddRenderer(Entity* cloneFrom)
-{
-	if (!Renderer_)
-	{
-		if (cloneFrom)
-			Renderer_.reset(cloneFrom->GetRenderer()->Clone());
-		else
-			Renderer_ = std::make_unique<Renderer>();
-
-		static_cast<Component*>(Renderer_.get())->entity = this;
-		static_cast<Component*>(Renderer_.get())->transform = this->Transform_.get();
-	}
-	return Renderer_.get();
 }

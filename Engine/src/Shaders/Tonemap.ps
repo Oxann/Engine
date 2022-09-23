@@ -13,7 +13,7 @@ SamplerState frameBufferSampler : register(s0);
 
 float4 main(IN In) : SV_TARGET
 {
-	float3 final = abs(frameBuffer.SampleLevel(frameBufferSampler, In.texCoord,0)).xyz;
+	float3 final = frameBuffer.SampleLevel(frameBufferSampler, In.texCoord,0).xyz;
 
     final = ACESFilm(final);
 

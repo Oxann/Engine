@@ -64,9 +64,6 @@
     <ClCompile Include="src\Resources.cpp">
       <Filter>Resources</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer.cpp">
-      <Filter>ECS</Filter>
-    </ClCompile>
     <ClCompile Include="src\Transform.cpp">
       <Filter>ECS</Filter>
     </ClCompile>
@@ -118,7 +115,6 @@
     </ClCompile>
     <ClCompile Include="src\ThreadPool.cpp" />
     <ClCompile Include="src\Material.cpp" />
-    <ClCompile Include="src\TextureSerializer.cpp" />
     <ClCompile Include="src\EnvironmentMap.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -140,6 +136,17 @@
     <ClCompile Include="src\PhysicsWorld.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="src\TextureSerializer.cpp">
+      <Filter>Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RendererBase.cpp" />
+    <ClCompile Include="src\SkinnedRenderer.cpp" />
+    <ClCompile Include="src\Skeleton.cpp" />
+    <ClCompile Include="src\Animation.cpp" />
+    <ClCompile Include="src\Animator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
@@ -212,9 +219,6 @@
     </ClInclude>
     <ClInclude Include="src\Resources.h">
       <Filter>Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Renderer.h">
-      <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="src\Transform.h">
       <Filter>ECS</Filter>
@@ -329,6 +333,18 @@
     <ClInclude Include="src\SphereCollider.h">
       <Filter>Physics</Filter>
     </ClInclude>
+    <ClInclude Include="src\Renderer.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RendererBase.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SkinnedRenderer.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Skeleton.h" />
+    <ClInclude Include="src\Animation.h" />
+    <ClInclude Include="src\Animator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\assimp\Debug\assimp-vc142-mtd.dll">
@@ -395,7 +411,13 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="src\Shaders\IntegrateBRDF.vs">
-      <Filter>Serialization</Filter>
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\ShadowCastSkinned.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\ShadowCastSkinned.ps">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

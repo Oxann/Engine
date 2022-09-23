@@ -9,60 +9,53 @@
 #include "Editor.h"
 #include "Resources.h"
 
-Renderer* Renderer::Clone()
-{
-	Renderer* newRenderer = new Renderer;
-	newRenderer->topology = this->topology;
-	newRenderer->materials = this->materials;
-	newRenderer->mesh = this->mesh;
-	return newRenderer;
-}
-
-void Renderer::SetMesh(Mesh* mesh)
-{
-	static Material* defaultLitMaterial = Resources::FindMaterial("$Default\\LitPBR");
-
-	this->mesh = mesh;
-	materials.resize(0u);
-
-	if (mesh != nullptr)
-	{
-		for (int i = 0; i < mesh->GetSubMeshCount(); i++)
-			materials.push_back(defaultLitMaterial);
-	}
-}
-
-const Mesh* Renderer::GetMesh() const
-{
-	return mesh;
-}
-
-void Renderer::SetMaterial(Material* material, unsigned int materialIndex)
-{
-	if (materialIndex >= materials.size())
-	{
-		std::stringstream ss;
-		ss << "Entity name: " << GetEntity()->name << std::endl
-			<< "Component: Renderer" << std::endl
-			<< "Material index is not correct, it must be greater than zero and less than submeshcount - 1";
-		THROW_ENGINE_EXCEPTION(ss.str(), true);
-	}
-	else
-		materials[materialIndex] = material;
-}
-
-const std::vector<Material*>& Renderer::GetMaterials() const
-{
-	return materials;
-}
-
 void Renderer::Start()
 {
 	Scene::GetActiveScene()->rendererManager.renderers.push_back(this);
 	rendererManager = &Scene::GetActiveScene()->rendererManager;
 }
 
-void Renderer::Update()
+void Renderer::Render(unsigned int subMeshIndex)
+{
+	Render(subMeshIndex, materials[subMeshIndex]);
+}
+
+void Renderer::Render(unsigned int subMeshIndex, const Material* material)
+{
+	if (subMeshIndex < mesh->GetSubMeshCount())
+	{
+		const Mesh::SubMesh* subMesh = &GetMesh()->GetSubMeshes()[subMeshIndex];
+		Material* material = materials[subMeshIndex];
+		
+		subMesh->GetIndexBuffer()->BindPipeline();
+
+		//Updating vertex shader per object buffer for this renderer.
+		Shader::VertexShaderPerObjectBuffer::buffer.model = GetWorldMatrix();
+		Shader::VertexShaderPerObjectBuffer::buffer.modelView = GetWorldViewMatrix();
+		Shader::VertexShaderPerObjectBuffer::buffer.modelViewProjection = GetWorldViewProjectionMatrix();
+		Shader::VertexShaderPerObjectBuffer::buffer.normal = GetNormalMatrix();
+		Shader::GetVertexShaderPerObjectBuffer()->ChangeData(&Shader::VertexShaderPerObjectBuffer::buffer);
+
+		if (material->HasShadows())
+		{
+			Shader::VertexShaderShadowBuffer::buffer.lightSpaceMatrix = lightSpaceMatrix;
+			Shader::GetVertexShaderShadowBuffer()->ChangeData(&Shader::VertexShaderShadowBuffer::buffer);
+		}
+
+		materials[subMeshIndex]->Bind(subMesh);
+		Graphics::pDeviceContext->DrawIndexed(subMesh->GetIndexCount(), 0u, 0u);
+	}
+}
+
+Renderer* Renderer::Clone()
+{
+	Renderer* newRenderer = new Renderer;
+	newRenderer->materials = this->materials;
+	newRenderer->mesh = this->mesh;
+	return newRenderer;
+}
+
+void Renderer::PrepareForRendering()
 {
 	UpdateMatrices();
 
@@ -112,24 +105,6 @@ void Renderer::Update()
 	TransposeMatrices();
 }
 
-void Renderer::Render(unsigned int subMeshIndex)
-{
-	if (subMeshIndex < mesh->GetSubMeshCount())
-	{
-		materials[subMeshIndex]->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
-		Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
-	}
-}
-
-void Renderer::Render(unsigned int subMeshIndex, const Material* material)
-{
-	if (subMeshIndex < mesh->GetSubMeshCount())
-	{
-		material->Bind(&mesh->GetSubMeshes()[subMeshIndex], this);
-		Graphics::pDeviceContext->DrawIndexed(mesh->GetSubMeshes()[subMeshIndex].GetIndexCount(), 0u, 0u);
-	}
-}
-
 void Renderer::UpdateMatrices()
 {
 	worldMatrix = GetTransform()->GetLocalMatrix();
@@ -137,7 +112,7 @@ void Renderer::UpdateMatrices()
 	for (const Entity* parent = GetEntity()->GetParent(); parent != nullptr;)
 	{
 		//If the parent entity has a renderer we can use its world matrix.
-		if (Renderer* parentRenderer = parent->GetRenderer())
+		if (Renderer* parentRenderer = parent->GetComponent<Renderer>())
 		{
 			worldMatrix = worldMatrix * parentRenderer->worldMatrix;
 			break;
@@ -192,4 +167,23 @@ const DirectX::XMMATRIX& Renderer::GetNormalMatrix()
 	}
 
 	return normalMatrix;
+}
+
+void Renderer::SetMesh(Mesh* mesh)
+{
+	static Material* defaultLitMaterial = Resources::FindMaterial("$Default\\LitPBR");
+
+	this->mesh = mesh;
+	materials.resize(0u);
+
+	if (mesh != nullptr)
+	{
+		for (int i = 0; i < mesh->GetSubMeshCount(); i++)
+			materials.push_back(defaultLitMaterial);
+	}
+}
+
+const Mesh* Renderer::GetMesh() const
+{
+	return mesh;
 }

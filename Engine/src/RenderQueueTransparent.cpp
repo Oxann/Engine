@@ -68,7 +68,7 @@ void RenderQueueTransparent::Render()
 		renderItem.renderer->Render(renderItem.subMeshIndex);
 
 		//Counting rendered vertices.
-		const Mesh::SubMesh& subMesh = renderItem.renderer->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
+		const Mesh::SubMesh& subMesh = static_cast<Renderer*>(renderItem.renderer)->GetMesh()->GetSubMeshes()[renderItem.subMeshIndex];
 		rendererManager->vertexCount += subMesh.GetVertexCount();
 		rendererManager->triangleCount += subMesh.GetIndexCount() / 3u;
 	}

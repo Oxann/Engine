@@ -63,7 +63,6 @@ void Physics::Update()
 {
 	const btCollisionObjectArray& objects = Scene::ActiveScene->physicsWorld->world->getCollisionObjectArray();
 	const unsigned int size = objects.size();
-	std::vector<Collider*> cols;
 
 	for (int i = 0; i < size; i++)
 	{
@@ -87,14 +86,6 @@ void Physics::Update()
 			_transform.setRotation(btQuaternion(worldQuaternion.x, worldQuaternion.y, worldQuaternion.z, worldQuaternion.w));
 
 			objects[i]->setWorldTransform(_transform);
-
-			Collider* x = transform->GetEntity()->GetComponent<BoxCollider>();
-			Collider* y = transform->GetEntity()->GetComponent<SphereCollider>();
-
-			if (x)
-				cols.push_back(x);
-			else if (y)
-				cols.push_back(y);
 		}
 	}
 

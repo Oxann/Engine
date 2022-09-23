@@ -95,6 +95,8 @@ int Engine::Start()
 
 void Engine::Update()
 {
+    Physics::Update();
+
 	//Updating Components
 	for (auto& entity : Scene::ActiveScene->Entities)
 	{
@@ -107,8 +109,6 @@ void Engine::Update()
 
 	Editor::Update();
 #endif
-
-    Physics::Update();
 
 	//Render
 	Scene::ActiveScene->rendererManager.Update();

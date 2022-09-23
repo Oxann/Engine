@@ -160,23 +160,20 @@ unsigned int Material::GetTextureCount() const
 	return texture2Ds.size();
 }
 
-void Material::Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const
+bool Material::HasShadows() const
+{
+	return shaderView.GetActiveVertexShader().HasShadows();
+}
+
+void Material::Bind(const Mesh::SubMesh* subMesh) const
 {
 	shaderView.GetActiveVertexShader().Bind();
 	shaderView.GetActivePixelShader().Bind();
 
-	subMesh->GetIndexBuffer()->BindPipeline();
 	const auto& vertexElements = shaderView.GetActiveVertexShader().GetVertexElements();
 
 	for (int i = 0; i < vertexElements.size(); i++)
 		subMesh->GetVertexElement(vertexElements[i])->BindPipeline();
-
-	//Updating vertex shader per object buffer for this renderer.
-	Shader::VertexShaderPerObjectBuffer::buffer.model = renderer->GetWorldMatrix();
-	Shader::VertexShaderPerObjectBuffer::buffer.modelView = renderer->GetWorldViewMatrix();
-	Shader::VertexShaderPerObjectBuffer::buffer.modelViewProjection = renderer->GetWorldViewProjectionMatrix();
-	Shader::VertexShaderPerObjectBuffer::buffer.normal = renderer->GetNormalMatrix();
-	Shader::GetVertexShaderPerObjectBuffer()->ChangeData(&Shader::VertexShaderPerObjectBuffer::buffer);
 
 	shaderView.shader->materialBuffer->BindPipeline();
 	shaderView.shader->materialBuffer->ChangeData(materialBuffer.data());
@@ -192,11 +189,5 @@ void Material::Bind(const Mesh::SubMesh* subMesh, Renderer* renderer) const
 			static Texture* whiteTexture = Resources::FindTexture("$Default\\White");
 			whiteTexture->BindPipeline(texture2DDef.slot);
 		}
-	}
-
-	if (shaderView.GetActiveVertexShader().HasShadows())
-	{
-		Shader::VertexShaderShadowBuffer::buffer.lightSpaceMatrix = renderer->lightSpaceMatrix;
-		Shader::GetVertexShaderShadowBuffer()->ChangeData(&Shader::VertexShaderShadowBuffer::buffer);
 	}
 }
