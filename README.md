@@ -2,13 +2,17 @@
 
 A framework for practicing graphics and game engine programming.
 
+![Alt Text](https://media.giphy.com/media/JVIVMvhWGDmFHNYsCx/giphy.gif)
+
 # Features
 
 - ECS and Scene System
-- Blinn-Phong Lighting Model
+- PBR
 - Material System
+- Shadows
+- Skeletal Animation
+- Physics
 - Scene Editor
-- Logging
 
 # Usage
 
@@ -41,3 +45,5 @@ void Scene::Init()
 - [assimp](https://github.com/assimp/assimp)
 - [Dear ImGui](https://github.com/ocornut/imgui)
 - [stb](https://github.com/nothings/stb)
+- [bullet3](https://github.com/bulletphysics/bullet3)
+- [nlohmann/json](https://github.com/nlohmann/json)
